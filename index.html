@@ -8,7 +8,6 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
-  <!-- Stile base -->
   <style>
     :root {
       --bg: #0b1120;
@@ -210,7 +209,6 @@
       background: rgba(239, 68, 68, 0.08);
     }
 
-    /* Evidenziazione BUY / SELL */
     .card-buy {
       border-left: 4px solid #22c55e;
     }
@@ -313,6 +311,16 @@
     .muted {
       color: var(--muted);
       font-size: 0.8rem;
+    }
+
+    .buy-text {
+      color: #22c55e;
+      font-weight: 500;
+    }
+
+    .sell-text {
+      color: #ef4444;
+      font-weight: 500;
     }
 
     footer {
@@ -418,21 +426,46 @@
               <th>Link</th>
             </tr>
           </thead>
-          <tbody id="pairsTableBody">
-            <!-- Righe generate via JS -->
-          </tbody>
+          <tbody id="pairsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sezione ultimi 10 giorni -->
+    <div class="section">
+      <div class="section-title">
+        Volumi ultimi 10 giorni
+        <span>(BUY / SELL in USDC da Helius)</span>
+      </div>
+      <div id="historyError" class="error" style="display:none;"></div>
+      <div class="muted" id="historyInfo">Caricamento storico in corso...</div>
+      <div style="overflow-x:auto; margin-top:8px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Volume BUY (USDC)</th>
+              <th>Volume SELL (USDC)</th>
+              <th>Totale (USDC)</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody"></tbody>
         </table>
       </div>
     </div>
 
     <footer>
-      Dashboard HTML statica • Dati live da Dexscreener • Multi-utente via semplice hosting web
+      Dashboard HTML statica • Dati live da Dexscreener & Helius • Multi-utente via semplice hosting web
     </footer>
   </div>
 
+  <!-- Carica la API key da file separato -->
+  <script src="config.js"></script>
+
   <script>
     const TOKEN_MINT = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
-    const API_URL = `https://api.dexscreener.com/latest/dex/tokens/${TOKEN_MINT}`;
+    const DEX_API_URL = `https://api.dexscreener.com/latest/dex/tokens/${TOKEN_MINT}`;
+    const HELIUS_URL = `https://api.helius.xyz/v0/token-transactions?api-key=${HELIUS_API_KEY}`;
 
     const statusText = document.getElementById("statusText");
     const refreshBtn = document.getElementById("refreshBtn");
@@ -452,6 +485,10 @@
     const pairsInfo = document.getElementById("pairsInfo");
     const pairsError = document.getElementById("pairsError");
 
+    const historyTableBody = document.getElementById("historyTableBody");
+    const historyInfo = document.getElementById("historyInfo");
+    const historyError = document.getElementById("historyError");
+
     function setStatus(message, isOk = true) {
       statusText.innerHTML = `Stato: <span style="color:${isOk ? '#22c55e' : '#ef4444'}">${message}</span>`;
     }
@@ -460,13 +497,18 @@
       if (value === null || value === undefined || isNaN(value)) return "-";
       if (value >= 1_000_000) return "$" + (value / 1_000_000).toFixed(2) + "M";
       if (value >= 1_000) return "$" + (value / 1_000).toFixed(2) + "K";
-      return "$" + Number(value).toFixed(6);
+      return "$" + Number(value).toFixed(2);
     }
 
     function formatPercent(value) {
       if (value === null || value === undefined || isNaN(value)) return "-";
       const sign = value > 0 ? "+" : "";
       return sign + value.toFixed(2) + "%";
+    }
+
+    function formatDate(ts) {
+      const d = new Date(ts * 1000);
+      return d.toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit", year: "2-digit" });
     }
 
     function updateMainCards(bestPair) {
@@ -484,7 +526,7 @@
 
       if (priceChange24h !== undefined && priceChange24h !== null) {
         priceChangeEl.textContent = formatPercent(priceChange24h);
-        priceChangePillEl.textContent = priceChange24h > 0 ? "Bullish" : (priceChange24h < 0 ? "Bearish" : "Flat";
+        priceChangePillEl.textContent = priceChange24h > 0 ? "Bullish" : (priceChange24h < 0 ? "Bearish" : "Flat");
         priceChangePillEl.classList.remove("positive", "negative");
         if (priceChange24h > 0) {
           priceChangePillEl.classList.add("positive");
@@ -501,7 +543,6 @@
       liquidityEl.textContent = formatUsd(liquidityUsd);
       fdvEl.textContent = "FDV: " + formatUsd(fdv);
 
-      // BUY / SELL VOLUME (stima)
       const buys = bestPair.txns?.h24?.buys || 0;
       const sells = bestPair.txns?.h24?.sells || 0;
       const totalTx = buys + sells;
@@ -577,21 +618,19 @@
       });
     }
 
-    async function fetchTokenData() {
-      setStatus("caricamento...", true);
+    async function fetchDexData() {
+      setStatus("caricamento dati Dexscreener...", true);
       pairsError.style.display = "none";
       pairsError.textContent = "";
 
       try {
-        const res = await fetch(API_URL);
-        if (!res.ok) {
-          throw new Error("HTTP " + res.status);
-        }
+        const res = await fetch(DEX_API_URL);
+        if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
 
         const pairs = data.pairs || [];
         if (!pairs.length) {
-          setStatus("nessun dato trovato", false);
+          setStatus("nessun dato Dexscreener trovato", false);
           pairsInfo.textContent = "Nessuna coppia trovata per questo token.";
           return;
         }
@@ -609,17 +648,155 @@
         setStatus("ultimo aggiornamento: " + now.toLocaleTimeString(), true);
       } catch (err) {
         console.error(err);
-        setStatus("errore nel caricamento", false);
+        setStatus("errore Dexscreener", false);
         pairsError.style.display = "block";
         pairsError.textContent = "Errore nel recupero dati da Dexscreener: " + err.message;
       }
     }
 
+    function updateHistoryTable(dayMap) {
+      historyTableBody.innerHTML = "";
+
+      const days = Object.keys(dayMap)
+        .map(d => parseInt(d, 10))
+        .sort((a, b) => b - a)
+        .slice(0, 10);
+
+      if (!days.length) {
+        historyInfo.textContent = "Nessun dato storico trovato.";
+        return;
+      }
+
+      historyInfo.textContent = `Giorni mostrati: ${days.length}`;
+
+      days.forEach(dayTs => {
+        const dayData = dayMap[dayTs];
+        const tr = document.createElement("tr");
+
+        const dateTd = document.createElement("td");
+        dateTd.textContent = formatDate(dayTs);
+        tr.appendChild(dateTd);
+
+        const buyTd = document.createElement("td");
+        buyTd.innerHTML = `<span class="buy-text">${formatUsd(dayData.buy)}</span>`;
+        tr.appendChild(buyTd);
+
+        const sellTd = document.createElement("td");
+        sellTd.innerHTML = `<span class="sell-text">${formatUsd(dayData.sell)}</span>`;
+        tr.appendChild(sellTd);
+
+        const totalTd = document.createElement("td");
+        totalTd.textContent = formatUsd(dayData.buy + dayData.sell);
+        tr.appendChild(totalTd);
+
+        historyTableBody.appendChild(tr);
+      });
+    }
+
+    async function fetchHistoryData() {
+      historyError.style.display = "none";
+      historyError.textContent = "";
+      historyInfo.textContent = "Caricamento storico in corso...";
+
+      const nowSec = Math.floor(Date.now() / 1000);
+      const tenDaysAgoSec = nowSec - 10 * 24 * 60 * 60;
+
+      const body = {
+        mint: TOKEN_MINT,
+        limit: 5000,
+        before: nowSec
+      };
+
+      try {
+        const res = await fetch(HELIUS_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(body)
+        });
+
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+
+        const txs = data || [];
+        if (!Array.isArray(txs) || !txs.length) {
+          historyInfo.textContent = "Nessuna transazione trovata per lo storico.";
+          return;
+        }
+
+        const dayMap = {};
+
+        txs.forEach(tx => {
+          const ts = tx.timestamp || tx.blockTime || 0;
+          if (!ts || ts < tenDaysAgoSec) return;
+
+          const dayStart = Math.floor(ts / 86400) * 86400;
+
+          if (!dayMap[dayStart]) {
+            dayMap[dayStart] = { buy: 0, sell: 0 };
+          }
+
+          let usdValue = 0;
+          if (tx.tokenTransfers && tx.tokenTransfers.length > 0) {
+            const transfer = tx.tokenTransfers.find(t => t.mint === TOKEN_MINT);
+            if (transfer && typeof transfer.tokenAmount === "number" && tx.usdValue) {
+              usdValue = tx.usdValue;
+            } else if (tx.usdValue) {
+              usdValue = tx.usdValue;
+            }
+          } else if (tx.usdValue) {
+            usdValue = tx.usdValue;
+          }
+
+          if (!usdValue || isNaN(usdValue)) return;
+
+          let isBuy = false;
+          let isSell = false;
+
+          if (tx.tokenTransfers && tx.tokenTransfers.length > 0) {
+            const transfer = tx.tokenTransfers.find(t => t.mint === TOKEN_MINT);
+            if (transfer) {
+              if (transfer.toUserAccount && !transfer.fromUserAccount) {
+                isBuy = true;
+              } else if (transfer.fromUserAccount && !transfer.toUserAccount) {
+                isSell = true;
+              }
+            }
+          }
+
+          if (!isBuy && !isSell) {
+            if (usdValue > 0) {
+              isBuy = true;
+            }
+          }
+
+          if (isBuy) {
+            dayMap[dayStart].buy += usdValue;
+          } else if (isSell) {
+            dayMap[dayStart].sell += usdValue;
+          }
+        });
+
+        updateHistoryTable(dayMap);
+      } catch (err) {
+        console.error(err);
+        historyError.style.display = "block";
+        historyError.textContent = "Errore nel recupero storico da Helius: " + err.message;
+        historyInfo.textContent = "Impossibile caricare lo storico.";
+      }
+    }
+
+    async function refreshAll() {
+      await fetchDexData();
+      await fetchHistoryData();
+    }
+
     refreshBtn.addEventListener("click", () => {
-      fetchTokenData();
+      refreshAll();
     });
 
-    fetchTokenData();
+    refreshAll();
   </script>
 </body>
 </html>
