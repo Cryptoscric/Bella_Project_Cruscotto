@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Token Solana - BUMPER</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- Stile base -->
+  <style>
+    :root {
+      --bg: #0b1120;
+      --bg-card: #020617;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.15);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #ef4444;
+      --border: #1f2937;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .token-tag {
+      font-size: 0.8rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover {
+      background: rgba(34, 197, 94, 0.25);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .status-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .status-text span {
+      color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.7));
+      border-radius: 14px;
+      padding: 14px 14px 12px;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.12), transparent 55%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .card-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 2px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pill {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+    }
+
+    .pill.positive {
+      border-color: rgba(34, 197, 94, 0.6);
+      color: var(--accent);
+      background: rgba(34, 197, 94, 0.08);
+    }
+
+    .pill.negative {
+      border-color: rgba(239, 68, 68, 0.6);
+      color: var(--danger);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title span {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    thead {
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    th {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    tbody tr:hover {
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      color: var(--muted);
+      gap: 4px;
+    }
+
+    .badge.dex {
+      border-color: rgba(59, 130, 246, 0.6);
+      color: #60a5fa;
+      background: rgba(37, 99, 235, 0.12);
+    }
+
+    .link {
+      color: #60a5fa;
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+
+    .error {
+      color: var(--danger);
+      font-size: 0.85rem;
+      margin-top: 6px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    footer {
+      margin-top: 28px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="title-block">
+        <h1>
+          Bella Bumper
+          <span class="token-tag">$BUMPER • Solana</span>
+        </h1>
+        <div class="subtitle">
+          Mint: <code>5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk</code>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="refreshBtn">
+          🔄 Aggiorna ora
+        </button>
+        <div class="status-text" id="statusText">
+          Stato: <span>in attesa...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Cards principali -->
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-label">Prezzo</div>
+        </div>
+        <div class="card-value" id="priceUsd">-</div>
+        <div class="card-sub" id="priceNative">-</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-label">Variazione 24h</div>
+          <div class="pill" id="priceChangePill">-</div>
+        </div>
+        <div class="card-value" id="priceChange">-</div>
+        <div class="card-sub muted">Basato sui dati Dexscreener</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-label">Volume 24h</div>
+        </div>
+        <div class="card-value" id="volume24h">-</div>
+        <div class="card-sub muted">USD equivalente</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-label">Liquidità & FDV</div>
+        </div>
+        <div class="card-value" id="liquidity">-</div>
+        <div class="card-sub" id="fdv">FDV: -</div>
+      </div>
+    </div>
+
+    <!-- Sezione coppie DEX -->
+    <div class="section">
+      <div class="section-title">
+        Coppie DEX
+        <span>(dati da Dexscreener)</span>
+      </div>
+      <div id="pairsError" class="error" style="display:none;"></div>
+      <div class="muted" id="pairsInfo">Caricamento coppie in corso...</div>
+      <div style="overflow-x:auto; margin-top:8px;">
+        <table>
+          <thead>
+            <tr>
+              <th>DEX</th>
+              <th>Coppia</th>
+              <th>Prezzo</th>
+              <th>Variazione 24h</th>
+              <th>Volume 24h</th>
+              <th>Liquidità</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody id="pairsTableBody">
+            <!-- Righe generate via JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer>
+      Dashboard HTML statica • Dati live da Dexscreener • Multi-utente via semplice hosting web
+    </footer>
+  </div>
+
+  <script>
+    const TOKEN_MINT = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
+    const API_URL = `https://api.dexscreener.com/latest/dex/tokens/${TOKEN_MINT}`;
+
+    const statusText = document.getElementById("statusText");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    const priceUsdEl = document.getElementById("priceUsd");
+    const priceNativeEl = document.getElementById("priceNative");
+    const priceChangeEl = document.getElementById("priceChange");
+    const priceChangePillEl = document.getElementById("priceChangePill");
+    const volume24hEl = document.getElementById("volume24h");
+    const liquidityEl = document.getElementById("liquidity");
+    const fdvEl = document.getElementById("fdv");
+
+    const pairsTableBody = document.getElementById("pairsTableBody");
+    const pairsInfo = document.getElementById("pairsInfo");
+    const pairsError = document.getElementById("pairsError");
+
+    function setStatus(message, isOk = true) {
+      statusText.innerHTML = `Stato: <span style="color:${isOk ? '#22c55e' : '#ef4444'}">${message}</span>`;
+    }
+
+    function formatUsd(value) {
+      if (value === null || value === undefined || isNaN(value)) return "-";
+      if (value >= 1_000_000) return "$" + (value / 1_000_000).toFixed(2) + "M";
+      if (value >= 1_000) return "$" + (value / 1_000).toFixed(2) + "K";
+      return "$" + Number(value).toFixed(6);
+    }
+
+    function formatPercent(value) {
+      if (value === null || value === undefined || isNaN(value)) return "-";
+      const sign = value > 0 ? "+" : "";
+      return sign + value.toFixed(2) + "%";
+    }
+
+    function formatNumber(value) {
+      if (value === null || value === undefined || isNaN(value)) return "-";
+      return Number(value).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    }
+
+    function updateMainCards(bestPair) {
+      if (!bestPair) return;
+
+      const priceUsd = bestPair.priceUsd;
+      const priceNative = bestPair.priceNative;
+      const priceChange24h = bestPair.priceChange?.h24;
+      const volume24h = bestPair.volume?.h24;
+      const liquidityUsd = bestPair.liquidity?.usd;
+      const fdv = bestPair.fdv;
+
+      priceUsdEl.textContent = priceUsd ? "$" + Number(priceUsd).toFixed(6) : "-";
+      priceNativeEl.textContent = priceNative ? `${Number(priceNative).toFixed(6)} ${bestPair.baseToken?.symbol || ""}` : "-";
+
+      if (priceChange24h !== undefined && priceChange24h !== null) {
+        priceChangeEl.textContent = formatPercent(priceChange24h);
+        priceChangePillEl.textContent = priceChange24h > 0 ? "Bullish" : (priceChange24h < 0 ? "Bearish" : "Flat");
+        priceChangePillEl.classList.remove("positive", "negative");
+        if (priceChange24h > 0) {
+          priceChangePillEl.classList.add("positive");
+        } else if (priceChange24h < 0) {
+          priceChangePillEl.classList.add("negative");
+        }
+      } else {
+        priceChangeEl.textContent = "-";
+        priceChangePillEl.textContent = "-";
+        priceChangePillEl.classList.remove("positive", "negative");
+      }
+
+      volume24hEl.textContent = formatUsd(volume24h);
+      liquidityEl.textContent = formatUsd(liquidityUsd);
+      fdvEl.textContent = "FDV: " + formatUsd(fdv);
+    }
+
+    function updatePairsTable(pairs) {
+      pairsTableBody.innerHTML = "";
+
+      if (!pairs || pairs.length === 0) {
+        pairsInfo.textContent = "Nessuna coppia trovata per questo token.";
+        return;
+      }
+
+      pairsInfo.textContent = `Coppie trovate: ${pairs.length}`;
+
+      pairs.forEach(pair => {
+        const tr = document.createElement("tr");
+
+        const dexTd = document.createElement("td");
+        dexTd.innerHTML = `<span class="badge dex">${pair.dexId || "DEX"}</span>`;
+        tr.appendChild(dexTd);
+
+        const pairTd = document.createElement("td");
+        const base = pair.baseToken?.symbol || "BASE";
+        const quote = pair.quoteToken?.symbol || "QUOTE";
+        pairTd.textContent = `${base} / ${quote}`;
+        tr.appendChild(pairTd);
+
+        const priceTd = document.createElement("td");
+        priceTd.textContent = pair.priceUsd ? "$" + Number(pair.priceUsd).toFixed(6) : "-";
+        tr.appendChild(priceTd);
+
+        const changeTd = document.createElement("td");
+        const change = pair.priceChange?.h24;
+        changeTd.textContent = formatPercent(change);
+        changeTd.style.color = change > 0 ? "#22c55e" : (change < 0 ? "#ef4444" : "#e5e7eb");
+        tr.appendChild(changeTd);
+
+        const volumeTd = document.createElement("td");
+        volumeTd.textContent = formatUsd(pair.volume?.h24);
+        tr.appendChild(volumeTd);
+
+        const liqTd = document.createElement("td");
+        liqTd.textContent = formatUsd(pair.liquidity?.usd);
+        tr.appendChild(liqTd);
+
+        const linkTd = document.createElement("td");
+        if (pair.url) {
+          const a = document.createElement("a");
+          a.href = pair.url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.className = "link";
+          a.textContent = "Apri";
+          linkTd.appendChild(a);
+        } else {
+          linkTd.textContent = "-";
+        }
+        tr.appendChild(linkTd);
+
+        pairsTableBody.appendChild(tr);
+      });
+    }
+
+    async function fetchTokenData() {
+      setStatus("caricamento...", true);
+      pairsError.style.display = "none";
+      pairsError.textContent = "";
+
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) {
+          throw new Error("HTTP " + res.status);
+        }
+        const data = await res.json();
+
+        const pairs = data.pairs || [];
+        if (!pairs.length) {
+          setStatus("nessun dato trovato", false);
+          pairsInfo.textContent = "Nessuna coppia trovata per questo token.";
+          return;
+        }
+
+        const bestPair = pairs.reduce((best, current) => {
+          const volBest = best?.volume?.h24 || 0;
+          const volCurrent = current?.volume?.h24 || 0;
+          return volCurrent > volBest ? current : best;
+        }, pairs[0]);
+
+        updateMainCards(bestPair);
+        updatePairsTable(pairs);
+
+        const now = new Date();
+        setStatus("ultimo aggiornamento: " + now.toLocaleTimeString(), true);
+      } catch (err) {
+        console.error(err);
+        setStatus("errore nel caricamento", false);
+        pairsError.style.display = "block";
+        pairsError.textContent = "Errore nel recupero dati da Dexscreener: " + err.message;
+      }
+    }
+
+    refreshBtn.addEventListener("click", () => {
+      fetchTokenData();
+    });
+
+    fetchTokenData();
+  </script>
+</body>
+</html>
