@@ -103,11 +103,6 @@
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     }
 
-    button:active {
-      transform: translateY(0);
-      box-shadow: none;
-    }
-
     .status-text {
       font-size: 0.8rem;
       color: var(--muted);
@@ -224,6 +219,19 @@
       font-weight: 400;
     }
 
+    /* 🔥 SCRITTA ROSSA LAMPEGGIANTE VELOCE */
+    .blink-red {
+      color: #ef4444;
+      font-weight: 700;
+      animation: blinkFast 0.5s infinite;
+    }
+
+    @keyframes blinkFast {
+      0% { opacity: 1; }
+      50% { opacity: 0.15; }
+      100% { opacity: 1; }
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -250,42 +258,6 @@
     }
 
     tbody tr:hover { background: rgba(15, 23, 42, 0.9); }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      color: var(--muted);
-      gap: 4px;
-    }
-
-    .badge.dex {
-      border-color: rgba(59, 130, 246, 0.6);
-      color: #60a5fa;
-      background: rgba(37, 99, 235, 0.12);
-    }
-
-    .link {
-      color: #60a5fa;
-      text-decoration: none;
-      font-size: 0.8rem;
-    }
-
-    .link:hover { text-decoration: underline; }
-
-    .error {
-      color: var(--danger);
-      font-size: 0.85rem;
-      margin-top: 6px;
-    }
-
-    .muted {
-      color: var(--muted);
-      font-size: 0.8rem;
-    }
 
     .buy-text { color: #22c55e; font-weight: 500; }
     .sell-text { color: #ef4444; font-weight: 500; }
@@ -397,7 +369,7 @@
     <div class="section">
       <div class="section-title">
         Volumi ultimi 10 giorni
-        <span>(BUY / SELL in USDC da Helius)</span>
+        <span class="blink-red">(BUY / SELL in USDC da Helius)</span>
       </div>
       <div id="historyError" class="error" style="display:none;"></div>
       <div class="muted" id="historyInfo">Caricamento storico in corso...</div>
@@ -421,7 +393,6 @@
     </footer>
   </div>
 
-  <!-- API key in file separato -->
   <script src="config.js"></script>
 
   <script>
@@ -494,244 +465,7 @@
       if (priceChange24h !== undefined && priceChange24h !== null) {
         priceChangeEl.textContent = formatPercent(priceChange24h);
         priceChangePillEl.textContent = priceChange24h > 0 ? "Bullish" : (priceChange24h < 0 ? "Bearish" : "Flat");
-        priceChangePillEl.classList.remove("positive", "negative");
-        if (priceChange24h > 0) priceChangePillEl.classList.add("positive");
-        else if (priceChange24h < 0) priceChangePillEl.classList.add("negative");
-      } else {
-        priceChangeEl.textContent = "-";
-        priceChangePillEl.textContent = "-";
-        priceChangePillEl.classList.remove("positive", "negative");
-      }
-
-      volume24hEl.textContent = formatUsd(volume24h);
-      liquidityEl.textContent = formatUsd(liquidityUsd);
-      fdvEl.textContent = "FDV: " + formatUsd(fdv);
-
-      const buys = bestPair.txns?.h24?.buys || 0;
-      const sells = bestPair.txns?.h24?.sells || 0;
-      const totalTx = buys + sells;
-
-      let buyVolumeUsd = 0;
-      let sellVolumeUsd = 0;
-
-      if (totalTx > 0 && volume24h) {
-        buyVolumeUsd = (buys / totalTx) * volume24h;
-        sellVolumeUsd = (sells / totalTx) * volume24h;
-      }
-
-      buyVolume24hEl.textContent = formatUsd(buyVolumeUsd);
-      sellVolume24hEl.textContent = formatUsd(sellVolumeUsd);
-    }
-
-    function updatePairsTable(pairs) {
-      pairsTableBody.innerHTML = "";
-
-      if (!pairs || pairs.length === 0) {
-        pairsInfo.textContent = "Nessuna coppia trovata per questo token.";
-        return;
-      }
-
-      pairsInfo.textContent = `Coppie trovate: ${pairs.length}`;
-
-      pairs.forEach(pair => {
-        const tr = document.createElement("tr");
-
-        const dexTd = document.createElement("td");
-        dexTd.innerHTML = `<span class="badge dex">${pair.dexId || "DEX"}</span>`;
-        tr.appendChild(dexTd);
-
-        const pairTd = document.createElement("td");
-        const base = pair.baseToken?.symbol || "BASE";
-        const quote = pair.quoteToken?.symbol || "QUOTE";
-        pairTd.textContent = `${base} / ${quote}`;
-        tr.appendChild(pairTd);
-
-        const priceTd = document.createElement("td");
-        priceTd.textContent = pair.priceUsd ? "$" + Number(pair.priceUsd).toFixed(6) : "-";
-        tr.appendChild(priceTd);
-
-        const changeTd = document.createElement("td");
-        const change = pair.priceChange?.h24;
-        changeTd.textContent = formatPercent(change);
-        changeTd.style.color = change > 0 ? "#22c55e" : (change < 0 ? "#ef4444" : "#e5e7eb");
-        tr.appendChild(changeTd);
-
-        const volumeTd = document.createElement("td");
-        volumeTd.textContent = formatUsd(pair.volume?.h24);
-        tr.appendChild(volumeTd);
-
-        const liqTd = document.createElement("td");
-        liqTd.textContent = formatUsd(pair.liquidity?.usd);
-        tr.appendChild(liqTd);
-
-        const linkTd = document.createElement("td");
-        if (pair.url) {
-          const a = document.createElement("a");
-          a.href = pair.url;
-          a.target = "_blank";
-          a.rel = "noopener noreferrer";
-          a.className = "link";
-          a.textContent = "Apri";
-          linkTd.appendChild(a);
-        } else {
-          linkTd.textContent = "-";
-        }
-        tr.appendChild(linkTd);
-
-        pairsTableBody.appendChild(tr);
-      });
-    }
-
-    async function fetchDexData() {
-      setStatus("caricamento dati Dexscreener...", true);
-      pairsError.style.display = "none";
-      pairsError.textContent = "";
-
-      try {
-        const res = await fetch(DEX_API_URL);
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json();
-
-        const pairs = data.pairs || [];
-        if (!pairs.length) {
-          setStatus("nessun dato Dexscreener trovato", false);
-          pairsInfo.textContent = "Nessuna coppia trovata per questo token.";
-          return;
-        }
-
-        const bestPair = pairs.reduce((best, current) => {
-          const volBest = best?.volume?.h24 || 0;
-          const volCurrent = current?.volume?.h24 || 0;
-          return volCurrent > volBest ? current : best;
-        }, pairs[0]);
-
-        updateMainCards(bestPair);
-        updatePairsTable(pairs);
-
-        const now = new Date();
-        setStatus("ultimo aggiornamento: " + now.toLocaleTimeString(), true);
-      } catch (err) {
-        console.error(err);
-        setStatus("errore Dexscreener", false);
-        pairsError.style.display = "block";
-        pairsError.textContent = "Errore nel recupero dati da Dexscreener: " + err.message;
-      }
-    }
-
-    function updateHistoryTable(dayMap) {
-      historyTableBody.innerHTML = "";
-
-      const days = Object.keys(dayMap)
-        .map(d => parseInt(d, 10))
-        .sort((a, b) => b - a)
-        .slice(0, 10);
-
-      if (!days.length) {
-        historyInfo.textContent = "Nessun dato storico trovato.";
-        return;
-      }
-
-      historyInfo.textContent = `Giorni mostrati: ${days.length}`;
-
-      days.forEach(dayTs => {
-        const dayData = dayMap[dayTs];
-        const tr = document.createElement("tr");
-
-        const dateTd = document.createElement("td");
-        dateTd.textContent = formatDate(dayTs);
-        tr.appendChild(dateTd);
-
-        const buyTd = document.createElement("td");
-        buyTd.innerHTML = `<span class="buy-text">${formatUsd(dayData.buy)}</span>`;
-        tr.appendChild(buyTd);
-
-        const sellTd = document.createElement("td");
-        sellTd.innerHTML = `<span class="sell-text">${formatUsd(dayData.sell)}</span>`;
-        tr.appendChild(sellTd);
-
-        const totalTd = document.createElement("td");
-        totalTd.textContent = formatUsd(dayData.buy + dayData.sell);
-        tr.appendChild(totalTd);
-
-        historyTableBody.appendChild(tr);
-      });
-    }
-
-    async function fetchHistoryData() {
-      historyError.style.display = "none";
-      historyError.textContent = "";
-      historyInfo.textContent = "Caricamento storico in corso...";
-
-      const nowSec = Math.floor(Date.now() / 1000);
-      const tenDaysAgoSec = nowSec - 10 * 24 * 60 * 60;
-
-      try {
-        const res = await fetch(HELIUS_HISTORY_URL);
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const txs = await res.json();
-
-        if (!Array.isArray(txs) || !txs.length) {
-          historyInfo.textContent = "Nessuna transazione trovata per lo storico.";
-          return;
-        }
-
-        const dayMap = {};
-
-        txs.forEach(tx => {
-          const ts = tx.timestamp || tx.blockTime || 0;
-          if (!ts || ts < tenDaysAgoSec) return;
-
-          const dayStart = Math.floor(ts / 86400) * 86400;
-          if (!dayMap[dayStart]) dayMap[dayStart] = { buy: 0, sell: 0 };
-
-          if (!tx.tokenTransfers || !tx.tokenTransfers.length) return;
-
-          const transfer = tx.tokenTransfers.find(t => t.mint === TOKEN_MINT);
-          if (!transfer) return;
-
-          const amount = typeof transfer.tokenAmount === "number"
-            ? transfer.tokenAmount
-            : (typeof transfer.amount === "number" ? transfer.amount : 0);
-
-          if (!amount || !CURRENT_PRICE_USD) return;
-
-          const usdValue = Math.abs(amount) * CURRENT_PRICE_USD;
-
-          let isBuy = false;
-          let isSell = false;
-
-          if (transfer.toUserAccount && !transfer.fromUserAccount) {
-            isBuy = true;
-          } else if (transfer.fromUserAccount && !transfer.toUserAccount) {
-            isSell = true;
-          }
-
-          if (!isBuy && !isSell) {
-            if (usdValue > 0) isBuy = true;
-          }
-
-          if (isBuy) dayMap[dayStart].buy += usdValue;
-          else if (isSell) dayMap[dayStart].sell += usdValue;
-        });
-
-        updateHistoryTable(dayMap);
-      } catch (err) {
-        console.error(err);
-        historyError.style.display = "block";
-        historyError.textContent = "Errore nel recupero storico da Helius: " + err.message;
-        historyInfo.textContent = "Impossibile caricare lo storico.";
-      }
-    }
-
-    async function refreshAll() {
-      await fetchDexData();
-      await fetchHistoryData();
-    }
-
-    refreshBtn.addEventListener("click", () => {
-      refreshAll();
-    });
-
+        priceChangePillEl.classList.remove
     refreshAll();
   </script>
 </body>
