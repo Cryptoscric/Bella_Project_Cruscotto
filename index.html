@@ -5,7 +5,6 @@
   <title>Dashboard Token Solana - BUMPER</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
   <style>
@@ -20,9 +19,7 @@
       --border: #1f2937;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -128,15 +125,11 @@
     }
 
     @media (max-width: 900px) {
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 
     @media (max-width: 600px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+      .grid { grid-template-columns: 1fr; }
     }
 
     .card {
@@ -209,25 +202,12 @@
       background: rgba(239, 68, 68, 0.08);
     }
 
-    .card-buy {
-      border-left: 4px solid #22c55e;
-    }
+    .card-buy { border-left: 4px solid #22c55e; }
+    .card-sell { border-left: 4px solid #ef4444; }
+    .card-buy .card-value { color: #22c55e; }
+    .card-sell .card-value { color: #ef4444; }
 
-    .card-sell {
-      border-left: 4px solid #ef4444;
-    }
-
-    .card-buy .card-value {
-      color: #22c55e;
-    }
-
-    .card-sell .card-value {
-      color: #ef4444;
-    }
-
-    .section {
-      margin-top: 24px;
-    }
+    .section { margin-top: 24px; }
 
     .section-title {
       font-size: 1rem;
@@ -254,9 +234,7 @@
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
     }
 
-    thead {
-      background: rgba(15, 23, 42, 0.95);
-    }
+    thead { background: rgba(15, 23, 42, 0.95); }
 
     th, td {
       padding: 10px 12px;
@@ -271,9 +249,7 @@
       color: var(--muted);
     }
 
-    tbody tr:hover {
-      background: rgba(15, 23, 42, 0.9);
-    }
+    tbody tr:hover { background: rgba(15, 23, 42, 0.9); }
 
     .badge {
       display: inline-flex;
@@ -298,9 +274,7 @@
       font-size: 0.8rem;
     }
 
-    .link:hover {
-      text-decoration: underline;
-    }
+    .link:hover { text-decoration: underline; }
 
     .error {
       color: var(--danger);
@@ -313,15 +287,8 @@
       font-size: 0.8rem;
     }
 
-    .buy-text {
-      color: #22c55e;
-      font-weight: 500;
-    }
-
-    .sell-text {
-      color: #ef4444;
-      font-weight: 500;
-    }
+    .buy-text { color: #22c55e; font-weight: 500; }
+    .sell-text { color: #ef4444; font-weight: 500; }
 
     footer {
       margin-top: 28px;
@@ -344,16 +311,13 @@
         </div>
       </div>
       <div class="controls">
-        <button id="refreshBtn">
-          🔄 Aggiorna ora
-        </button>
+        <button id="refreshBtn">🔄 Aggiorna ora</button>
         <div class="status-text" id="statusText">
           Stato: <span>in attesa...</span>
         </div>
       </div>
     </header>
 
-    <!-- Cards principali -->
     <div class="grid">
       <div class="card">
         <div class="card-header">
@@ -405,7 +369,6 @@
       </div>
     </div>
 
-    <!-- Sezione coppie DEX -->
     <div class="section">
       <div class="section-title">
         Coppie DEX
@@ -431,7 +394,6 @@
       </div>
     </div>
 
-    <!-- Sezione ultimi 10 giorni -->
     <div class="section">
       <div class="section-title">
         Volumi ultimi 10 giorni
@@ -459,13 +421,14 @@
     </footer>
   </div>
 
-  <!-- Carica la API key da file separato -->
+  <!-- API key in file separato -->
   <script src="config.js"></script>
 
   <script>
     const TOKEN_MINT = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
     const DEX_API_URL = `https://api.dexscreener.com/latest/dex/tokens/${TOKEN_MINT}`;
-    const HELIUS_URL = `https://api.helius.xyz/v0/token-transactions?api-key=${HELIUS_API_KEY}`;
+    const HELIUS_HISTORY_URL =
+      `https://api.helius.xyz/v0/addresses/${TOKEN_MINT}/transactions?api-key=${HELIUS_API_KEY}&limit=1000`;
 
     const statusText = document.getElementById("statusText");
     const refreshBtn = document.getElementById("refreshBtn");
@@ -488,6 +451,8 @@
     const historyTableBody = document.getElementById("historyTableBody");
     const historyInfo = document.getElementById("historyInfo");
     const historyError = document.getElementById("historyError");
+
+    let CURRENT_PRICE_USD = null;
 
     function setStatus(message, isOk = true) {
       statusText.innerHTML = `Stato: <span style="color:${isOk ? '#22c55e' : '#ef4444'}">${message}</span>`;
@@ -521,6 +486,8 @@
       const liquidityUsd = bestPair.liquidity?.usd;
       const fdv = bestPair.fdv;
 
+      CURRENT_PRICE_USD = priceUsd ? Number(priceUsd) : null;
+
       priceUsdEl.textContent = priceUsd ? "$" + Number(priceUsd).toFixed(6) : "-";
       priceNativeEl.textContent = priceNative ? `${Number(priceNative).toFixed(6)} ${bestPair.baseToken?.symbol || ""}` : "-";
 
@@ -528,11 +495,8 @@
         priceChangeEl.textContent = formatPercent(priceChange24h);
         priceChangePillEl.textContent = priceChange24h > 0 ? "Bullish" : (priceChange24h < 0 ? "Bearish" : "Flat");
         priceChangePillEl.classList.remove("positive", "negative");
-        if (priceChange24h > 0) {
-          priceChangePillEl.classList.add("positive");
-        } else if (priceChange24h < 0) {
-          priceChangePillEl.classList.add("negative");
-        }
+        if (priceChange24h > 0) priceChangePillEl.classList.add("positive");
+        else if (priceChange24h < 0) priceChangePillEl.classList.add("negative");
       } else {
         priceChangeEl.textContent = "-";
         priceChangePillEl.textContent = "-";
@@ -701,25 +665,11 @@
       const nowSec = Math.floor(Date.now() / 1000);
       const tenDaysAgoSec = nowSec - 10 * 24 * 60 * 60;
 
-      const body = {
-        mint: TOKEN_MINT,
-        limit: 5000,
-        before: nowSec
-      };
-
       try {
-        const res = await fetch(HELIUS_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(body)
-        });
-
+        const res = await fetch(HELIUS_HISTORY_URL);
         if (!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json();
+        const txs = await res.json();
 
-        const txs = data || [];
         if (!Array.isArray(txs) || !txs.length) {
           historyInfo.textContent = "Nessuna transazione trovata per lo storico.";
           return;
@@ -732,50 +682,36 @@
           if (!ts || ts < tenDaysAgoSec) return;
 
           const dayStart = Math.floor(ts / 86400) * 86400;
+          if (!dayMap[dayStart]) dayMap[dayStart] = { buy: 0, sell: 0 };
 
-          if (!dayMap[dayStart]) {
-            dayMap[dayStart] = { buy: 0, sell: 0 };
-          }
+          if (!tx.tokenTransfers || !tx.tokenTransfers.length) return;
 
-          let usdValue = 0;
-          if (tx.tokenTransfers && tx.tokenTransfers.length > 0) {
-            const transfer = tx.tokenTransfers.find(t => t.mint === TOKEN_MINT);
-            if (transfer && typeof transfer.tokenAmount === "number" && tx.usdValue) {
-              usdValue = tx.usdValue;
-            } else if (tx.usdValue) {
-              usdValue = tx.usdValue;
-            }
-          } else if (tx.usdValue) {
-            usdValue = tx.usdValue;
-          }
+          const transfer = tx.tokenTransfers.find(t => t.mint === TOKEN_MINT);
+          if (!transfer) return;
 
-          if (!usdValue || isNaN(usdValue)) return;
+          const amount = typeof transfer.tokenAmount === "number"
+            ? transfer.tokenAmount
+            : (typeof transfer.amount === "number" ? transfer.amount : 0);
+
+          if (!amount || !CURRENT_PRICE_USD) return;
+
+          const usdValue = Math.abs(amount) * CURRENT_PRICE_USD;
 
           let isBuy = false;
           let isSell = false;
 
-          if (tx.tokenTransfers && tx.tokenTransfers.length > 0) {
-            const transfer = tx.tokenTransfers.find(t => t.mint === TOKEN_MINT);
-            if (transfer) {
-              if (transfer.toUserAccount && !transfer.fromUserAccount) {
-                isBuy = true;
-              } else if (transfer.fromUserAccount && !transfer.toUserAccount) {
-                isSell = true;
-              }
-            }
+          if (transfer.toUserAccount && !transfer.fromUserAccount) {
+            isBuy = true;
+          } else if (transfer.fromUserAccount && !transfer.toUserAccount) {
+            isSell = true;
           }
 
           if (!isBuy && !isSell) {
-            if (usdValue > 0) {
-              isBuy = true;
-            }
+            if (usdValue > 0) isBuy = true;
           }
 
-          if (isBuy) {
-            dayMap[dayStart].buy += usdValue;
-          } else if (isSell) {
-            dayMap[dayStart].sell += usdValue;
-          }
+          if (isBuy) dayMap[dayStart].buy += usdValue;
+          else if (isSell) dayMap[dayStart].sell += usdValue;
         });
 
         updateHistoryTable(dayMap);
