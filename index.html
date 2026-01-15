@@ -123,7 +123,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
       margin-bottom: 20px;
     }
@@ -357,6 +357,22 @@
 
       <div class="card">
         <div class="card-header">
+          <div class="card-label">Volume Buy 24h</div>
+        </div>
+        <div class="card-value" id="buyVolume24h">-</div>
+        <div class="card-sub muted">In USDC (stima)</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-label">Volume Sell 24h</div>
+        </div>
+        <div class="card-value" id="sellVolume24h">-</div>
+        <div class="card-sub muted">In USDC (stima)</div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
           <div class="card-label">Liquidità & FDV</div>
         </div>
         <div class="card-value" id="liquidity">-</div>
@@ -411,6 +427,9 @@
     const volume24hEl = document.getElementById("volume24h");
     const liquidityEl = document.getElementById("liquidity");
     const fdvEl = document.getElementById("fdv");
+
+    const buyVolume24hEl = document.getElementById("buyVolume24h");
+    const sellVolume24hEl = document.getElementById("sellVolume24h");
 
     const pairsTableBody = document.getElementById("pairsTableBody");
     const pairsInfo = document.getElementById("pairsInfo");
@@ -469,6 +488,22 @@
       volume24hEl.textContent = formatUsd(volume24h);
       liquidityEl.textContent = formatUsd(liquidityUsd);
       fdvEl.textContent = "FDV: " + formatUsd(fdv);
+
+      // --- BUY / SELL VOLUME CALC ---
+      const buys = bestPair.txns?.h24?.buys || 0;
+      const sells = bestPair.txns?.h24?.sells || 0;
+      const totalTx = buys + sells;
+
+      let buyVolumeUsd = 0;
+      let sellVolumeUsd = 0;
+
+      if (totalTx > 0 && volume24h) {
+        buyVolumeUsd = (buys / totalTx) * volume24h;
+        sellVolumeUsd = (sells / totalTx) * volume24h;
+      }
+
+      buyVolume24hEl.textContent = formatUsd(buyVolumeUsd);
+      sellVolume24hEl.textContent = formatUsd(sellVolumeUsd);
     }
 
     function updatePairsTable(pairs) {
