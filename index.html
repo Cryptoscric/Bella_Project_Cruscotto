@@ -210,6 +210,23 @@
       background: rgba(239, 68, 68, 0.08);
     }
 
+    /* Evidenziazione BUY / SELL */
+    .card-buy {
+      border-left: 4px solid #22c55e;
+    }
+
+    .card-sell {
+      border-left: 4px solid #ef4444;
+    }
+
+    .card-buy .card-value {
+      color: #22c55e;
+    }
+
+    .card-sell .card-value {
+      color: #ef4444;
+    }
+
     .section {
       margin-top: 24px;
     }
@@ -355,7 +372,7 @@
         <div class="card-sub muted">USD equivalente</div>
       </div>
 
-      <div class="card">
+      <div class="card card-buy">
         <div class="card-header">
           <div class="card-label">Volume Buy 24h</div>
         </div>
@@ -363,7 +380,7 @@
         <div class="card-sub muted">In USDC (stima)</div>
       </div>
 
-      <div class="card">
+      <div class="card card-sell">
         <div class="card-header">
           <div class="card-label">Volume Sell 24h</div>
         </div>
@@ -452,11 +469,6 @@
       return sign + value.toFixed(2) + "%";
     }
 
-    function formatNumber(value) {
-      if (value === null || value === undefined || isNaN(value)) return "-";
-      return Number(value).toLocaleString("en-US", { maximumFractionDigits: 2 });
-    }
-
     function updateMainCards(bestPair) {
       if (!bestPair) return;
 
@@ -472,7 +484,7 @@
 
       if (priceChange24h !== undefined && priceChange24h !== null) {
         priceChangeEl.textContent = formatPercent(priceChange24h);
-        priceChangePillEl.textContent = priceChange24h > 0 ? "Bullish" : (priceChange24h < 0 ? "Bearish" : "Flat");
+        priceChangePillEl.textContent = priceChange24h > 0 ? "Bullish" : (priceChange24h < 0 ? "Bearish" : "Flat";
         priceChangePillEl.classList.remove("positive", "negative");
         if (priceChange24h > 0) {
           priceChangePillEl.classList.add("positive");
@@ -489,7 +501,7 @@
       liquidityEl.textContent = formatUsd(liquidityUsd);
       fdvEl.textContent = "FDV: " + formatUsd(fdv);
 
-      // --- BUY / SELL VOLUME CALC ---
+      // BUY / SELL VOLUME (stima)
       const buys = bestPair.txns?.h24?.buys || 0;
       const sells = bestPair.txns?.h24?.sells || 0;
       const totalTx = buys + sells;
