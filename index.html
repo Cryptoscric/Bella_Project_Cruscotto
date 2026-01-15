@@ -1,125 +1,364 @@
-<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Dashboard Token Solana - BUMPER</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet"><style>
-:root{--bg:#0b1120;--accent:#22c55e;--accent-soft:rgba(34,197,94,.15);--text:#e5e7eb;--muted:#9ca3af;--danger:#ef4444;}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"Inter",sans-serif;background:radial-gradient(circle at top,#1f2937 0,#020617 45%,#000 100%);color:var(--text)}
-.app{max-width:1200px;margin:auto;padding:24px 16px 40px}
-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:24px}
-h1{font-size:1.6rem;font-weight:600;display:flex;align-items:center;gap:8px}
-.token-tag{font-size:.8rem;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);border:1px solid rgba(34,197,94,.4)}
-.subtitle{font-size:.85rem;color:var(--muted);word-break:break-all}
-button{border:none;border-radius:999px;padding:8px 16px;font-size:.85rem;font-weight:500;cursor:pointer;background:var(--accent-soft);color:var(--accent);border:1px solid rgba(34,197,94,.4)}
-button:hover{background:rgba(34,197,94,.25)}
-.status-text{font-size:.8rem;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
-@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:600px){.grid{grid-template-columns:1fr}}
-.card{background:rgba(15,23,42,.9);border-radius:14px;padding:14px;border:1px solid rgba(15,23,42,.9);box-shadow:0 18px 40px rgba(0,0,0,.6);position:relative}
-.card-label{font-size:.75rem;color:var(--muted);text-transform:uppercase}
-.card-value{font-size:1.1rem;font-weight:600}
-.card-sub{font-size:.8rem;color:var(--muted)}
-.card-buy{border-left:4px solid #22c55e}
-.card-sell{border-left:4px solid #ef4444}
-.section{margin-top:24px}
-.section-title{font-size:1rem;font-weight:500;margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.section-title span{font-size:.8rem;color:var(--muted)}
-/* 🔥 BLINK ROSSO LENTO */
-.blink-red{color:#ef4444;font-weight:700;animation:blinkSlow 1.2s infinite}
-@keyframes blinkSlow{0%{opacity:1}50%{opacity:.25}100%{opacity:1}}
-table{width:100%;border-collapse:collapse;font-size:.85rem;background:rgba(15,23,42,.9);border-radius:14px;overflow:hidden}
-th,td{padding:10px 12px;border-bottom:1px solid rgba(31,41,55,.9)}
-th{font-size:.75rem;color:var(--muted);text-transform:uppercase}
-.buy-text{color:##ef4444 !important;font-weight:700}
-.sell-text{color:##ef4444 !important;font-weight:700}
-footer{text-align:center;margin-top:28px;font-size:.75rem;color:var(--muted)}
-</style></head>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Token Solana - BUMPER</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b1120;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.15);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #ef4444;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #000 100%);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 1200px;
+      margin: auto;
+      padding: 24px 16px 40px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .token-tag {
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--muted);
+      word-break: break-all;
+    }
+
+    button {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: none;
+      background: var(--accent-soft);
+      color: var(--accent);
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.9);
+      padding: 14px;
+      border-radius: 14px;
+      border-left: 4px solid transparent;
+    }
+
+    .card-buy { border-left-color: #22c55e; }
+    .card-sell { border-left-color: #ef4444; }
+
+    .card-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .card-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .section {
+      margin-top: 24px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 🔥 Blink rosso lento */
+    .blink-red {
+      color: #ef4444;
+      font-weight: 700;
+      animation: blinkSlow 1.2s infinite;
+    }
+
+    @keyframes blinkSlow {
+      0% { opacity: 1; }
+      50% { opacity: 0.25; }
+      100% { opacity: 1; }
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+    }
+
+    th {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .buy-text {
+      color: #22c55e;
+      font-weight: 700;
+    }
+
+    .sell-text {
+      color: #ef4444;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
 <body>
-<div class="app">
-<header>
-<div>
-<h1>Bella Bumper <span class="token-tag">$BUMPER • Solana</span></h1>
-<div class="subtitle">Mint: <code>5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk</code></div>
-</div>
-<div class="controls">
-<button id="refreshBtn">🔄 Aggiorna ora</button>
-<div class="status-text" id="statusText">Stato: <span>in attesa...</span></div>
-</div>
-</header>
+  <div class="app">
 
-<div class="grid">
-<div class="card"><div class="card-label">Prezzo</div><div class="card-value" id="priceUsd">-</div><div class="card-sub" id="priceNative">-</div></div>
-<div class="card"><div class="card-label">Variazione 24h</div><div class="card-value" id="priceChange">-</div></div>
-<div class="card"><div class="card-label">Volume 24h</div><div class="card-value" id="volume24h">-</div></div>
-<div class="card card-buy"><div class="card-label">Buy 24h</div><div class="card-value" id="buyVolume24h">-</div></div>
-<div class="card card-sell"><div class="card-label">Sell 24h</div><div class="card-value" id="sellVolume24h">-</div></div>
-<div class="card"><div class="card-label">Liquidità</div><div class="card-value" id="liquidity">-</div><div class="card-sub" id="fdv">FDV: -</div></div>
-</div>
+    <header>
+      <div>
+        <h1>Bella Bumper <span class="token-tag">$BUMPER • Solana</span></h1>
+        <div class="subtitle">Mint: <code>5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk</code></div>
+      </div>
 
-<div class="section">
-<div class="section-title">Coppie DEX <span>(dati Dexscreener)</span></div>
-<table><thead><tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h</th><th>Volume</th><th>Liquidità</th></tr></thead><tbody id="pairsTableBody"></tbody></table>
-</div>
+      <div>
+        <button id="refreshBtn">🔄 Aggiorna ora</button>
+        <div id="statusText" style="font-size:0.8rem;color:var(--muted);">Stato: <span>in attesa...</span></div>
+      </div>
+    </header>
 
-<div class="section">
-<div class="section-title">Volumi ultimi 10 giorni <span class="blink-red">(BUY / SELL in USDC da Helius)</span></div>
-<table><thead><tr><th>Data</th><th>BUY</th><th>SELL</th><th>Totale</th></tr></thead><tbody id="historyTableBody"></tbody></table>
-</div>
+    <div class="grid">
+      <div class="card">
+        <div class="card-label">Prezzo</div>
+        <div class="card-value" id="priceUsd">-</div>
+        <div class="card-sub" id="priceNative">-</div>
+      </div>
 
-<footer>Dashboard HTML statica • Dati live da Dexscreener & Helius</footer>
-</div>
+      <div class="card">
+        <div class="card-label">Variazione 24h</div>
+        <div class="card-value" id="priceChange">-</div>
+      </div>
 
-<script src="config.js"></script>
-<script>
-const TOKEN="5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
-const DEX=`https://api.dexscreener.com/latest/dex/tokens/${TOKEN}`;
-const HELIUS=`https://api.helius.xyz/v0/addresses/${TOKEN}/transactions?api-key=${HELIUS_API_KEY}&limit=1000`;
-let PRICE=null;
+      <div class="card">
+        <div class="card-label">Volume 24h</div>
+        <div class="card-value" id="volume24h">-</div>
+      </div>
 
-function $(id){return document.getElementById(id)}
-function usd(v){return v?("$"+Number(v).toFixed(2)):"-"}
+      <div class="card card-buy">
+        <div class="card-label">Buy 24h</div>
+        <div class="card-value" id="buyVolume24h">-</div>
+      </div>
 
-async function loadDex(){
-let r=await fetch(DEX);let j=await r.json();let p=j.pairs||[];if(!p.length)return;
-let best=p.sort((a,b)=>(b.volume?.h24||0)-(a.volume?.h24||0))[0];
-PRICE=Number(best.priceUsd)||null;
-$("priceUsd").textContent=best.priceUsd?("$"+Number(best.priceUsd).toFixed(6)):"-";
-$("priceNative").textContent=best.priceNative||"-";
-$("priceChange").textContent=(best.priceChange?.h24||0)+"%";
-$("volume24h").textContent=usd(best.volume?.h24);
-$("liquidity").textContent=usd(best.liquidity?.usd);
-$("fdv").textContent="FDV: "+usd(best.fdv);
-let buys=best.txns?.h24?.buys||0,sells=best.txns?.h24?.sells||0,vol=best.volume?.h24||0;
-$("buyVolume24h").textContent=usd((buys/(buys+sells))*vol||0);
-$("sellVolume24h").textContent=usd((sells/(buys+sells))*vol||0);
-let html="";
-p.forEach(x=>{
-html+=`<tr><td>${x.dexId}</td><td>${x.baseToken?.symbol}/${x.quoteToken?.symbol}</td><td>${usd(x.priceUsd)}</td><td>${x.priceChange?.h24||0}%</td><td>${usd(x.volume?.h24)}</td><td>${usd(x.liquidity?.usd)}</td></tr>`;
-});
-$("pairsTableBody").innerHTML=html;
-}
+      <div class="card card-sell">
+        <div class="card-label">Sell 24h</div>
+        <div class="card-value" id="sellVolume24h">-</div>
+      </div>
 
-async function loadHistory(){
-let r=await fetch(HELIUS);let tx=await r.json();let now=Date.now()/1000;let min=now-864000;
-let map={};
-tx.forEach(t=>{
-let ts=t.timestamp;if(!ts||ts<min)return;
-let day=Math.floor(ts/86400)*86400;
-if(!map[day])map[day]={buy:0,sell:0};
-let tr=t.tokenTransfers?.find(a=>a.mint===TOKEN);if(!tr||!PRICE)return;
-let usdVal=Math.abs(tr.tokenAmount||tr.amount||0)*PRICE;
-if(tr.toUserAccount&&!tr.fromUserAccount)map[day].buy+=usdVal;
-else if(tr.fromUserAccount&&!tr.toUserAccount)map[day].sell+=usdVal;
-else map[day].buy+=usdVal;
-});
-let days=Object.keys(map).sort((a,b)=>b-a).slice(0,10);
-let html="";
-days.forEach(d=>{
-html+=`<tr><td>${new Date(d*1000).toLocaleDateString("it-IT")}</td><td class="buy-text">${usd(map[d].buy)}</td><td class="sell-text">${usd(map[d].sell)}</td><td>${usd(map[d].buy+map[d].sell)}</td></tr>`;
-});
-$("historyTableBody").innerHTML=html;
-}
+      <div class="card">
+        <div class="card-label">Liquidità</div>
+        <div class="card-value" id="liquidity">-</div>
+        <div class="card-sub" id="fdv">FDV: -</div>
+      </div>
+    </div>
 
-async function refresh(){await loadDex();await loadHistory();$("statusText").innerHTML="Stato: <span style='color:#22c55e'>Aggiornato</span>"}
-$("refreshBtn").onclick=refresh;
-refresh();
-</script>
-</body></html>
+    <div class="section">
+      <div class="section-title">Coppie DEX <span>(dati Dexscreener)</span></div>
+      <table>
+        <thead>
+          <tr>
+            <th>DEX</th>
+            <th>Coppia</th>
+            <th>Prezzo</th>
+            <th>24h</th>
+            <th>Volume</th>
+            <th>Liquidità</th>
+          </tr>
+        </thead>
+        <tbody id="pairsTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        Volumi ultimi 10 giorni
+        <span class="blink-red">(BUY / SELL in USDC da Helius)</span>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>BUY</th>
+            <th>SELL</th>
+            <th>Totale</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script src="config.js"></script>
+
+  <script>
+    const TOKEN = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
+    const DEX = `https://api.dexscreener.com/latest/dex/tokens/${TOKEN}`;
+    const HELIUS = `https://api.helius.xyz/v0/addresses/${TOKEN}/transactions?api-key=${HELIUS_API_KEY}&limit=1000`;
+
+    let CURRENT_PRICE = null;
+    let PRICE_CHANGE_24H = 0;
+
+    function $(id) { return document.getElementById(id); }
+
+    function usd(v) {
+      if (!v || isNaN(v)) return "-";
+      return "$" + Number(v).toFixed(2);
+    }
+
+    async function loadDex() {
+      const r = await fetch(DEX);
+      const j = await r.json();
+      const pairs = j.pairs || [];
+      if (!pairs.length) return;
+
+      const best = pairs.sort((a, b) => (b.volume?.h24 || 0) - (a.volume?.h24 || 0))[0];
+
+      CURRENT_PRICE = Number(best.priceUsd) || null;
+      PRICE_CHANGE_24H = Number(best.priceChange?.h24 || 0);
+
+      $("priceUsd").textContent = usd(CURRENT_PRICE);
+      $("priceNative").textContent = best.priceNative || "-";
+      $("priceChange").textContent = PRICE_CHANGE_24H + "%";
+      $("volume24h").textContent = usd(best.volume?.h24);
+      $("liquidity").textContent = usd(best.liquidity?.usd);
+      $("fdv").textContent = "FDV: " + usd(best.fdv);
+
+      const buys = best.txns?.h24?.buys || 0;
+      const sells = best.txns?.h24?.sells || 0;
+      const vol = best.volume?.h24 || 0;
+
+      $("buyVolume24h").textContent = usd((buys / (buys + sells)) * vol || 0);
+      $("sellVolume24h").textContent = usd((sells / (buys + sells)) * vol || 0);
+
+      let html = "";
+      pairs.forEach(p => {
+        html += `
+          <tr>
+            <td>${p.dexId}</td>
+            <td>${p.baseToken?.symbol}/${p.quoteToken?.symbol}</td>
+            <td>${usd(p.priceUsd)}</td>
+            <td>${p.priceChange?.h24 || 0}%</td>
+            <td>${usd(p.volume?.h24)}</td>
+            <td>${usd(p.liquidity?.usd)}</td>
+          </tr>`;
+      });
+
+      $("pairsTableBody").innerHTML = html;
+    }
+
+    function estimateHistoricalPrice() {
+      if (!CURRENT_PRICE) return CURRENT_PRICE;
+      const factor = 1 + (PRICE_CHANGE_24H / 100);
+      return CURRENT_PRICE / factor;
+    }
+
+    async function loadHistory() {
+      const r = await fetch(HELIUS);
+      const tx = await r.json();
+
+      const now = Date.now() / 1000;
+      const min = now - 864000;
+
+      const map = {};
+
+      tx.forEach(t => {
+        const ts = t.timestamp;
+        if (!ts || ts < min) return;
+
+        const day = Math.floor(ts / 86400) * 86400;
+
+        if (!map[day]) map[day] = { buy: 0, sell: 0 };
+
+        const tr = t.tokenTransfers?.find(a => a.mint === TOKEN);
+        if (!tr) return;
+
+        const amount = tr.tokenAmount ?? tr.amount ?? tr.rawTokenAmount ?? 0;
+
+        const price = estimateHistoricalPrice();
+        const usdVal = Math.abs(amount) * price;
+
+        if (tr.toUserAccount && !tr.fromUserAccount) map[day].buy += usdVal;
+        else if (tr.fromUserAccount && !tr.toUserAccount) map[day].sell += usdVal;
+        else map[day].buy += usdVal;
+      });
+
+      const days = Object.keys(map).sort((a, b) => b - a).slice(0, 10);
+
+      let html = "";
+      days.forEach(d => {
+        html += `
+          <tr>
+            <td>${new Date(d * 1000).toLocaleDateString("it-IT")}</td>
+            <td class="buy-text">${usd(map[d].buy)}</td>
+            <td class="sell-text">${usd(map[d].sell)}</td>
+            <td>${usd(map[d].buy + map[d].sell)}</td>
+          </tr>`;
+      });
+
+      $("historyTableBody").innerHTML = html;
+    }
+
+    async function refresh() {
+      await loadDex();
+      await loadHistory();
+      $("statusText").innerHTML = "Stato: <span style='color:#22c55e'>Aggiornato</span>";
+    }
+
+    $("refreshBtn").onclick = refresh;
+    refresh();
+  </script>
+</body>
+</html>
