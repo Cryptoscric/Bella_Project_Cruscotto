@@ -36,6 +36,18 @@
       justify-content: space-between;
       flex-wrap: wrap;
       margin-bottom: 24px;
+      align-items: center;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      width: 72px;
+      height: auto;
     }
 
     h1 {
@@ -44,6 +56,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      margin: 0;
     }
 
     .token-tag {
@@ -68,6 +81,7 @@
       color: var(--accent);
       cursor: pointer;
       font-weight: 500;
+      margin-left: 8px;
     }
 
     .grid {
@@ -108,6 +122,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      margin-bottom: 8px;
     }
 
     .blink-red {
@@ -133,6 +148,7 @@
     th, td {
       padding: 10px 12px;
       border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+      font-size: 0.85rem;
     }
 
     th {
@@ -150,6 +166,38 @@
       color: #ef4444;
       font-weight: 700;
     }
+
+    .toolbar {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      align-items: center;
+    }
+
+    canvas {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 100%;
+      height: 260px;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      header {
+        gap: 12px;
+      }
+      .header-left {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 
@@ -157,10 +205,13 @@
   <div class="app">
 
     <header>
-      <div>
-        <h1>Bella Bumper <span class="token-tag">$BUMPER • Solana</span></h1>
-        <div class="subtitle">
-          Mint: <code>5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk</code>
+      <div class="header-left">
+        <img src="logo.png" alt="Logo Bella Bumper" class="logo" />
+        <div>
+          <h1>Bella Bumper <span class="token-tag">$BUMPER • Solana</span></h1>
+          <div class="subtitle">
+            Mint: <code>5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk</code>
+          </div>
         </div>
       </div>
 
@@ -243,6 +294,13 @@
         <span class="blink-red">(BUY / SELL in USDC da Helius)</span>
       </div>
 
+      <div class="toolbar">
+        <span id="lastUpdateText"></span>
+        <button id="exportCsvBtn">⬇ Esporta CSV</button>
+      </div>
+
+      <canvas id="historyChart"></canvas>
+
       <table>
         <thead>
           <tr>
@@ -253,6 +311,21 @@
           </tr>
         </thead>
         <tbody id="historyTableBody"></tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Top wallet per volumi (ultimi 10 giorni)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Wallet</th>
+            <th>BUY</th>
+            <th>SELL</th>
+            <th>Totale</th>
+          </tr>
+        </thead>
+        <tbody id="walletsTableBody"></tbody>
       </table>
     </div>
 
@@ -268,8 +341,12 @@
     const DAS_HOLDERS = `https://api.helius.xyz/v0/addresses/${TOKEN}/holders?api-key=${HELIUS_API_KEY}`;
     const HELIUS = `https://api.helius.xyz/v0/addresses/${TOKEN}/transactions?api-key=${HELIUS_API_KEY}&limit=1000`;
 
+    const REFRESH_MS = 60000;
+
     let CURRENT_PRICE = null;
     let PRICE_CHANGE_24H = 0;
+    let historyData = [];
+    let walletsData = [];
 
     function $(id) { return document.getElementById(id); }
 
@@ -282,6 +359,11 @@
       if (!CURRENT_PRICE) return 0;
       const factor = 1 + (PRICE_CHANGE_24H / 100);
       return CURRENT_PRICE / factor;
+    }
+
+    function shortAddr(a) {
+      if (!a) return "-";
+      return a.slice(0, 4) + "..." + a.slice(-4);
     }
 
     async function loadTokenInfo() {
@@ -380,57 +462,194 @@
       const now = Date.now() / 1000;
       const min = now - 864000;
 
-      const map = {};
+      const mapDays = {};
+      const mapWallets = {};
 
       tx.forEach(t => {
         const ts = t.timestamp;
         if (!ts || ts < min) return;
 
         const day = Math.floor(ts / 86400) * 86400;
-
-        if (!map[day]) map[day] = { buy: 0, sell: 0 };
+        if (!mapDays[day]) mapDays[day] = { buy: 0, sell: 0 };
 
         const tr = t.tokenTransfers?.find(a => a.mint === TOKEN);
         if (!tr) return;
 
         const amount = tr.tokenAmount ?? tr.amount ?? tr.rawTokenAmount ?? 0;
-
         const price = estimateHistoricalPrice();
         const usdVal = Math.abs(amount) * price;
 
-        if (tr.toUserAccount && !tr.fromUserAccount) map[day].buy += usdVal;
-        else if (tr.fromUserAccount && !tr.toUserAccount) map[day].sell += usdVal;
-        else map[day].buy += usdVal;
+        const to = tr.toUserAccount;
+        const from = tr.fromUserAccount;
+
+        if (to && !from) {
+          mapDays[day].buy += usdVal;
+          if (!mapWallets[to]) mapWallets[to] = { buy: 0, sell: 0 };
+          mapWallets[to].buy += usdVal;
+        } else if (from && !to) {
+          mapDays[day].sell += usdVal;
+          if (!mapWallets[from]) mapWallets[from] = { buy: 0, sell: 0 };
+          mapWallets[from].sell += usdVal;
+        } else {
+          mapDays[day].buy += usdVal;
+        }
       });
 
-      const days = Object.keys(map)
+      const days = Object.keys(mapDays)
         .sort((a, b) => b - a)
         .slice(0, 10);
 
+      historyData = days.map(d => ({
+        ts: Number(d),
+        date: new Date(d * 1000).toLocaleDateString("it-IT"),
+        buy: mapDays[d].buy,
+        sell: mapDays[d].sell,
+        total: mapDays[d].buy + mapDays[d].sell
+      })).reverse();
+
       let html = "";
-      days.forEach(d => {
+      historyData.forEach(row => {
         html += `
           <tr>
-            <td>${new Date(d * 1000).toLocaleDateString("it-IT")}</td>
-            <td class="buy-text">${usd(map[d].buy)}</td>
-            <td class="sell-text">${usd(map[d].sell)}</td>
-            <td>${usd(map[d].buy + map[d].sell)}</td>
+            <td>${row.date}</td>
+            <td class="buy-text">${usd(row.buy)}</td>
+            <td class="sell-text">${usd(row.sell)}</td>
+            <td>${usd(row.total)}</td>
           </tr>`;
       });
-
       $("historyTableBody").innerHTML = html;
+
+      const walletsArr = Object.keys(mapWallets).map(w => ({
+        wallet: w,
+        buy: mapWallets[w].buy,
+        sell: mapWallets[w].sell,
+        total: mapWallets[w].buy + mapWallets[w].sell
+      })).sort((a, b) => b.total - a.total).slice(0, 10);
+
+      walletsData = walletsArr;
+
+      let wHtml = "";
+      walletsArr.forEach(w => {
+        wHtml += `
+          <tr>
+            <td>${shortAddr(w.wallet)}</td>
+            <td class="buy-text">${usd(w.buy)}</td>
+            <td class="sell-text">${usd(w.sell)}</td>
+            <td>${usd(w.total)}</td>
+          </tr>`;
+      });
+      $("walletsTableBody").innerHTML = wHtml;
+
+      drawHistoryChart();
+    }
+
+    function drawHistoryChart() {
+      const canvas = $("historyChart");
+      const ctx = canvas.getContext("2d");
+
+      const width = canvas.width = canvas.clientWidth;
+      const height = canvas.height = canvas.clientHeight;
+
+      ctx.clearRect(0, 0, width, height);
+
+      if (!historyData.length) {
+        ctx.fillStyle = "#9ca3af";
+        ctx.font = "14px Inter";
+        ctx.fillText("Nessun dato disponibile", 20, height / 2);
+        return;
+      }
+
+      const maxVal = Math.max(...historyData.map(d => d.total || 0)) || 1;
+      const padding = 32;
+      const chartWidth = width - padding * 2;
+      const chartHeight = height - padding * 2;
+      const barGroupWidth = chartWidth / historyData.length;
+      const barWidth = barGroupWidth * 0.35;
+
+      ctx.strokeStyle = "#1f2937";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padding, padding);
+      ctx.lineTo(padding, padding + chartHeight);
+      ctx.lineTo(padding + chartWidth, padding + chartHeight);
+      ctx.stroke();
+
+      historyData.forEach((d, i) => {
+        const xCenter = padding + barGroupWidth * i + barGroupWidth / 2;
+
+        const buyH = (d.buy / maxVal) * chartHeight;
+        const sellH = (d.sell / maxVal) * chartHeight;
+
+        ctx.fillStyle = "#22c55e";
+        ctx.fillRect(
+          xCenter - barWidth - 2,
+          padding + chartHeight - buyH,
+          barWidth,
+          buyH
+        );
+
+        ctx.fillStyle = "#ef4444";
+        ctx.fillRect(
+          xCenter + 2,
+          padding + chartHeight - sellH,
+          barWidth,
+          sellH
+        );
+
+        ctx.fillStyle = "#9ca3af";
+        ctx.font = "10px Inter";
+        ctx.textAlign = "center";
+        const label = d.date.slice(0, 5);
+        ctx.fillText(label, xCenter, padding + chartHeight + 12);
+      });
+    }
+
+    function exportCsv() {
+      if (!historyData.length) return;
+
+      let csv = "Data,Buy,Sell,Totale\n";
+      historyData.forEach(r => {
+        csv += `${r.date},${r.buy.toFixed(2)},${r.sell.toFixed(2)},${r.total.toFixed(2)}\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "bumper_volumi_10_giorni.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function updateLastUpdate() {
+      const now = new Date();
+      $("lastUpdateText").textContent =
+        "Ultimo aggiornamento: " + now.toLocaleTimeString("it-IT");
     }
 
     async function refresh() {
-      await loadDex();
-      await loadTokenInfo();
-      await loadHistory();
       $("statusText").innerHTML =
-        "Stato: <span style='color:#22c55e'>Aggiornato</span>";
+        "Stato: <span style='color:#facc15'>Aggiornamento...</span>";
+      try {
+        await loadDex();
+        await loadTokenInfo();
+        await loadHistory();
+        $("statusText").innerHTML =
+          "Stato: <span style='color:#22c55e'>Aggiornato</span>";
+        updateLastUpdate();
+      } catch (e) {
+        $("statusText").innerHTML =
+          "Stato: <span style='color:#ef4444'>Errore</span>";
+      }
     }
 
     $("refreshBtn").onclick = refresh;
+    $("exportCsvBtn").onclick = exportCsv;
+
     refresh();
+    setInterval(refresh, REFRESH_MS);
   </script>
 
 </body>
