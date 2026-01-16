@@ -6,13 +6,14 @@
 
   <style>
     body{
-      background: radial-gradient(circle at 20% 20%, #10131a, #050609);
-      color:#e8e8e8;
+      background:#0d1117;
+      color:#e5e7eb;
       font-family:"Inter", Arial, sans-serif;
-      padding:25px;
+      padding:30px;
       margin:0;
     }
 
+    /* MENU */
     .menu{
       position:absolute;
       top:20px;
@@ -22,36 +23,34 @@
     }
     .pill{
       padding:10px 20px;
-      border:2px solid #6bb6ff;
+      border:2px solid #3b82f6;
       border-radius:30px;
-      color:#b7d9ff;
+      color:#93c5fd;
       text-decoration:none;
       font-weight:600;
       transition:0.25s;
-      backdrop-filter: blur(6px);
-      background:rgba(10,15,25,0.6);
+      background:rgba(17,24,39,0.6);
+      backdrop-filter:blur(6px);
     }
     .pill:hover{
-      background:#6bb6ff33;
+      background:#3b82f633;
       border-color:#ffffff;
       color:white;
     }
     .pill.active{
-      background:#6bb6ff55;
+      background:#3b82f655;
       border-color:white;
       color:white;
-      cursor:default;
     }
 
+    /* HEADER */
     h1{
       display:flex;
       align-items:center;
       gap:15px;
       font-size:32px;
       font-weight:800;
-      letter-spacing:0.5px;
-      margin-top:10px;
-      margin-bottom:25px;
+      margin-bottom:30px;
     }
     #logo{
       width:70px;
@@ -61,70 +60,173 @@
       box-shadow:0 0 18px rgba(0,0,0,0.6);
     }
 
-    #pianoVendita{
-      background: linear-gradient(135deg, #ffffff11, #ffffff05);
-      border:1px solid rgba(255,255,255,0.15);
-      backdrop-filter: blur(10px);
-      border-radius:18px;
+    /* CARD */
+    .card{
+      background:#11161f;
+      border:1px solid #1f2630;
+      border-radius:16px;
       padding:25px;
-      box-shadow:0 4px 20px rgba(0,0,0,0.4);
       margin-bottom:25px;
-      display:flex;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      gap:20px;
+      box-shadow:0 4px 18px rgba(0,0,0,0.4);
     }
 
-    .semaforo-dot{
-      width:14px;
-      height:14px;
-      border-radius:50%;
-      display:inline-block;
-      margin-right:6px;
+    .value{
+      font-size:34px;
+      font-weight:800;
+      color:white;
     }
 
-    .green{color:#4aff8a;font-weight:700;}
-    .red{color:#ff5c5c;font-weight:700;}
-    .yellow{color:#ffd86b;font-weight:700;}
+    .green{color:#22c55e;font-weight:700;}
+    .red{color:#ef4444;font-weight:700;}
+    .yellow{color:#facc15;font-weight:700;}
+
+    /* BADGE RISCHIO */
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 14px;
+      border-radius:20px;
+      font-weight:700;
+      font-size:14px;
+    }
+    .badge.green{
+      background:#22c55e22;
+      border:1px solid #22c55e;
+      color:#22c55e;
+    }
+    .badge.yellow{
+      background:#facc1522;
+      border:1px solid #facc15;
+      color:#facc15;
+    }
+    .badge.red{
+      background:#ef444422;
+      border:1px solid #ef4444;
+      color:#ef4444;
+    }
+
+    /* SPARKLINE GRANDE */
+    #sparkImpact{
+      width:100%;
+      height:80px;
+      background:#0b0f14;
+      border-radius:10px;
+      margin-top:15px;
+      box-shadow:inset 0 0 12px rgba(0,0,0,0.5);
+    }
+
+    /* TITOLI SEZIONI */
+    .section-title{
+      font-size:22px;
+      font-weight:800;
+      margin-bottom:12px;
+      color:#93c5fd;
+      text-transform:uppercase;
+      letter-spacing:1px;
+    }
+
+    /* BOX TESTUALI */
+    .text-box{
+      background:#0f141b;
+      border:1px solid #1f2630;
+      padding:18px;
+      border-radius:12px;
+      margin-top:15px;
+      line-height:1.55;
+      font-size:15px;
+      color:#d1d5db;
+    }
   </style>
 </head>
 
 <body>
 
+  <!-- MENU -->
   <div class="menu">
     <a class="pill" href="index.html">Dashboard</a>
     <a class="pill" href="vendita.html">Vendita</a>
     <a class="pill active" href="piano.html">Piano</a>
   </div>
 
+  <!-- HEADER -->
   <h1>
     <img id="logo" src="logo.png">
-    <span>Piano di Vendita</span>
+    <span>Piano di Vendita – Analisi Strategica</span>
   </h1>
 
-  <div id="pianoVendita">
-    <div>
-      <div style="font-size:22px;font-weight:900;color:#ff5c5c">Piano di vendita (basso impatto)</div>
-      <div id="safeSellTop" style="font-size:34px;font-weight:900;color:#4aff8a;margin-top:8px">–</div>
-      <div style="font-size:20px;font-weight:900;color:#4aff8a">BUMPER totali</div>
-      <div id="riskLabel" style="margin-top:12px;font-size:16px;font-weight:900;color:#1b1f27">
-        <span id="riskDot" class="semaforo-dot" style="background:#999"></span>Rischio: –
+  <!-- CARD PRINCIPALE -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px">
+
+      <!-- COLONNA SINISTRA -->
+      <div style="flex:1;min-width:260px">
+        <div class="section-title">Parametri principali</div>
+
+        <div class="value" id="safeSellTop">–</div>
+        <div style="margin-top:4px;color:#9ca3af;font-weight:600">BUMPER vendibili con basso impatto</div>
+
+        <div style="margin-top:20px;font-size:18px;font-weight:700">
+          Equivalente: <span id="safeSellUSDC" class="green">–</span> USDC
+        </div>
+
+        <div style="margin-top:20px">
+          <span id="riskBadge" class="badge">Rischio: –</span>
+        </div>
+
+        <div style="margin-top:20px;font-size:16px">
+          Impatto per tranche: <span id="impactPerTranche">–</span>
+        </div>
+
+        <div style="margin-top:10px;font-size:14px;color:#9ca3af">
+          Prezzo dopo tranche: <span id="estimatedPrice">–</span>
+        </div>
       </div>
+
+      <!-- COLONNA DESTRA -->
+      <div style="flex:1;min-width:260px">
+        <div class="section-title">Impatto stimato</div>
+        <canvas id="sparkImpact"></canvas>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- STRATEGIA CONSIGLIATA -->
+  <div class="card">
+    <div class="section-title">Strategia consigliata</div>
+
+    <div style="font-size:17px;font-weight:600">
+      Tranche totali: <span id="dcaCount" class="green">–</span><br>
+      Dimensione tranche: <span id="dcaTranche" class="green">–</span> BUMPER
     </div>
 
-    <div style="text-align:right">
-      <div style="font-size:20px;font-weight:900;color:#e8e8e8">
-        Equivalente: <span id="safeSellUSDC" style="color:#4aff8a">–</span> USDC
-      </div>
-      <div style="font-size:18px;margin-top:10px;color:#c0c6d8;font-weight:900">
-        DCA: <span id="dcaCount">–</span> × <span id="dcaTranche">–</span>
-      </div>
-      <div style="font-size:16px;margin-top:10px;color:#a5aec4;font-weight:900">
-        Impatto per tranche: <span id="impactPerTranche">–</span>
-      </div>
-      <div style="font-size:13px;margin-top:10px;color:#9aa3b8">
-        Prezzo dopo tranche: <span id="estimatedPrice">–</span>
-      </div>
+    <div class="text-box" id="strategyText">
+      –
+    </div>
+  </div>
+
+  <!-- NOTE OPERATIVE -->
+  <div class="card">
+    <div class="section-title">Note operative</div>
+
+    <div class="text-box">
+      • Evitare tranche con impatto superiore allo 0.25% per non entrare in zona rossa.<br>
+      • Monitorare il rapporto BUY/SELL nelle ultime 6 ore per valutare la pressione di mercato.<br>
+      • Se il sentiment diventa rosso, aumentare il numero di tranche per ridurre l’impatto.<br>
+      • In caso di forte volatilità, ridurre la dimensione delle tranche del 20–30%.
+    </div>
+  </div>
+
+  <!-- PERCHÉ FUNZIONA -->
+  <div class="card">
+    <div class="section-title">Perché questo piano funziona</div>
+
+    <div class="text-box">
+      Questo piano sfrutta la profondità della liquidità attuale per distribuire la vendita in più tranche,
+      riducendo l’impatto sul prezzo e mantenendo il mercato stabile.  
+      La strategia è progettata per minimizzare lo slippage, evitare reazioni dei market maker e preservare
+      il valore del token durante la liquidazione.
     </div>
   </div>
 
@@ -146,19 +248,48 @@
       document.getElementById("dcaCount").textContent = tr;
       document.getElementById("dcaTranche").textContent = trancheB.toLocaleString();
       document.getElementById("impactPerTranche").innerHTML =
-        (impact>=0 ? `<span class='green'>${impact.toFixed(2)}%</span>` :
-                     `<span class='red'>${impact.toFixed(2)}%</span>`);
+        impact>=0 ? `<span class='green'>${impact.toFixed(2)}%</span>` :
+                    `<span class='red'>${impact.toFixed(2)}%</span>`;
 
       document.getElementById("estimatedPrice").textContent =
         "$"+(price*(1-impact/100)).toFixed(8);
 
-      let dot=document.getElementById("riskDot");
-      dot.style.background = impact>=0.75 ? "#ff5c5c" :
-                             impact>=0.25 ? "#ffd86b" : "#4aff8a";
+      /* BADGE RISCHIO */
+      let badge=document.getElementById("riskBadge");
+      if(impact>=0.75){
+        badge.className="badge red";
+        badge.textContent="Rischio: Alto";
+      } else if(impact>=0.25){
+        badge.className="badge yellow";
+        badge.textContent="Rischio: Medio";
+      } else {
+        badge.className="badge green";
+        badge.textContent="Rischio: Basso";
+      }
 
-      document.getElementById("riskLabel").innerHTML =
-        `<span class="semaforo-dot" style="background:${dot.style.background}"></span>`+
-        `Rischio: ${impact>=0.75?"Alto":impact>=0.25?"Medio":"Basso"}`;
+      /* TESTO STRATEGIA */
+      document.getElementById("strategyText").innerHTML =
+        `Con una liquidità attuale di <b>${liq.toLocaleString()} USDC</b> e un volume 24h significativo,
+        la strategia ottimale è vendere in <b>${tr}</b> tranche da <b>${trancheB.toLocaleString()}</b> BUMPER ciascuna.
+        Questo mantiene l’impatto sotto la soglia critica e preserva il prezzo di mercato.`
+
+      /* SPARKLINE */
+      let c=document.getElementById("sparkImpact");
+      let x=c.getContext("2d");
+      x.clearRect(0,0,c.width,c.height);
+
+      let val = impact/100;
+      let y = c.height - (val * c.height);
+
+      x.strokeStyle="#3b82f6";
+      x.lineWidth=3;
+      x.shadowBlur=8;
+      x.shadowColor="#3b82f6aa";
+
+      x.beginPath();
+      x.moveTo(10,y);
+      x.lineTo(c.width-10,y);
+      x.stroke();
     }
 
     loadFromStorage();
