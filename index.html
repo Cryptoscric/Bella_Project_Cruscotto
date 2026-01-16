@@ -40,7 +40,7 @@ th{background:#1e222a;color:#9ecbff}
 </div>
 
 <!-- CARDS DATI -->
-<div class="card"><h2>Prezzo</h2><div id="price" class="value">–</div><div id="price-change" class="yellow">–</div></div>
+<div class="card"><h2>Prezzo</h2><div id="price" class="value">–</div><div id="priceChange" class="yellow">–</div></div>
 <div class="card"><h2>Volume 24h</h2><div id="volume24" class="value">–</div></div>
 <div class="card"><h2>Liquidità</h2><div id="liquidity" class="value">–</div></div>
 <div class="card"><h2>FDV</h2><div id="fdv" class="value">–</div></div>
@@ -53,7 +53,7 @@ th{background:#1e222a;color:#9ecbff}
 </table>
 </div>
 
-<!-- VENDITA PERSONALIZZATA (SPOSTATA QUI) -->
+<!-- VENDITA PERSONALIZZATA -->
 <div class="card">
 <h2>Vendita Personalizzata</h2>
 
@@ -96,7 +96,7 @@ function fmtUsd(v){if(!v)return"–";v=+v;return v<1?"$"+v.toFixed(6):"$"+v.toLo
 function fmtNum(v){return(+v).toLocaleString()}
 function signed(v){if(v===null||isNaN(v))return"–";let pos=v>=0,txt=v.toFixed(2)+"% "+(pos?"(positivo)":"(negativo)");return `<span style="color:${pos?"#00cc33":"#ff3333"};font-weight:bold">${txt}</span>`}
 
-function updateUserBalance(){userBalance=+userBalance.value;updateCustomSell()}
+function updateUserBalance(){userBalance=+document.getElementById("userBalance").value;updateCustomSell()}
 function sliderChanged(){if(!userBalance)return;customSellInput.value=Math.floor(userBalance*(+customSlider.value)/100);updateCustomSell()}
 function quickSell(p){if(!userBalance)return;customSellInput.value=Math.floor(userBalance*p/100);customSlider.value=p;updateCustomSell()}
 
@@ -137,16 +137,16 @@ fetch(URL).then(r=>r.json()).then(d=>{
 if(!d.pairs)return;
 let best=d.pairs.sort((a,b)=>(b.liquidity?.usd??0)-(a.liquidity?.usd??0))[0];
 globalPrice=+best.priceUsd||0;
-price.textContent="$"+globalPrice.toFixed(8);
-price-change.textContent=(best.priceChange?.h24??"–")+"%";
+document.getElementById("price").textContent="$"+globalPrice.toFixed(8);
+document.getElementById("priceChange").textContent=(best.priceChange?.h24??"–")+"%";
 
 let TL=0,TV=0,TB=0,TS=0;
 d.pairs.forEach(p=>{TL+=+(p.liquidity?.usd??0);TV+=+(p.volume?.h24??0);TB+=p.txns?.h24?.buys??0;TS+=p.txns?.h24?.sells??0});
 globalLiquidity=TL;globalVolume=TV;globalBuys=TB;globalSells=TS;
 
-liquidity.textContent=fmtUsd(TL);
-volume24.textContent=fmtUsd(TV);
-fdv.textContent=fmtUsd(best.fdv);
+document.getElementById("liquidity").textContent=fmtUsd(TL);
+document.getElementById("volume24").textContent=fmtUsd(TV);
+document.getElementById("fdv").textContent=fmtUsd(best.fdv);
 
 let planUSD=TL*0.02;
 planSafeSell=planUSD/globalPrice;
@@ -154,18 +154,18 @@ let tr=computeTranche(TL,TV,TB,TS);
 let trancheB=planSafeSell/tr;
 planImpact=(planUSD/tr)/TL*100;
 
-safeSellTop.textContent=fmtNum(planSafeSell);
-safeSellUSDC.textContent=fmtUsd(planUSD);
-dcaCount.textContent=tr;
-dcaTranche.textContent=fmtNum(trancheB);
-impactPerTranche.innerHTML=signed(planImpact);
-estimatedPrice.textContent="$"+(globalPrice*(1-planImpact/100)).toFixed(8);
+document.getElementById("safeSellTop").textContent=fmtNum(planSafeSell);
+document.getElementById("safeSellUSDC").textContent=fmtUsd(planUSD);
+document.getElementById("dcaCount").textContent=tr;
+document.getElementById("dcaTranche").textContent=fmtNum(trancheB);
+document.getElementById("impactPerTranche").innerHTML=signed(planImpact);
+document.getElementById("estimatedPrice").textContent="$"+(globalPrice*(1-planImpact/100)).toFixed(8);
 
-let dot=riskDot;
+let dot=document.getElementById("riskDot");
 dot.style.background=planImpact>=0.75?"#ff3333":planImpact>=0.25?"#ffcc00":"#00cc33";
-riskLabel.innerHTML=`<span class="semaforo-dot" style="background:${dot.style.background}"></span>Rischio: ${planImpact>=0.75?"Alto":planImpact>=0.25?"Medio":"Basso"}`;
+document.getElementById("riskLabel").innerHTML=`<span class="semaforo-dot" style="background:${dot.style.background}"></span>Rischio: ${planImpact>=0.75?"Alto":planImpact>=0.25?"Medio":"Basso"}`;
 
-let t=pairs;
+let t=document.getElementById("pairs");
 t.innerHTML="<tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h%</th><th>Volume</th><th>Liquidity</th></tr>";
 d.pairs.forEach(p=>{
 t.innerHTML+=`<tr>
