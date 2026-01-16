@@ -106,6 +106,11 @@
         </div>
     </div>
 
+    <div class="card">
+        <h2>Total Supply (on-chain)</h2>
+        <div id="totalSupply" class="value">–</div>
+    </div>
+
 </div>
 
 <div class="card">
@@ -138,6 +143,66 @@ function fmtNum(v) {
     return Number(v).toLocaleString();
 }
 
+//
+// ===============================
+// SUPPLY ON-CHAIN (SPL TOKEN MINT)
+// ===============================
+//
+async function loadOnChainSupply() {
+    try {
+        const rpcUrl = "https://api.mainnet-beta.solana.com";
+
+        const res = await fetch(rpcUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                jsonrpc: "2.0",
+                id: 1,
+                method: "getAccountInfo",
+                params: [
+                    TOKEN_MINT,
+                    { "encoding": "base64" }
+                ]
+            })
+        });
+
+        const data = await res.json();
+
+        if (!data.result || !data.result.value) {
+            console.error("Mint account non trovata");
+            return null;
+        }
+
+        const b64 = data.result.value.data[0];
+        const raw = atob(b64);
+        const bytes = Uint8Array.from(raw, c => c.charCodeAt(0));
+
+        // SPL Token Mint layout:
+        // offset 36–44 = supply (u64 LE)
+        // offset 44 = decimals (u8)
+
+        const supplyBytes = bytes.slice(36, 44);
+        let supply = 0n;
+        for (let i = 0; i < 8; i++) {
+            supply += BigInt(supplyBytes[i]) << (8n * BigInt(i));
+        }
+
+        const decimals = bytes[44];
+        const totalSupply = Number(supply) / Math.pow(10, decimals);
+
+        return totalSupply;
+
+    } catch (err) {
+        console.error("Errore lettura supply on-chain:", err);
+        return null;
+    }
+}
+
+//
+// ===============================
+// DEXSCREENER
+// ===============================
+//
 async function loadDexscreener() {
     try {
         const res = await fetch(DS_URL);
@@ -212,8 +277,17 @@ async function loadDexscreener() {
     }
 }
 
-function loadAll() {
+//
+// ===============================
+// LOAD ALL
+// ===============================
+//
+async function loadAll() {
     loadDexscreener();
+
+    const supply = await loadOnChainSupply();
+    document.getElementById("totalSupply").textContent =
+        supply ? fmtNum(supply) : "Non disponibile";
 }
 
 loadAll();
