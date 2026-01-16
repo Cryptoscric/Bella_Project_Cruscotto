@@ -1,27 +1,49 @@
-<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>BUMPER Dashboard</title>
-<style>
-body{background:#0b0d10;color:#e6e6e6;font-family:Arial;padding:25px;margin:0}
-h1{display:flex;align-items:center;gap:15px;font-size:28px;font-weight:bold}
-#logo{width:70px;height:70px;border-radius:10px;background:#111}
-.card{background:#161a20;padding:20px;border-radius:12px;margin-bottom:20px;border:1px solid #222}
-.value{font-size:28px;font-weight:bold}
-.green{color:#00cc33;font-weight:bold}
-.red{color:#ff3333;font-weight:bold}
-.yellow{color:#ffd700;font-weight:bold}
-.input-box{width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#222;color:white;font-size:16px;margin-bottom:10px}
-.quick-btn{padding:8px 14px;margin-right:8px;background:#333;border:1px solid #555;border-radius:6px;color:white;cursor:pointer;font-weight:bold}
-.update-btn{padding:10px 18px;background:#00cc33;border:none;border-radius:8px;color:black;font-weight:bold;cursor:pointer}
-.sparkline{width:120px;height:30px;background:#111;border-radius:6px;margin-top:8px}
-.semaforo-dot{width:14px;height:14px;border-radius:50%;display:inline-block;margin-right:6px}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>BUMPER Dashboard</title>
+  <style>
+    body{background:#0b0d10;color:#e6e6e6;font-family:Arial;padding:25px;margin:0}
+    h1{display:flex;align-items:center;gap:15px;font-size:28px;font-weight:bold}
+    #logo{width:70px;height:70px;border-radius:10px;background:#111}
+    .card{background:#161a20;padding:20px;border-radius:12px;margin-bottom:20px;border:1px solid #222}
+    .value{font-size:28px;font-weight:bold}
+    .green{color:#00cc33;font-weight:bold}
+    .red{color:#ff3333;font-weight:bold}
+    .yellow{color:#ffd700;font-weight:bold}
+    .input-box{width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#222;color:white;font-size:16px;margin-bottom:10px}
+    .quick-btn{padding:8px 14px;margin-right:8px;background:#333;border:1px solid #555;border-radius:6px;color:white;cursor:pointer;font-weight:bold}
+    .update-btn{padding:10px 18px;background:#00cc33;border:none;border-radius:8px;color:black;font-weight:bold;cursor:pointer}
+    .sparkline{width:120px;height:30px;background:#111;border-radius:6px;margin-top:8px}
+    .semaforo-dot{width:14px;height:14px;border-radius:50%;display:inline-block;margin-right:6px}
 
-/* Tabella DEX migliorata */
-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:16px}
-th,td{padding:10px;border-bottom:1px solid #333}
-th{background:#1e222a;color:#9ecbff;font-size:15px}
-tr:nth-child(odd){background:#1a1d23}
-tr:nth-child(even){background:#22262d}
-</style>
-</head><body>
+    /* Titoli interni con linea spessa */
+    .section-title{
+      text-align:center;
+      font-weight:900;
+      font-size:20px;
+      margin:14px 0 10px 0;
+    }
+    .section-title::before,
+    .section-title::after{
+      content:"";
+      display:inline-block;
+      width:28%;
+      border-top:3px solid #cccccc;
+      margin:0 10px;
+      transform:translateY(-4px);
+    }
+
+    /* Tabella DEX migliorata */
+    table{width:100%;border-collapse:collapse;margin-top:12px;font-size:16px}
+    th,td{padding:10px;border-bottom:1px solid #333}
+    th{background:#1e222a;color:#9ecbff;font-size:15px}
+    tr:nth-child(odd){background:#1a1d23}
+    tr:nth-child(even){background:#22262d}
+  </style>
+</head>
+<body>
 
 <h1><img id="logo" src="logo.png"><span>BUMPER Dashboard</span></h1>
 
@@ -65,27 +87,34 @@ tr:nth-child(even){background:#22262d}
   </div>
 </div>
 
-<!-- 📊 BUY/SELL ANALYTICS -->
+<!-- MEGA-CARD: BUY/SELL + VOLUMI -->
 <div class="card">
-  <h2>Buy/Sell Analytics</h2>
+  <div class="section-title">BUY/SELL</div>
 
-  <div id="bs24" style="margin-top:10px;font-size:16px"></div>
-  <div id="bs6" style="margin-top:6px;font-size:16px"></div>
-  <div id="bs1" style="margin-top:6px;font-size:16px"></div>
-  <div id="bs48" style="margin-top:6px;font-size:16px"></div>
+  <div id="bs24" style="margin-top:6px;font-size:18px"></div>
+  <div id="bs6"  style="margin-top:6px;font-size:18px"></div>
+  <div id="bs1"  style="margin-top:6px;font-size:18px"></div>
 
-  <div id="sentiment" style="margin-top:12px;font-size:18px;font-weight:bold"></div>
+  <div id="sentiment" style="margin-top:12px;font-size:20px;font-weight:bold"></div>
 
   <!-- Barre separate -->
-  <div style="margin-top:15px">
+  <div style="margin-top:16px">
     <div style="color:#00cc33;font-weight:bold">BUY</div>
     <div id="barBuy" style="height:10px;background:#00cc33;width:0%;border-radius:4px"></div>
 
-    <div style="color:#ff3333;font-weight:bold;margin-top:10px">SELL</div>
+    <div style="color:#ff3333;font-weight:bold;margin-top:12px">SELL</div>
     <div id="barSell" style="height:10px;background:#ff3333;width:0%;border-radius:4px"></div>
   </div>
 
-  <canvas id="sparkBS" class="sparkline" style="margin-top:15px"></canvas>
+  <canvas id="sparkBS" class="sparkline" style="margin-top:16px"></canvas>
+
+  <div class="section-title" style="margin-top:24px">VOLUMI</div>
+
+  <div id="vol1"  style="margin-top:6px;font-size:18px"></div>
+  <div id="vol6"  style="margin-top:6px;font-size:18px"></div>
+  <div id="vol24" style="margin-top:6px;font-size:18px"></div>
+  <div id="vol48" style="margin-top:6px;font-size:18px"></div>
+  <div id="vol72" style="margin-top:6px;font-size:18px"></div>
 </div>
 
 <!-- DEX -->
@@ -135,7 +164,11 @@ const URL="https://api.dexscreener.com/latest/dex/tokens/"+TOKEN;
 let userBalance=0,globalPrice=0,globalLiquidity=0,globalVolume=0;
 let planImpact=0,planSafeSell=0;
 
-function fmtUsd(v){if(!v)return"–";v=+v;return v<1?"$"+v.toFixed(6):"$"+v.toLocaleString()}
+function fmtUsd(v){
+  if(!v)return"–";
+  v=+v;
+  return v<1?"$"+v.toFixed(2):"$"+v.toLocaleString();
+}
 function fmtNum(v){return(+v).toLocaleString()}
 
 function signed(v){
@@ -145,9 +178,21 @@ function signed(v){
   return `<span style="color:${pos?"#00cc33":"#ff3333"};font-weight:bold">${txt}</span>`;
 }
 
-function updateUserBalance(){userBalance=+document.getElementById("userBalance").value;updateCustomSell()}
-function sliderChanged(){if(!userBalance)return;customSellInput.value=Math.floor(userBalance*(+customSlider.value)/100);updateCustomSell()}
-function quickSell(p){if(!userBalance)return;customSellInput.value=Math.floor(userBalance*p/100);customSlider.value=p;updateCustomSell()}
+function updateUserBalance(){
+  userBalance=+document.getElementById("userBalance").value;
+  updateCustomSell();
+}
+function sliderChanged(){
+  if(!userBalance)return;
+  customSellInput.value=Math.floor(userBalance*(+customSlider.value)/100);
+  updateCustomSell();
+}
+function quickSell(p){
+  if(!userBalance)return;
+  customSellInput.value=Math.floor(userBalance*p/100);
+  customSlider.value=p;
+  updateCustomSell();
+}
 
 function drawSpark(c,val){
   let x=c.getContext("2d");
@@ -221,20 +266,71 @@ function loadDex(){
     document.getElementById("volume24").textContent=fmtUsd(TV);
     document.getElementById("fdv").textContent=fmtUsd(best.fdv);
 
-    /* BUY/SELL ANALYTICS */
-    document.getElementById("bs24").innerHTML=`<b>24h:</b> BUY <span class="green">${B24}</span> — SELL <span class="red">${S24}</span>`;
-    document.getElementById("bs6").innerHTML=`<b>6h:</b> BUY <span class="green">${B6}</span> — SELL <span class="red">${S6}</span>`;
-    document.getElementById("bs1").innerHTML=`<b>1h:</b> BUY <span class="green">${B1}</span> — SELL <span class="red">${S1}</span>`;
+    /* Funzione per stimare split BUY/SELL in USDT per una finestra */
+    function splitVolume(p, keyVol, keyTx){
+      let vol = p.volume?.[keyVol] ?? 0;
+      let buys = p.txns?.[keyTx]?.buys ?? 0;
+      let sells = p.txns?.[keyTx]?.sells ?? 0;
+      let tot = buys + sells;
+      if(!tot || !vol) return {vb:0,vs:0};
+      return {
+        vb: vol * (buys/tot),
+        vs: vol * (sells/tot)
+      };
+    }
 
-    /* VOLUME 48h */
+    /* BUY/SELL USDT per 24h, 6h, 1h */
+    let V24_BUY=0,V24_SELL=0,V6_BUY=0,V6_SELL=0,V1_BUY=0,V1_SELL=0;
+
+    d.pairs.forEach(p=>{
+      let s24 = splitVolume(p,"h24","h24");
+      V24_BUY+=s24.vb; V24_SELL+=s24.vs;
+      let s6 = splitVolume(p,"h6","h6");
+      V6_BUY+=s6.vb; V6_SELL+=s6.vs;
+      let s1 = splitVolume(p,"h1","h1");
+      V1_BUY+=s1.vb; V1_SELL+=s1.vs;
+    });
+
+    /* BUY/SELL ANALYTICS (NUMERI + USDT) */
+    document.getElementById("bs24").innerHTML=
+      `<b>24h:</b> BUY <span class="green">${B24}</span> `+
+      `<span style="color:#ffffff">(${fmtUsd(V24_BUY)})</span> — `+
+      `SELL <span class="red">${S24}</span> `+
+      `<span style="color:#ffffff">(${fmtUsd(V24_SELL)})</span>`;
+
+    document.getElementById("bs6").innerHTML=
+      `<b>6h:</b> BUY <span class="green">${B6}</span> `+
+      `<span style="color:#ffffff">(${fmtUsd(V6_BUY)})</span> — `+
+      `SELL <span class="red">${S6}</span> `+
+      `<span style="color:#ffffff">(${fmtUsd(V6_SELL)})</span>`;
+
+    document.getElementById("bs1").innerHTML=
+      `<b>1h:</b> BUY <span class="green">${B1}</span> `+
+      `<span style="color:#ffffff">(${fmtUsd(V1_BUY)})</span> — `+
+      `SELL <span class="red">${S1}</span> `+
+      `<span style="color:#ffffff">(${fmtUsd(V1_SELL)})</span>`;
+
+    /* VOLUME 48h e 72h (totali) */
     let V24 = TV;
     let V6 = d.pairs.reduce((a,p)=>a+(p.volume?.h6??0),0);
     let V1 = d.pairs.reduce((a,p)=>a+(p.volume?.h1??0),0);
     let V24_prev = V24 - V6 + V1;
     let V48 = V24 + V24_prev;
+    let V72 = V24 + V24_prev + V24_prev;
 
-    document.getElementById("bs48").innerHTML =
-      `<b>Volume 48h:</b> <span class="yellow">${fmtUsd(V48)}</span>`;
+    /* Stima BUY/SELL per 24h precedente, 48h, 72h */
+    let tot24 = V24_BUY + V24_SELL;
+    let ratioBuy24 = tot24 ? V24_BUY/tot24 : 0.5;
+    let ratioSell24 = 1 - ratioBuy24;
+
+    let V24prev_BUY = V24_prev * ratioBuy24;
+    let V24prev_SELL = V24_prev * ratioSell24;
+
+    let V48_BUY = V24_BUY + V24prev_BUY;
+    let V48_SELL = V24_SELL + V24prev_SELL;
+
+    let V72_BUY = V24_BUY + V24prev_BUY + V24prev_BUY;
+    let V72_SELL = V24_SELL + V24prev_SELL + V24prev_SELL;
 
     /* SENTIMENT */
     let sentiment = B24>S24 ? "VERDE (buy > sell)" : B24<S24 ? "ROSSO (sell > buy)" : "GIALLO (equilibrato)";
@@ -251,6 +347,32 @@ function loadDex(){
     document.getElementById("barSell").style.width=sellPct+"%";
 
     drawSpark(sparkBS, buyPct/100);
+
+    /* Sezione VOLUMI: 1h, 6h, 24h, 48h, 72h con BUY/SELL */
+    document.getElementById("vol1").innerHTML =
+      `<b>Volume 1h:</b> `+
+      `BUY <span class="green">${fmtUsd(V1_BUY)}</span> — `+
+      `SELL <span class="red">${fmtUsd(V1_SELL)}</span>`;
+
+    document.getElementById("vol6").innerHTML =
+      `<b>Volume 6h:</b> `+
+      `BUY <span class="green">${fmtUsd(V6_BUY)}</span> — `+
+      `SELL <span class="red">${fmtUsd(V6_SELL)}</span>`;
+
+    document.getElementById("vol24").innerHTML =
+      `<b>Volume 24h:</b> `+
+      `BUY <span class="green">${fmtUsd(V24_BUY)}</span> — `+
+      `SELL <span class="red">${fmtUsd(V24_SELL)}</span>`;
+
+    document.getElementById("vol48").innerHTML =
+      `<b>Volume 48h:</b> `+
+      `BUY <span class="green">${fmtUsd(V48_BUY)}</span> — `+
+      `SELL <span class="red">${fmtUsd(V48_SELL)}</span>`;
+
+    document.getElementById("vol72").innerHTML =
+      `<b>Volume 72h:</b> `+
+      `BUY <span class="green">${fmtUsd(V72_BUY)}</span> — `+
+      `SELL <span class="red">${fmtUsd(V72_SELL)}</span>`;
 
     /* Piano di vendita */
     let planUSD=TL*0.02;
@@ -293,4 +415,5 @@ function loadDex(){
 loadDex();
 setInterval(loadDex,10000);
 </script>
-</body></html>
+</body>
+</html>
