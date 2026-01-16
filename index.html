@@ -5,41 +5,45 @@
   <title>BUMPER Dashboard – SPA</title>
 
   <style>
+    /* LAYOUT GENERALE */
     body{
-      background:#0b0d10;
-      color:#e6e6e6;
-      font-family:Arial;
+      background: radial-gradient(circle at 20% 20%, #10131a, #050609);
+      color:#e8e8e8;
+      font-family:"Inter", Arial, sans-serif;
       padding:25px;
       margin:0;
     }
 
-    /* MENU IN ALTO A DESTRA – PILL TRASPARENTI */
+    /* MENU IN ALTO A DESTRA – PILL MODERNE */
     .menu{
       position:absolute;
       top:20px;
       right:30px;
       display:flex;
-      gap:12px;
+      gap:14px;
+      z-index:10;
     }
     .pill{
-      padding:8px 16px;
-      border:2px solid #9ecbff;
-      border-radius:20px;
-      color:#9ecbff;
+      padding:10px 20px;
+      border:2px solid #6bb6ff;
+      border-radius:30px;
+      color:#b7d9ff;
       text-decoration:none;
-      font-weight:bold;
-      transition:0.2s;
+      font-weight:600;
+      transition:0.25s;
+      backdrop-filter: blur(6px);
+      background:rgba(10,15,25,0.6);
       cursor:pointer;
     }
     .pill:hover{
-      background:#9ecbff22;
+      background:#6bb6ff33;
+      border-color:#ffffff;
       color:white;
-      border-color:white;
     }
     .pill.active{
+      background:#6bb6ff55;
       border-color:white;
       color:white;
-      background:#9ecbff22;
       cursor:default;
     }
 
@@ -48,76 +52,95 @@
       display:flex;
       align-items:center;
       gap:15px;
-      font-size:28px;
-      font-weight:bold;
+      font-size:32px;
+      font-weight:800;
+      letter-spacing:0.5px;
+      margin-top:10px;
+      margin-bottom:25px;
     }
     #logo{
       width:70px;
       height:70px;
-      border-radius:10px;
+      border-radius:16px;
       background:#111;
+      box-shadow:0 0 18px rgba(0,0,0,0.6);
     }
 
-    /* CARD GENERICA */
+    /* CARD – GLASSMORPHISM */
     .card{
-      background:#161a20;
-      padding:20px;
-      border-radius:12px;
-      margin-bottom:20px;
-      border:1px solid #222;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(14px);
+      border:1px solid rgba(255,255,255,0.08);
+      padding:22px;
+      border-radius:16px;
+      margin-bottom:22px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.35);
     }
-    .value{
-      font-size:28px;
-      font-weight:bold;
-    }
-    .green{color:#00cc33;font-weight:bold;}
-    .red{color:#ff3333;font-weight:bold;}
-    .yellow{color:#ffd700;font-weight:bold;}
 
-    /* TITOLI INTERNI CON LINEA SPESSA */
+    .value{
+      font-size:32px;
+      font-weight:800;
+      color:#ffffff;
+    }
+
+    .green{color:#4aff8a;font-weight:700;}
+    .red{color:#ff5c5c;font-weight:700;}
+    .yellow{color:#ffd86b;font-weight:700;}
+
+    /* TITOLI INTERNI CON LINEA */
     .section-title{
       text-align:center;
       font-weight:900;
       font-size:20px;
       margin:14px 0 10px 0;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      color:#dfe7ff;
     }
     .section-title::before,
     .section-title::after{
       content:"";
       display:inline-block;
-      width:28%;
-      border-top:3px solid #cccccc;
+      width:24%;
+      border-top:3px solid #3b4a63;
       margin:0 10px;
       transform:translateY(-4px);
     }
 
     /* SPARKLINE */
     .sparkline{
-      width:120px;
-      height:30px;
-      background:#111;
-      border-radius:6px;
-      margin-top:8px;
+      width:140px;
+      height:40px;
+      background:#0d1015;
+      border-radius:8px;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
     }
 
     /* TABELLA DEX */
     table{
       width:100%;
       border-collapse:collapse;
-      margin-top:12px;
-      font-size:16px;
-    }
-    th,td{
-      padding:10px;
-      border-bottom:1px solid #333;
+      font-size:15px;
+      border-radius:12px;
+      overflow:hidden;
     }
     th{
-      background:#1e222a;
+      background:#1a2332;
       color:#9ecbff;
-      font-size:15px;
+      padding:12px;
+      text-align:left;
+      font-weight:700;
     }
-    tr:nth-child(odd){background:#1a1d23;}
-    tr:nth-child(even){background:#22262d;}
+    td{
+      padding:12px;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    tr:nth-child(even){
+      background:rgba(255,255,255,0.02);
+    }
+    tr:hover{
+      background:rgba(255,255,255,0.05);
+    }
 
     .semaforo-dot{
       width:14px;
@@ -127,35 +150,107 @@
       margin-right:6px;
     }
 
+    /* PIANO DI VENDITA – CARD SPECIALE */
+    #pianoVendita{
+      background: linear-gradient(135deg, #ffffff11, #ffffff05);
+      border:1px solid rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border-radius:18px;
+      padding:25px;
+      box-shadow:0 4px 20px rgba(0,0,0,0.4);
+      margin-bottom:25px;
+      display:flex;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:20px;
+    }
+
     /* INPUT / BOTTONI VENDITA */
     .input-box{
       width:100%;
-      padding:10px;
-      border-radius:8px;
-      border:1px solid #444;
-      background:#222;
+      padding:12px;
+      border-radius:10px;
+      border:1px solid #2a2f38;
+      background:#0f1217;
       color:white;
       font-size:16px;
       margin-bottom:10px;
+      transition:0.2s;
     }
+    .input-box:focus{
+      border-color:#6bb6ff;
+      outline:none;
+      box-shadow:0 0 8px #6bb6ff55;
+    }
+
     .quick-btn{
       padding:8px 14px;
       margin-right:8px;
-      background:#333;
-      border:1px solid #555;
-      border-radius:6px;
-      color:white;
+      background:#1b2230;
+      border:1px solid #3a4760;
+      border-radius:8px;
+      color:#dfe7ff;
       cursor:pointer;
-      font-weight:bold;
+      font-weight:600;
+      font-size:13px;
+      transition:0.2s;
     }
+    .quick-btn:hover{
+      background:#2a3650;
+      border-color:#6bb6ff;
+      color:white;
+    }
+
     .update-btn{
       padding:10px 18px;
-      background:#00cc33;
+      background:linear-gradient(135deg,#4aff8a,#00cc55);
       border:none;
-      border-radius:8px;
-      color:black;
-      font-weight:bold;
+      border-radius:10px;
+      color:#041008;
+      font-weight:700;
       cursor:pointer;
+      margin-top:6px;
+      box-shadow:0 0 12px rgba(0,0,0,0.5);
+      transition:0.2s;
+    }
+    .update-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 0 16px rgba(0,0,0,0.7);
+    }
+
+    /* SLIDER */
+    input[type="range"]{
+      width:100%;
+      height:6px;
+      border-radius:3px;
+      background:#2a2f38;
+      outline:none;
+      -webkit-appearance:none;
+      appearance:none;
+      margin-top:4px;
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      appearance:none;
+      width:18px;
+      height:18px;
+      background:#6bb6ff;
+      border-radius:50%;
+      cursor:pointer;
+      box-shadow:0 0 8px #6bb6ffaa;
+    }
+
+    /* BARRE BUY/SELL */
+    #barBuy, #barSell{
+      height:12px;
+      border-radius:6px;
+      transition:width 0.4s ease;
+    }
+    #barBuy{
+      background:linear-gradient(90deg, #4aff8a, #00cc55);
+    }
+    #barSell{
+      background:linear-gradient(90deg, #ff5c5c, #cc0000);
     }
 
     /* VISTE SPA */
@@ -173,7 +268,7 @@
 
   <!-- HEADER COMUNE -->
   <h1>
-    <img id="logo" src="logo.png">
+    <img id="logo" src="logo.png" alt="Logo">
     <span>BUMPER Dashboard</span>
   </h1>
 
@@ -181,21 +276,29 @@
   <div id="viewDashboard" class="view active">
 
     <!-- PIANO DI VENDITA -->
-    <div style="background:#dddddd;padding:20px;border-radius:12px;margin-bottom:25px;display:flex;justify-content:space-between;flex-wrap:wrap">
+    <div id="pianoVendita">
       <div>
-        <div style="font-size:22px;font-weight:900;color:#ff3333">Piano di vendita (basso impatto)</div>
-        <div id="safeSellTop" style="font-size:34px;font-weight:900;color:#00cc33;margin-top:8px">–</div>
-        <div style="font-size:20px;font-weight:900;color:#00cc33">BUMPER totali</div>
-        <div id="riskLabel" style="margin-top:12px;font-size:16px;font-weight:900;color:#333">
+        <div style="font-size:22px;font-weight:900;color:#ff5c5c">Piano di vendita (basso impatto)</div>
+        <div id="safeSellTop" style="font-size:34px;font-weight:900;color:#4aff8a;margin-top:8px">–</div>
+        <div style="font-size:20px;font-weight:900;color:#4aff8a">BUMPER totali</div>
+        <div id="riskLabel" style="margin-top:12px;font-size:16px;font-weight:900;color:#1b1f27">
           <span id="riskDot" class="semaforo-dot" style="background:#999"></span>Rischio: –
         </div>
       </div>
 
       <div style="text-align:right">
-        <div style="font-size:20px;font-weight:900;color:#222">Equivalente: <span id="safeSellUSDC" style="color:#00cc33">–</span> USDC</div>
-        <div style="font-size:18px;margin-top:10px;color:#444;font-weight:900">DCA: <span id="dcaCount">–</span> × <span id="dcaTranche">–</span></div>
-        <div style="font-size:16px;margin-top:10px;color:#555;font-weight:900">Impatto per tranche: <span id="impactPerTranche">–</span></div>
-        <div style="font-size:13px;margin-top:10px;color:#333">Prezzo dopo tranche: <span id="estimatedPrice">–</span></div>
+        <div style="font-size:20px;font-weight:900;color:#e8e8e8">
+          Equivalente: <span id="safeSellUSDC" style="color:#4aff8a">–</span> USDC
+        </div>
+        <div style="font-size:18px;margin-top:10px;color:#c0c6d8;font-weight:900">
+          DCA: <span id="dcaCount">–</span> × <span id="dcaTranche">–</span>
+        </div>
+        <div style="font-size:16px;margin-top:10px;color:#a5aec4;font-weight:900">
+          Impatto per tranche: <span id="impactPerTranche">–</span>
+        </div>
+        <div style="font-size:13px;margin-top:10px;color:#9aa3b8">
+          Prezzo dopo tranche: <span id="estimatedPrice">–</span>
+        </div>
       </div>
     </div>
 
@@ -223,7 +326,7 @@
     <!-- MEGA-CARD BUY/SELL + VOLUMI -->
     <div class="card">
 
-      <div class="section-title">BUY/SELL</div>
+      <div class="section-title">BUY / SELL</div>
 
       <div id="bs24" style="margin-top:6px;font-size:18px"></div>
       <div id="bs6"  style="margin-top:6px;font-size:18px"></div>
@@ -232,11 +335,11 @@
       <div id="sentiment" style="margin-top:12px;font-size:20px;font-weight:bold"></div>
 
       <div style="margin-top:16px">
-        <div style="color:#00cc33;font-weight:bold">BUY</div>
-        <div id="barBuy" style="height:10px;background:#00cc33;width:0%;border-radius:4px"></div>
+        <div style="color:#4aff8a;font-weight:bold">BUY</div>
+        <div id="barBuy" style="width:0%"></div>
 
-        <div style="color:#ff3333;font-weight:bold;margin-top:12px">SELL</div>
-        <div id="barSell" style="height:10px;background:#ff3333;width:0%;border-radius:4px"></div>
+        <div style="color:#ff5c5c;font-weight:bold;margin-top:12px">SELL</div>
+        <div id="barSell" style="width:0%"></div>
       </div>
 
       <canvas id="sparkBS" class="sparkline" style="margin-top:16px"></canvas>
@@ -275,7 +378,7 @@
 
       <label>Quanti BUMPER vuoi vendere?</label>
       <input id="customSellInput" class="input-box" type="number" oninput="updateCustomSell()">
-      <input id="customSlider" type="range" min="0" max="100" value="0" style="width:100%" oninput="sliderChanged()">
+      <input id="customSlider" type="range" min="0" max="100" value="0" oninput="sliderChanged()">
 
       <div style="margin-top:10px">
         <button class="quick-btn" onclick="quickSell(10)">10%</button>
@@ -302,7 +405,7 @@
     const TOKEN="5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
     const URL="https://api.dexscreener.com/latest/dex/tokens/"+TOKEN;
 
-    /* STATO CONDIVISO (DATA BRIDGE) */
+    /* STATO CONDIVISO */
     let userBalance=0;
     let globalPrice=0;
     let globalLiquidity=0;
@@ -321,7 +424,7 @@
       if(v===null||isNaN(v))return"–";
       let pos=v>=0;
       let txt=v.toFixed(2)+"% "+(pos?"(sotto soglia)":"(sopra soglia)");
-      return `<span style="color:${pos?"#00cc33":"#ff3333"};font-weight:bold">${txt}</span>`;
+      return `<span style="color:${pos?"#4aff8a":"#ff5c5c"};font-weight:bold">${txt}</span>`;
     }
 
     function drawSpark(c,val){
@@ -329,7 +432,7 @@
       x.clearRect(0,0,c.width,c.height);
       if(!val||isNaN(val))return;
       let max=1.5,y=c.height-(Math.min(val,max)/max)*c.height;
-      x.strokeStyle=val>=0.75?"#ff3333":val>=0.25?"#ffcc00":"#00cc33";
+      x.strokeStyle=val>=0.75?"#ff5c5c":val>=0.25?"#ffd86b":"#4aff8a";
       x.lineWidth=2;
       x.beginPath();x.moveTo(5,y);x.lineTo(c.width-5,y);x.stroke();
     }
@@ -341,13 +444,14 @@
     }
     function sliderChanged(){
       if(!userBalance)return;
-      customSellInput.value=Math.floor(userBalance*(+customSlider.value)/100);
+      document.getElementById("customSellInput").value=
+        Math.floor(userBalance*(+document.getElementById("customSlider").value)/100);
       updateCustomSell();
     }
     function quickSell(p){
       if(!userBalance)return;
-      customSellInput.value=Math.floor(userBalance*p/100);
-      customSlider.value=p;
+      document.getElementById("customSellInput").value=Math.floor(userBalance*p/100);
+      document.getElementById("customSlider").value=p;
       updateCustomSell();
     }
     function updateCustomSell(){
@@ -376,7 +480,9 @@
       let diff=impact-planImpact;
       document.getElementById("customDiff").innerHTML=signed(diff);
 
-      document.getElementById("customPrice").textContent="$"+(globalPrice*(1-impact/100)).toFixed(8);
+      document.getElementById("customPrice").textContent=
+        "$"+(globalPrice*(1-impact/100)).toFixed(8);
+
       drawSpark(document.getElementById("sparkline"),impact);
     }
 
@@ -390,7 +496,7 @@
       return Math.max(3,Math.min(20,n));
     }
 
-    /* CARICAMENTO DEX + POPOLAMENTO DASHBOARD + DATA BRIDGE */
+    /* CARICAMENTO DEX + POPOLAMENTO DASHBOARD */
     function loadDex(){
       fetch(URL).then(r=>r.json()).then(d=>{
         if(!d.pairs)return;
@@ -510,7 +616,7 @@
 
         /* SENTIMENT + BARRE + SPARK */
         let sentiment=B24>S24?"VERDE (buy > sell)":B24<S24?"ROSSO (sell > buy)":"GIALLO (equilibrato)";
-        let color=B24>S24?"#00cc33":B24<S24?"#ff3333":"#ffcc00";
+        let color=B24>S24?"#4aff8a":B24<S24?"#ff5c5c":"#ffd86b";
         document.getElementById("sentiment").innerHTML=
           `Sentiment: <span style="color:${color}">${sentiment}</span>`;
 
@@ -535,10 +641,11 @@
         document.getElementById("dcaCount").textContent=tr;
         document.getElementById("dcaTranche").textContent=fmtNum(trancheB);
         document.getElementById("impactPerTranche").innerHTML=signed(planImpact);
-        document.getElementById("estimatedPrice").textContent="$"+(globalPrice*(1-planImpact/100)).toFixed(8);
+        document.getElementById("estimatedPrice").textContent=
+          "$"+(globalPrice*(1-planImpact/100)).toFixed(8);
 
         let dot=document.getElementById("riskDot");
-        dot.style.background=planImpact>=0.75?"#ff3333":planImpact>=0.25?"#ffcc00":"#00cc33";
+        dot.style.background=planImpact>=0.75?"#ff5c5c":planImpact>=0.25?"#ffd86b":"#4aff8a";
         document.getElementById("riskLabel").innerHTML=
           `<span class="semaforo-dot" style="background:${dot.style.background}"></span>`+
           `Rischio: ${planImpact>=0.75?"Alto":planImpact>=0.25?"Medio":"Basso"}`;
@@ -557,7 +664,7 @@
 </tr>`;
         });
 
-        /* AGGIORNA VENDITA PERSONALIZZATA SE LA VIEW È APERTA */
+        /* SE SONO NELLA VIEW VENDITA, AGGIORNO */
         if(document.getElementById("viewVendita").classList.contains("active")){
           updateCustomSell();
         }
