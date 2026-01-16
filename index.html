@@ -99,28 +99,28 @@
 <div class="grid">
 
     <div class="card">
-        <h2>Prezzo</h2>
+        <h2>Prezzo (miglior coppia)</h2>
         <div id="price" class="value">–</div>
         <div id="price-change" style="margin-top:8px; font-size:18px;"></div>
     </div>
 
     <div class="card">
-        <h2>Volume 24h</h2>
+        <h2>Volume 24h (totale)</h2>
         <div id="volume24" class="value">–</div>
     </div>
 
     <div class="card">
-        <h2>Liquidità</h2>
+        <h2>Liquidità Totale</h2>
         <div id="liquidity" class="value">–</div>
     </div>
 
     <div class="card">
-        <h2>FDV</h2>
+        <h2>FDV (miglior coppia)</h2>
         <div id="fdv" class="value">–</div>
     </div>
 
     <div class="card">
-        <h2>BUY / SELL 24h</h2>
+        <h2>BUY / SELL 24h (totali)</h2>
         <div class="value" style="font-size:26px;">
             <span id="buys24">–</span> /
             <span id="sells24">–</span>
@@ -165,35 +165,61 @@ async function loadDexscreener() {
 
         if (!data.pairs || data.pairs.length === 0) return;
 
-        const p = data.pairs[0];
+        //
+        // 🔵 1. PREZZO E FDV DELLA COPPIA MIGLIORE (quella con più liquidità)
+        //
+        const bestPair = data.pairs.sort((a,b) =>
+            (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0)
+        )[0];
 
-        // Prezzo
-        const price = p.priceUsd ? Number(p.priceUsd) : null;
+        const price = bestPair.priceUsd ? Number(bestPair.priceUsd) : null;
         document.getElementById("price").textContent =
             price ? "$" + price.toFixed(8) : "–";
 
         document.getElementById("price-change").textContent =
-            p.priceChange?.h24 !== undefined ? `24h: ${p.priceChange.h24}%` : "";
+            bestPair.priceChange?.h24 !== undefined ? `24h: ${bestPair.priceChange.h24}%` : "";
 
-        // Volume
-        const vol24 = p.volume?.h24 ?? null;
-        document.getElementById("volume24").textContent = fmtUsd(vol24);
+        document.getElementById("fdv").textContent = fmtUsd(bestPair.fdv);
 
-        // Liquidity
-        document.getElementById("liquidity").textContent = fmtUsd(p.liquidity?.usd);
+        //
+        // 🔵 2. LIQUIDITÀ TOTALE (somma di tutte le coppie)
+        //
+        let totalLiquidity = 0;
+        data.pairs.forEach(pair => {
+            if (pair.liquidity?.usd) {
+                totalLiquidity += Number(pair.liquidity.usd);
+            }
+        });
+        document.getElementById("liquidity").textContent = fmtUsd(totalLiquidity);
 
-        // FDV
-        document.getElementById("fdv").textContent = fmtUsd(p.fdv);
+        //
+        // 🔵 3. VOLUME TOTALE 24H
+        //
+        let totalVolume = 0;
+        data.pairs.forEach(pair => {
+            if (pair.volume?.h24) {
+                totalVolume += Number(pair.volume.h24);
+            }
+        });
+        document.getElementById("volume24").textContent = fmtUsd(totalVolume);
 
-        // BUY / SELL
-        const buys = p.txns?.h24?.buys ?? 0;
-        const sells = p.txns?.h24?.sells ?? 0;
-        document.getElementById("buys24").textContent = buys;
-        document.getElementById("sells24").textContent = sells;
+        //
+        // 🔵 4. BUY / SELL TOTALI
+        //
+        let totalBuys = 0;
+        let totalSells = 0;
 
-        if (buys + sells > 0 && vol24 > 0) {
-            const buyVol = vol24 * (buys / (buys + sells));
-            const sellVol = vol24 * (sells / (buys + sells));
+        data.pairs.forEach(pair => {
+            totalBuys += pair.txns?.h24?.buys ?? 0;
+            totalSells += pair.txns?.h24?.sells ?? 0;
+        });
+
+        document.getElementById("buys24").textContent = totalBuys;
+        document.getElementById("sells24").textContent = totalSells;
+
+        if (totalBuys + totalSells > 0 && totalVolume > 0) {
+            const buyVol = totalVolume * (totalBuys / (totalBuys + totalSells));
+            const sellVol = totalVolume * (totalSells / (totalBuys + totalSells));
 
             document.getElementById("buyVolume").textContent =
                 "Acquisti: " + fmtUsd(buyVol);
@@ -201,7 +227,9 @@ async function loadDexscreener() {
                 "Vendite: " + fmtUsd(sellVol);
         }
 
-        // Tabella coppie
+        //
+        // 🔵 5. TABELLA COPPIE
+        //
         const table = document.getElementById("pairs");
         table.innerHTML = `
             <tr>
