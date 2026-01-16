@@ -2,675 +2,334 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>BUMPER Dashboard – SPA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BUMPER Dashboard – Pro Edition</title>
 
-  <!-- Chart.js + DataLabels -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 
   <style>
-    /* LAYOUT GENERALE */
-    body{
+    /* LAYOUT BASE */
+    body {
       background: radial-gradient(circle at 20% 20%, #10131a, #050609);
-      color:#e8e8e8;
-      font-family:"Inter", Arial, sans-serif;
-      padding:25px;
-      margin:0;
+      color: #e8e8e8;
+      font-family: "Inter", -apple-system, sans-serif;
+      padding: 15px;
+      margin: 0;
+      min-height: 100vh;
     }
 
-    /* MENU IN ALTO A DESTRA – PILL MODERNE */
-    .menu{
-      position:absolute;
-      top:20px;
-      right:30px;
-      display:flex;
-      gap:14px;
-      z-index:10;
+    /* MENU PILLS */
+    .menu {
+      position: sticky;
+      top: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      z-index: 100;
+      padding: 10px 0;
+      background: transparent;
     }
-    .pill{
-      padding:10px 20px;
-      border:2px solid #6bb6ff;
-      border-radius:30px;
-      color:#b7d9ff;
-      text-decoration:none;
-      font-weight:600;
-      transition:0.25s;
-      backdrop-filter: blur(6px);
-      background:rgba(10,15,25,0.6);
-      cursor:pointer;
+    .pill {
+      padding: 8px 16px;
+      border: 1px solid rgba(107, 182, 255, 0.4);
+      border-radius: 20px;
+      color: #b7d9ff;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      transition: 0.2s;
+      backdrop-filter: blur(10px);
+      background: rgba(10, 15, 25, 0.7);
+      cursor: pointer;
     }
-    .pill:hover{
-      background:#6bb6ff33;
-      border-color:#ffffff;
-      color:white;
-    }
-    .pill.active{
-      background:#6bb6ff55;
-      border-color:white;
-      color:white;
-      cursor:default;
+    .pill:hover, .pill.active {
+      background: #6bb6ff;
+      color: #050609;
+      border-color: white;
     }
 
     /* HEADER */
-    h1{
-      display:flex;
-      align-items:center;
-      gap:15px;
-      font-size:32px;
-      font-weight:800;
-      letter-spacing:0.5px;
-      margin-top:10px;
-      margin-bottom:25px;
+    .header-container {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
     }
-    #logo{
-      width:70px;
-      height:70px;
-      border-radius:16px;
-      background:#111;
-      box-shadow:0 0 18px rgba(0,0,0,0.6);
+    #logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
-    /* CARD – GLASSMORPHISM */
-    .card{
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(14px);
-      border:1px solid rgba(255,255,255,0.08);
-      padding:22px;
-      border-radius:16px;
-      margin-bottom:22px;
-      box-shadow: 0 4px 18px rgba(0,0,0,0.35);
+    /* GRID & CARDS */
+    .grid-main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 18px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .card h2 { font-size: 12px; color: #9ecbff; text-transform: uppercase; margin: 0 0 10px 0; letter-spacing: 0.5px; opacity: 0.8; }
+    .value { font-size: 22px; font-weight: 800; color: #fff; }
+
+    /* UTILS */
+    .green { color: #4aff8a; }
+    .red { color: #ff5c5c; }
+    .yellow { color: #ffd86b; }
+    
+    /* MINI CHART CONTAINER */
+    .sentiment-box {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .chart-container {
+      width: 90px;
+      height: 90px;
+      flex-shrink: 0;
     }
 
-    .value{
-      font-size:32px;
-      font-weight:800;
-      color:#ffffff;
+    /* VENDITA VIEW */
+    .view { display: none; }
+    .view.active { display: block; }
+    .input-box {
+      width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333;
+      background: #000; color: #fff; margin: 8px 0; box-sizing: border-box;
+    }
+    .quick-btn {
+      padding: 6px 12px; background: #1a1e26; border: 1px solid #333;
+      color: #fff; border-radius: 6px; cursor: pointer; margin: 5px 5px 0 0;
     }
 
-    .green{color:#4aff8a;font-weight:700;}
-    .red{color:#ff5c5c;font-weight:700;}
-    .yellow{color:#ffd86b;font-weight:700;}
-
-    /* TITOLI INTERNI */
-    .section-title{
-      text-align:center;
-      font-weight:900;
-      font-size:20px;
-      margin:14px 0 10px 0;
-      text-transform:uppercase;
-      letter-spacing:1px;
-      color:#dfe7ff;
-    }
-    .section-title::before,
-    .section-title::after{
-      content:"";
-      display:inline-block;
-      width:24%;
-      border-top:3px solid #3b4a63;
-      margin:0 10px;
-      transform:translateY(-4px);
-    }
-
-    /* SPARKLINE */
-    .sparkline{
-      width:140px;
-      height:40px;
-      background:#0d1015;
-      border-radius:8px;
-      box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
-    }
-
-    /* TABELLA DEX */
-    table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:15px;
-      border-radius:12px;
-      overflow:hidden;
-    }
-    th{
-      background:#1a2332;
-      color:#9ecbff;
-      padding:12px;
-      text-align:left;
-      font-weight:700;
-    }
-    td{
-      padding:12px;
-      border-bottom:1px solid rgba(255,255,255,0.06);
-    }
-    tr:nth-child(even){
-      background:rgba(255,255,255,0.02);
-    }
-    tr:hover{
-      background:rgba(255,255,255,0.05);
-    }
-
-    .semaforo-dot{
-      width:14px;
-      height:14px;
-      border-radius:50%;
-      display:inline-block;
-      margin-right:6px;
-    }
-
-    /* INPUT / BOTTONI */
-    .input-box{
-      width:100%;
-      padding:12px;
-      border-radius:10px;
-      border:1px solid #2a2f38;
-      background:#0f1217;
-      color:white;
-      font-size:16px;
-      margin-bottom:10px;
-      transition:0.2s;
-    }
-    .input-box:focus{
-      border-color:#6bb6ff;
-      outline:none;
-      box-shadow:0 0 8px #6bb6ff55;
-    }
-
-    .quick-btn{
-      padding:8px 14px;
-      margin-right:8px;
-      background:#1b2230;
-      border:1px solid #3a4760;
-      border-radius:8px;
-      color:#dfe7ff;
-      cursor:pointer;
-      font-weight:600;
-      font-size:13px;
-      transition:0.2s;
-    }
-    .quick-btn:hover{
-      background:#2a3650;
-      border-color:#6bb6ff;
-      color:white;
-    }
-
-    .update-btn{
-      padding:10px 18px;
-      background:linear-gradient(135deg,#4aff8a,#00cc55);
-      border:none;
-      border-radius:10px;
-      color:#041008;
-      font-weight:700;
-      cursor:pointer;
-      margin-top:6px;
-      box-shadow:0 0 12px rgba(0,0,0,0.5);
-      transition:0.2s;
-    }
-    .update-btn:hover{
-      transform:translateY(-1px);
-      box-shadow:0 0 16px rgba(0,0,0,0.7);
-    }
-
-    /* SLIDER */
-    input[type="range"]{
-      width:100%;
-      height:6px;
-      border-radius:3px;
-      background:#2a2f38;
-      outline:none;
-      -webkit-appearance:none;
-      appearance:none;
-      margin-top:4px;
-    }
-    input[type="range"]::-webkit-slider-thumb{
-      -webkit-appearance:none;
-      appearance:none;
-      width:18px;
-      height:18px;
-      background:#6bb6ff;
-      border-radius:50%;
-      cursor:pointer;
-      box-shadow:0 0 8px #6bb6ffaa;
-    }
-
-    /* VISTE SPA */
-    .view{display:none;}
-    .view.active{display:block;}
+    /* TABLES */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+    th { text-align: left; padding: 10px; border-bottom: 2px solid #333; color: #9ecbff; }
+    td { padding: 10px; border-bottom: 1px solid #222; }
   </style>
 </head>
 <body>
 
-  <!-- MENU -->
   <div class="menu">
-    <a class="pill active" data-view="dashboard">Dashboard</a>
-    <a class="pill" data-view="vendita">Vendita</a>
-    <a class="pill" href="piano.html">Piano</a>
+    <a class="pill active" data-view="dashboard">DASHBOARD</a>
+    <a class="pill" data-view="vendita">VENDITA</a>
+    <a class="pill" href="piano.html">PIANO</a>
   </div>
 
-  <!-- HEADER -->
-  <h1>
+  <div class="header-container">
     <img id="logo" src="logo.png" alt="Logo">
-    <span>BUMPER Dashboard</span>
-  </h1>
-
-  <!-- VIEW DASHBOARD -->
-  <div id="viewDashboard" class="view active">
-
-    <!-- CARDS DATI -->
-    <div class="card" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px">
-      <div>
-        <h2>Prezzo</h2>
-        <div id="price" class="value">–</div>
-        <div id="priceChange" class="yellow">–</div>
-      </div>
-      <div>
-        <h2>Volume 24h</h2>
-        <div id="volume24" class="value">–</div>
-      </div>
-      <div>
-        <h2>Liquidità</h2>
-        <div id="liquidity" class="value">–</div>
-      </div>
-      <div>
-        <h2>FDV</h2>
-        <div id="fdv" class="value">–</div>
-      </div>
-    </div>
-
-    <!-- MEGA-CARD BUY/SELL + TORTA -->
-    <div class="card">
-
-      <div class="section-title">BUY / SELL</div>
-
-      <div id="bs24" style="margin-top:6px;font-size:18px"></div>
-      <div id="bs6"  style="margin-top:6px;font-size:18px"></div>
-      <div id="bs1"  style="margin-top:6px;font-size:18px"></div>
-
-      <div id="sentiment" style="margin-top:12px;font-size:20px;font-weight:bold"></div>
-
-      <!-- GRAFICO A TORTA -->
-      <canvas id="pieChart" width="240" height="240" style="margin-top:20px"></canvas>
-
-      <canvas id="sparkBS" class="sparkline" style="margin-top:16px"></canvas>
-
-      <div class="section-title" style="margin-top:24px">VOLUMI</div>
-
-      <div id="vol1"  style="margin-top:6px;font-size:18px"></div>
-      <div id="vol6"  style="margin-top:6px;font-size:18px"></div>
-      <div id="vol24" style="margin-top:6px;font-size:18px"></div>
-      <div id="vol48" style="margin-top:6px;font-size:18px"></div>
-      <div id="vol72" style="margin-top:6px;font-size:18px"></div>
-
-    </div>
-
-    <!-- TABELLA DEX -->
-    <div class="card">
-      <h2>Coppie DEX</h2>
-      <table id="pairs">
-        <tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h%</th><th>Volume</th><th>Liquidity</th></tr>
-      </table>
-    </div>
-
+    <h1 style="margin:0; font-size: 24px;">BUMPER <span style="font-weight:300">Terminal</span></h1>
   </div>
 
-  <!-- VIEW VENDITA -->
+  <div id="viewDashboard" class="view active">
+    <div class="grid-main">
+      <div class="card">
+        <h2>Prezzo Attuale</h2>
+        <div id="price" class="value">$0.00000000</div>
+        <div id="priceChange" style="font-size: 14px; margin-top: 4px;">0.00%</div>
+      </div>
+      <div class="card">
+        <h2>Liquidity & Vol</h2>
+        <div id="liquidity" class="value" style="font-size: 18px;">$0</div>
+        <div id="volume24" style="font-size: 14px; margin-top: 4px; color: #aaa;">Vol 24h: $0</div>
+      </div>
+      <div class="card">
+        <h2>Sentiment (24h)</h2>
+        <div class="sentiment-box">
+          <div class="chart-container">
+            <canvas id="pieChart"></canvas>
+          </div>
+          <div>
+            <div id="sentimentLabel" style="font-weight: 800; font-size: 14px; margin-bottom: 4px;">---</div>
+            <div id="bs-stats" style="font-size: 12px; line-height: 1.4; color: #aaa;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-main" style="grid-template-columns: 1fr 2fr;">
+      <div class="card">
+        <h2>Breakdown Volumi</h2>
+        <div id="vol-history" style="font-size:13px; line-height: 1.8;"></div>
+      </div>
+      <div class="card" style="overflow-x: auto;">
+        <h2>DEX Pairs</h2>
+        <table id="pairsTable">
+          <thead>
+            <tr><th>DEX</th><th>Pair</th><th>Price</th><th>Liquidity</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <div id="viewVendita" class="view">
-
-    <div class="card">
-      <h2>Vendita Personalizzata</h2>
-
-      <label>Quanti BUMPER possiedi?</label>
-      <input id="userBalance" class="input-box" type="number" placeholder="Inserisci saldo">
-      <button class="update-btn" onclick="updateUserBalance()">Aggiorna</button>
-
-      <hr style="border-color:#333;margin:20px 0">
-
-      <label>Quanti BUMPER vuoi vendere?</label>
+    <div class="card" style="max-width: 500px; margin: 0 auto;">
+      <h2>Simulatore Exit Strategy</h2>
+      
+      <label style="font-size: 13px; color: #9ecbff;">Saldo BUMPER</label>
+      <input id="userBalance" class="input-box" type="number" placeholder="Inserisci quanti token hai..." oninput="updateCustomSell()">
+      
+      <label style="font-size: 13px; color: #9ecbff;">Quantità da vendere</label>
       <input id="customSellInput" class="input-box" type="number" oninput="updateCustomSell()">
-      <input id="customSlider" type="range" min="0" max="100" value="0" oninput="sliderChanged()">
-
-      <div style="margin-top:10px">
-        <button class="quick-btn" onclick="quickSell(10)">10%</button>
+      
+      <input id="customSlider" type="range" min="0" max="100" value="0" style="width:100%; margin: 10px 0;" oninput="sliderChanged()">
+      
+      <div style="margin-bottom: 20px;">
         <button class="quick-btn" onclick="quickSell(25)">25%</button>
         <button class="quick-btn" onclick="quickSell(50)">50%</button>
-        <button class="quick-btn" onclick="quickSell(100)">100%</button>
+        <button class="quick-btn" onclick="quickSell(100)">MAX</button>
       </div>
 
-      <div style="margin-top:20px;font-size:16px">
-        <div>USDC ottenuti: <span id="customUSDC" class="green">–</span></div>
-        <div>Impatto stimato: <span id="customImpact">–</span></div>
-        <div>Tranche consigliate: <span id="customTranche" class="green">–</span></div>
-        <div>Per restare in verde: <span id="customGreenTranche" class="green">–</span></div>
-        <div>Confronto con piano ottimale: <span id="customDiff">–</span></div>
-        <div style="margin-top:10px;font-size:13px">Prezzo dopo vendita: <span id="customPrice">–</span></div>
-        <canvas id="sparkline" class="sparkline"></canvas>
+      <div id="sellResults" style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display:none">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px">
+          <span>Incasso stimato:</span>
+          <span id="resUSDC" class="green" style="font-weight:bold"></span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px">
+          <span>Price Impact:</span>
+          <span id="resImpact"></span>
+        </div>
+        <div style="display:flex; justify-content:space-between">
+          <span>Tranche suggerite:</span>
+          <span id="resTranche" class="yellow"></span>
+        </div>
       </div>
     </div>
-
   </div>
 
   <script>
-    /* CONFIG */
-    const TOKEN="5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
-    const URL="https://api.dexscreener.com/latest/dex/tokens/"+TOKEN;
+    const TOKEN_ADDR = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
+    let globalData = { price: 0, liq: 0, vol: 0 };
+    let chartInstance = null;
 
-    /* STATO CONDIVISO */
-    let userBalance=0;
-    let globalPrice=0;
-    let globalLiquidity=0;
-    let globalVolume=0;
-    let planImpact=0;
-    let planSafeSell=0;
-    let planTranche=0;
-    let planTrancheB=0;
+    // Helpers
+    const fUsd = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: n < 1 ? 4 : 0 }).format(n);
+    const fCompact = (n) => new Intl.NumberFormat('en-US', { notation: "compact", compactDisplay: "short" }).format(n);
 
-    /* UTILITIES */
-    function fmtUsd(v){
-      if(!v)return"–";
-      v=+v;
-      return v<1?"$"+v.toFixed(2):"$"+v.toLocaleString();
-    }
-    function fmtNum(v){return(+v).toLocaleString();}
-    function signed(v){
-      if(v===null||isNaN(v))return"–";
-      let pos=v>=0;
-      let txt=v.toFixed(2)+"% "+(pos?"(sotto soglia)":"(sopra soglia)");
-      return `<span style="color:${pos?"#4aff8a":"#ff5c5c"};font-weight:bold">${txt}</span>`;
-    }
+    async function fetchData() {
+      try {
+        const r = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${TOKEN_ADDR}`);
+        const d = await r.json();
+        if (!d.pairs) return;
 
-    function drawSpark(c,val){
-      let x=c.getContext("2d");
-      x.clearRect(0,0,c.width,c.height);
-      if(!val||isNaN(val))return;
-      let max=1.5,y=c.height-(Math.min(val,max)/max)*c.height;
-      x.strokeStyle=val>=0.75?"#ff5c5c":val>=0.25?"#ffd86b":"#4aff8a";
-      x.lineWidth=2;
-      x.beginPath();x.moveTo(5,y);x.lineTo(c.width-5,y);x.stroke();
+        const main = d.pairs[0];
+        globalData.price = parseFloat(main.priceUsd);
+        globalData.liq = d.pairs.reduce((s, p) => s + (p.liquidity?.usd || 0), 0);
+        globalData.vol = d.pairs.reduce((s, p) => s + (p.volume?.h24 || 0), 0);
+
+        // Update UI
+        document.getElementById('price').textContent = `$${globalData.price.toFixed(8)}`;
+        document.getElementById('liquidity').textContent = fUsd(globalData.liq);
+        document.getElementById('volume24').textContent = `Vol 24h: ${fUsd(globalData.vol)}`;
+        
+        const change = main.priceChange.h24;
+        const pChangeEl = document.getElementById('priceChange');
+        pChangeEl.textContent = `${change}% (24h)`;
+        pChangeEl.className = change >= 0 ? 'green' : 'red';
+
+        updateSentiment(d.pairs);
+        updatePairsTable(d.pairs);
+        updateVolumeList(d.pairs);
+      } catch (e) { console.error("API Error", e); }
     }
 
-    /* GRAFICO A TORTA BUY/SELL */
-    function drawPieChart(buy, sell){
-      const ctx = document.getElementById("pieChart").getContext("2d");
+    function updateSentiment(pairs) {
+      const b = pairs.reduce((s, p) => s + (p.txns.h24.buys || 0), 0);
+      const s = pairs.reduce((sum, p) => sum + (p.txns.h24.sells || 0), 0);
+      const total = b + s;
+      const buyPct = ((b/total)*100).toFixed(1);
 
-      if(window.pieInstance){
-        window.pieInstance.destroy();
-      }
+      document.getElementById('sentimentLabel').innerHTML = b > s ? '<span class="green">BULLISH</span>' : '<span class="red">BEARISH</span>';
+      document.getElementById('bs-stats').innerHTML = `Buy: ${b} (${buyPct}%)<br>Sell: ${s}`;
 
-      window.pieInstance = new Chart(ctx, {
-        type: "doughnut",
+      const ctx = document.getElementById('pieChart').getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+      chartInstance = new Chart(ctx, {
+        type: 'doughnut',
         data: {
-          labels: ["BUY", "SELL"],
           datasets: [{
-            data: [buy, sell],
-            backgroundColor: ["#4aff8a", "#ff5c5c"],
-            borderColor: "#0d1015",
-            borderWidth: 2
+            data: [b, s],
+            backgroundColor: ['#4aff8a', '#ff5c5c'],
+            borderWidth: 0,
+            hoverOffset: 2
           }]
         },
         options: {
-          cutout: "40%",
-          plugins: {
-            legend: { display: false },
-            datalabels: {
-              color: "#ffffff",
-              font: { weight: "bold", size: 16 },
-              formatter: (value, ctx) => {
-                let total = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
-                if(!total) return "0%";
-                let pct = (value / total * 100).toFixed(1);
-                return pct + "%";
-              }
-            }
-          }
-        },
-        plugins: [ChartDataLabels]
-      });
-    }
-
-    /* VENDITA PERSONALIZZATA */
-    function updateUserBalance(){
-      userBalance=+document.getElementById("userBalance").value;
-      updateCustomSell();
-    }
-    function sliderChanged(){
-      if(!userBalance)return;
-      document.getElementById("customSellInput").value=
-        Math.floor(userBalance*(+document.getElementById("customSlider").value)/100);
-      updateCustomSell();
-    }
-    function quickSell(p){
-      if(!userBalance)return;
-      document.getElementById("customSellInput").value=Math.floor(userBalance*p/100);
-      document.getElementById("customSlider").value=p;
-      updateCustomSell();
-    }
-    function updateCustomSell(){
-      let amt=+document.getElementById("customSellInput").value;
-      if(!amt||!globalPrice||!globalLiquidity){
-        document.getElementById("customUSDC").textContent="–";
-        document.getElementById("customImpact").innerHTML="–";
-        document.getElementById("customTranche").textContent="–";
-        document.getElementById("customGreenTranche").textContent="–";
-        document.getElementById("customDiff").innerHTML="–";
-        document.getElementById("customPrice").textContent="–";
-        drawSpark(document.getElementById("sparkline"),null);
-        return;
-      }
-
-      let usd=amt*globalPrice;
-      let impact=usd/globalLiquidity*100;
-
-      document.getElementById("customUSDC").textContent=fmtUsd(usd);
-      document.getElementById("customImpact").innerHTML=signed(impact);
-
-      let tr=Math.max(1,Math.ceil(impact/0.25));
-      document.getElementById("customTranche").textContent=tr;
-      document.getElementById("customGreenTranche").textContent=tr;
-
-      let diff=impact-planImpact;
-      document.getElementById("customDiff").innerHTML=signed(diff);
-
-      document.getElementById("customPrice").textContent=
-        "$"+(globalPrice*(1-impact/100)).toFixed(8);
-
-      drawSpark(document.getElementById("sparkline"),impact);
-    }
-
-    /* LOGICA DCA */
-    function computeTranche(liq,vol,b,s){
-      let f1=Math.min(5,liq/100000);
-      let f2=Math.min(5,vol/200000);
-      let p=s/(b+1);
-      let f3=Math.min(5,p);
-      let n=Math.round(6+f3-f1-(f2*0.5));
-      return Math.max(3,Math.min(20,n));
-    }
-
-    /* CARICAMENTO DEX + POPOLAMENTO DASHBOARD */
-    function loadDex(){
-      fetch(URL).then(r=>r.json()).then(d=>{
-        if(!d.pairs)return;
-
-        let best=d.pairs.sort((a,b)=>(b.liquidity?.usd??0)-(a.liquidity?.usd??0))[0];
-        globalPrice=+best.priceUsd||0;
-
-        document.getElementById("price").textContent="$"+globalPrice.toFixed(8);
-        document.getElementById("priceChange").textContent=(best.priceChange?.h24??"–")+"%";
-
-        let TL=0,TV=0;
-        let B24=0,S24=0,B6=0,S6=0,B1=0,S1=0;
-
-        d.pairs.forEach(p=>{
-          TL+=+(p.liquidity?.usd??0);
-          TV+=+(p.volume?.h24??0);
-
-          B24+=p.txns?.h24?.buys??0;
-          S24+=p.txns?.h24?.sells??0;
-
-          B6+=p.txns?.h6?.buys??0;
-          S6+=p.txns?.h6?.sells??0;
-
-          B1+=p.txns?.h1?.buys??0;
-          S1+=p.txns?.h1?.sells??0;
-        });
-
-        globalLiquidity=TL;
-        globalVolume=TV;
-
-        document.getElementById("liquidity").textContent=fmtUsd(TL);
-        document.getElementById("volume24").textContent=fmtUsd(TV);
-        document.getElementById("fdv").textContent=fmtUsd(best.fdv);
-
-        /* BUY/SELL USDT PER FINESTRA */
-        function splitVolume(p,keyVol,keyTx){
-          let vol=p.volume?.[keyVol]??0;
-          let buys=p.txns?.[keyTx]?.buys??0;
-          let sells=p.txns?.[keyTx]?.sells??0;
-          let tot=buys+sells;
-          if(!tot||!vol)return{vb:0,vs:0};
-          return{
-            vb:vol*(buys/tot),
-            vs:vol*(sells/tot)
-          };
-        }
-
-        let V24_BUY=0,V24_SELL=0,V6_BUY=0,V6_SELL=0,V1_BUY=0,V1_SELL=0;
-        d.pairs.forEach(p=>{
-          let s24=splitVolume(p,"h24","h24");
-          V24_BUY+=s24.vb; V24_SELL+=s24.vs;
-          let s6=splitVolume(p,"h6","h6");
-          V6_BUY+=s6.vb; V6_SELL+=s6.vs;
-          let s1=splitVolume(p,"h1","h1");
-          V1_BUY+=s1.vb; V1_SELL+=s1.vs;
-        });
-
-        /* BUY/SELL ANALYTICS */
-        document.getElementById("bs24").innerHTML=
-          `<b>24h:</b> BUY <span class="green">${B24}</span> `+
-          `<span style="color:#ffffff">(${fmtUsd(V24_BUY)})</span> — `+
-          `SELL <span class="red">${S24}</span> `+
-          `<span style="color:#ffffff">(${fmtUsd(V24_SELL)})</span>`;
-
-        document.getElementById("bs6").innerHTML=
-          `<b>6h:</b> BUY <span class="green">${B6}</span> `+
-          `<span style="color:#ffffff">(${fmtUsd(V6_BUY)})</span> — `+
-          `SELL <span class="red">${S6}</span> `+
-          `<span style="color:#ffffff">(${fmtUsd(V6_SELL)})</span>`;
-
-        document.getElementById("bs1").innerHTML=
-          `<b>1h:</b> BUY <span class="green">${B1}</span> `+
-          `<span style="color:#ffffff">(${fmtUsd(V1_BUY)})</span> — `+
-          `SELL <span class="red">${S1}</span> `+
-          `<span style="color:#ffffff">(${fmtUsd(V1_SELL)})</span>`;
-
-        /* VOLUMI 1h, 6h, 24h, 48h, 72h */
-        let V24=TV;
-        let V6=d.pairs.reduce((a,p)=>a+(p.volume?.h6??0),0);
-        let V1=d.pairs.reduce((a,p)=>a+(p.volume?.h1??0),0);
-        let V24_prev=V24-V6+V1;
-        let V48=V24+V24_prev;
-        let V72=V24+V24_prev+V24_prev;
-
-        let tot24=V24_BUY+V24_SELL;
-        let ratioBuy24=tot24?V24_BUY/tot24:0.5;
-        let ratioSell24=1-ratioBuy24;
-
-        let V24prev_BUY=V24_prev*ratioBuy24;
-        let V24prev_SELL=V24_prev*ratioSell24;
-
-        let V48_BUY=V24_BUY+V24prev_BUY;
-        let V48_SELL=V24_SELL+V24prev_SELL;
-
-        let V72_BUY=V24_BUY+V24prev_BUY+V24prev_BUY;
-        let V72_SELL=V24_SELL+V24prev_SELL+V24prev_SELL;
-
-        document.getElementById("vol1").innerHTML=
-          `<b>Volume 1h:</b> BUY <span class="green">${fmtUsd(V1_BUY)}</span> — `+
-          `SELL <span class="red">${fmtUsd(V1_SELL)}</span>`;
-
-        document.getElementById("vol6").innerHTML=
-          `<b>Volume 6h:</b> BUY <span class="green">${fmtUsd(V6_BUY)}</span> — `+
-          `SELL <span class="red">${fmtUsd(V6_SELL)}</span>`;
-
-        document.getElementById("vol24").innerHTML=
-          `<b>Volume 24h:</b> BUY <span class="green">${fmtUsd(V24_BUY)}</span> — `+
-          `SELL <span class="red">${fmtUsd(V24_SELL)}</span>`;
-
-        document.getElementById("vol48").innerHTML=
-          `<b>Volume 48h:</b> BUY <span class="green">${fmtUsd(V48_BUY)}</span> — `+
-          `SELL <span class="red">${fmtUsd(V48_SELL)}</span>`;
-
-        document.getElementById("vol72").innerHTML=
-          `<b>Volume 72h:</b> BUY <span class="green">${fmtUsd(V72_BUY)}</span> — `+
-          `SELL <span class="red">${fmtUsd(V72_SELL)}</span>`;
-
-        /* SENTIMENT + TORTA + SPARK */
-        let sentiment=B24>S24?"VERDE (buy > sell)":B24<S24?"ROSSO (sell > buy)":"GIALLO (equilibrato)";
-        let color=B24>S24?"#4aff8a":B24<S24?"#ff5c5c":"#ffd86b";
-        document.getElementById("sentiment").innerHTML=
-          `Sentiment: <span style="color:${color}">${sentiment}</span>`;
-
-        let total=B24+S24;
-        let buyPct=total?(B24/total)*100:0;
-        let sellPct=total?(S24/total)*100:0;
-
-        drawPieChart(B24, S24);
-        drawSpark(document.getElementById("sparkBS"), buyPct/100);
-
-        /* PIANO DI VENDITA (SOLO LOGICA, NESSUNA CARD) */
-        let planUSD=TL*0.02;
-        planSafeSell=planUSD/globalPrice;
-        planTranche=computeTranche(TL,TV,B24,S24);
-        planTrancheB=planSafeSell/planTranche;
-        planImpact=(planUSD/planTranche)/TL*100;
-
-        /* SALVATAGGIO PER piano.html */
-        localStorage.setItem("globalPrice", globalPrice);
-        localStorage.setItem("globalLiquidity", globalLiquidity);
-        localStorage.setItem("planImpact", planImpact);
-        localStorage.setItem("planSafeSell", planSafeSell);
-        localStorage.setItem("planTranche", planTranche);
-        localStorage.setItem("planTrancheB", planTrancheB);
-
-        /* TABELLA DEX */
-        let t=document.getElementById("pairs");
-        t.innerHTML="<tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h%</th><th>Volume</th><th>Liquidity</th></tr>";
-        d.pairs.forEach(p=>{
-          t.innerHTML+=`<tr>
-<td>${p.dexId}</td>
-<td>${p.baseToken?.symbol}/${p.quoteToken?.symbol}</td>
-<td>${p.priceUsd?"$"+(+p.priceUsd).toFixed(8):"–"}</td>
-<td>${p.priceChange?.h24??"–"}%</td>
-<td>${fmtUsd(p.volume?.h24)}</td>
-<td>${fmtUsd(p.liquidity?.usd)}</td>
-</tr>`;
-        });
-
-        /* SE SONO NELLA VIEW VENDITA, AGGIORNO */
-        if(document.getElementById("viewVendita").classList.contains("active")){
-          updateCustomSell();
+          cutout: '75%',
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: { legend: { display: false }, datalabels: { display: false } }
         }
       });
     }
 
-    /* SPA: SWITCH VISTE */
-    document.querySelectorAll(".pill[data-view]").forEach(btn=>{
-      btn.addEventListener("click",e=>{
-        e.preventDefault();
-        let view=btn.getAttribute("data-view");
-        if(!view)return;
+    function updateVolumeList(pairs) {
+      const v1 = pairs.reduce((s, p) => s + (p.volume.h1 || 0), 0);
+      const v6 = pairs.reduce((s, p) => s + (p.volume.h6 || 0), 0);
+      document.getElementById('vol-history').innerHTML = `
+        <div style="display:flex;justify-content:space-between"><span>1h:</span><b>${fUsd(v1)}</b></div>
+        <div style="display:flex;justify-content:space-between"><span>6h:</span><b>${fUsd(v6)}</b></div>
+        <div style="display:flex;justify-content:space-between"><span>24h:</span><b>${fUsd(globalData.vol)}</b></div>
+      `;
+    }
 
-        document.querySelectorAll(".pill[data-view]").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
+    function updatePairsTable(pairs) {
+      const tbody = document.querySelector('#pairsTable tbody');
+      tbody.innerHTML = pairs.slice(0, 4).map(p => `
+        <tr>
+          <td>${p.dexId.toUpperCase()}</td>
+          <td>${p.quoteToken.symbol}</td>
+          <td>$${parseFloat(p.priceUsd).toFixed(6)}</td>
+          <td>${fCompact(p.liquidity?.usd || 0)}</td>
+        </tr>
+      `).join('');
+    }
 
-        document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-        document.getElementById("view"+view.charAt(0).toUpperCase()+view.slice(1)).classList.add("active");
+    // Sell Logic
+    function sliderChanged() {
+      const bal = document.getElementById('userBalance').value;
+      const pct = document.getElementById('customSlider').value;
+      document.getElementById('customSellInput').value = Math.floor(bal * pct / 100);
+      updateCustomSell();
+    }
+    function quickSell(p) { document.getElementById('customSlider').value = p; sliderChanged(); }
+    
+    function updateCustomSell() {
+      const amt = document.getElementById('customSellInput').value;
+      const res = document.getElementById('sellResults');
+      if (!amt || amt <= 0) { res.style.display = 'none'; return; }
 
-        if(view==="vendita"){
-          updateCustomSell();
-        }
-      });
+      res.style.display = 'block';
+      const val = amt * globalData.price;
+      const impact = (val / globalData.liq) * 100;
+
+      document.getElementById('resUSDC').textContent = fUsd(val);
+      document.getElementById('resImpact').textContent = `${impact.toFixed(2)}%`;
+      document.getElementById('resImpact').className = impact > 1 ? 'red' : 'green';
+      document.getElementById('resTranche').textContent = impact > 0.5 ? Math.ceil(impact/0.3) + " tranche" : "In blocco unico";
+    }
+
+    // SPA
+    document.querySelectorAll('.pill[data-view]').forEach(p => {
+      p.onclick = () => {
+        document.querySelectorAll('.pill, .view').forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+        document.getElementById(`view${p.dataset.view.charAt(0).toUpperCase() + p.dataset.view.slice(1)}`).classList.add('active');
+      };
     });
 
-    /* AVVIO */
-    loadDex();
-    setInterval(loadDex,10000);
+    fetchData();
+    setInterval(fetchData, 20000);
   </script>
 </body>
 </html>
