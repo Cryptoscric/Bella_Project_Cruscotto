@@ -260,10 +260,11 @@
 </head>
 <body>
 
-  <!-- MENU SPA -->
+  <!-- MENU SPA + LINK ESTERNO -->
   <div class="menu">
     <a class="pill active" data-view="dashboard">Dashboard</a>
     <a class="pill" data-view="vendita">Vendita</a>
+    <a class="pill" href="piano.html">Piano</a>
   </div>
 
   <!-- HEADER COMUNE -->
@@ -275,7 +276,7 @@
   <!-- VIEW DASHBOARD -->
   <div id="viewDashboard" class="view active">
 
-    <!-- PIANO DI VENDITA -->
+    <!-- PIANO DI VENDITA (ANTEPRIMA) -->
     <div id="pianoVendita">
       <div>
         <div style="font-size:22px;font-weight:900;color:#ff5c5c">Piano di vendita (basso impatto)</div>
@@ -412,6 +413,8 @@
     let globalVolume=0;
     let planImpact=0;
     let planSafeSell=0;
+    let planTranche=0;
+    let planTrancheB=0;
 
     /* UTILITIES */
     function fmtUsd(v){
@@ -632,14 +635,14 @@
         /* PIANO DI VENDITA */
         let planUSD=TL*0.02;
         planSafeSell=planUSD/globalPrice;
-        let tr=computeTranche(TL,TV,B24,S24);
-        let trancheB=planSafeSell/tr;
-        planImpact=(planUSD/tr)/TL*100;
+        planTranche=computeTranche(TL,TV,B24,S24);
+        planTrancheB=planSafeSell/planTranche;
+        planImpact=(planUSD/planTranche)/TL*100;
 
         document.getElementById("safeSellTop").textContent=fmtNum(planSafeSell);
         document.getElementById("safeSellUSDC").textContent=fmtUsd(planUSD);
-        document.getElementById("dcaCount").textContent=tr;
-        document.getElementById("dcaTranche").textContent=fmtNum(trancheB);
+        document.getElementById("dcaCount").textContent=planTranche;
+        document.getElementById("dcaTranche").textContent=fmtNum(planTrancheB);
         document.getElementById("impactPerTranche").innerHTML=signed(planImpact);
         document.getElementById("estimatedPrice").textContent=
           "$"+(globalPrice*(1-planImpact/100)).toFixed(8);
@@ -649,6 +652,14 @@
         document.getElementById("riskLabel").innerHTML=
           `<span class="semaforo-dot" style="background:${dot.style.background}"></span>`+
           `Rischio: ${planImpact>=0.75?"Alto":planImpact>=0.25?"Medio":"Basso"}`;
+
+        /* SALVATAGGIO PER piano.html */
+        localStorage.setItem("globalPrice", globalPrice);
+        localStorage.setItem("globalLiquidity", globalLiquidity);
+        localStorage.setItem("planImpact", planImpact);
+        localStorage.setItem("planSafeSell", planSafeSell);
+        localStorage.setItem("planTranche", planTranche);
+        localStorage.setItem("planTrancheB", planTrancheB);
 
         /* TABELLA DEX */
         let t=document.getElementById("pairs");
@@ -672,13 +683,13 @@
     }
 
     /* SPA: SWITCH VISTE */
-    document.querySelectorAll(".pill").forEach(btn=>{
+    document.querySelectorAll(".pill[data-view]").forEach(btn=>{
       btn.addEventListener("click",e=>{
         e.preventDefault();
         let view=btn.getAttribute("data-view");
         if(!view)return;
 
-        document.querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
+        document.querySelectorAll(".pill[data-view]").forEach(b=>b.classList.remove("active"));
         btn.classList.add("active");
 
         document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
