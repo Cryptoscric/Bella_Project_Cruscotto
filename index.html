@@ -58,8 +58,6 @@
     th {
         background:#1e222a;
     }
-    .status-ok { color:#00ff99; }
-    .status-err { color:#ff4d4d; }
     .green { color:#00ff99; }
     .red { color:#ff4d4d; }
 </style>
@@ -108,16 +106,6 @@
         </div>
     </div>
 
-    <div class="card">
-        <h2>Total Supply (calcolata)</h2>
-        <div id="totalSupply" class="value">–</div>
-    </div>
-
-    <div class="card">
-        <h2>Circulating Supply (calcolata)</h2>
-        <div id="circulatingSupply" class="value">–</div>
-    </div>
-
 </div>
 
 <div class="card">
@@ -150,9 +138,6 @@ function fmtNum(v) {
     return Number(v).toLocaleString();
 }
 
-// ===============================
-// DEXSCREENER + SUPPLY CALCOLATA
-// ===============================
 async function loadDexscreener() {
     try {
         const res = await fetch(DS_URL);
@@ -178,8 +163,7 @@ async function loadDexscreener() {
         document.getElementById("liquidity").textContent = fmtUsd(p.liquidity?.usd);
 
         // FDV
-        const fdv = p.fdv ?? null;
-        document.getElementById("fdv").textContent = fmtUsd(fdv);
+        document.getElementById("fdv").textContent = fmtUsd(p.fdv);
 
         // BUY / SELL
         const buys = p.txns?.h24?.buys ?? 0;
@@ -197,25 +181,7 @@ async function loadDexscreener() {
                 "Vendite: " + fmtUsd(sellVol);
         }
 
-        // ===============================
-        // SUPPLY CALCOLATA (FDV / PREZZO)
-        // ===============================
-        if (fdv && price) {
-            const totalSupply = fdv / price;
-            document.getElementById("totalSupply").textContent =
-                fmtNum(totalSupply);
-
-            const circulating = totalSupply - 100_000_000;
-            document.getElementById("circulatingSupply").textContent =
-                circulating > 0 ? fmtNum(circulating) : "Non disponibile";
-        } else {
-            document.getElementById("totalSupply").textContent = "Non disponibile";
-            document.getElementById("circulatingSupply").textContent = "Non disponibile";
-        }
-
-        // ===============================
-        // TABELLA COPPIE
-        // ===============================
+        // Tabella coppie
         const table = document.getElementById("pairs");
         table.innerHTML = `
             <tr>
