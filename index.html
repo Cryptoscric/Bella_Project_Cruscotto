@@ -1,3 +1,8 @@
+
+
+loadDex();setInterval(loadDex,10000);
+</script>
+</body></html>
 <!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>BUMPER Dashboard</title>
 <style>
 body{background:#0b0d10;color:#e6e6e6;font-family:Arial;padding:25px;margin:0}
@@ -8,7 +13,7 @@ h1{display:flex;align-items:center;gap:15px;font-size:28px;font-weight:bold}
 .green{color:#00cc33;font-weight:bold}
 .red{color:#ff3333;font-weight:bold}
 .yellow{color:#ffd700;font-weight:bold}
-.input-box{width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#222;color:white;font-size:16px;margin-bottom:10px}
+.input-box{width:100%;padding:10px;border-radius:8px;border:1px solid:#444;background:#222;color:white;font-size:16px;margin-bottom:10px}
 .quick-btn{padding:8px 14px;margin-right:8px;background:#333;border:1px solid #555;border-radius:6px;color:white;cursor:pointer;font-weight:bold}
 .update-btn{padding:10px 18px;background:#00cc33;border:none;border-radius:8px;color:black;font-weight:bold;cursor:pointer}
 .sparkline{width:120px;height:30px;background:#111;border-radius:6px;margin-top:8px}
@@ -109,7 +114,14 @@ let planImpact=0,planSafeSell=0;
 
 function fmtUsd(v){if(!v)return"–";v=+v;return v<1?"$"+v.toFixed(6):"$"+v.toLocaleString()}
 function fmtNum(v){return(+v).toLocaleString()}
-function signed(v){if(v===null||isNaN(v))return"–";let pos=v>=0,txt=v.toFixed(2)+"% "+(pos?"(positivo)":"(negativo)");return `<span style="color:${pos?"#00cc33":"#ff3333"};font-weight:bold">${txt}</span>`}
+
+/* 🔥 NUOVA VERSIONE: sotto soglia / sopra soglia */
+function signed(v){
+  if(v===null||isNaN(v))return"–";
+  let pos=v>=0;
+  let txt=v.toFixed(2)+"% "+(pos?"(sotto soglia)":"(sopra soglia)");
+  return `<span style="color:${pos?"#00cc33":"#ff3333"};font-weight:bold">${txt}</span>`;
+}
 
 function updateUserBalance(){userBalance=+document.getElementById("userBalance").value;updateCustomSell()}
 function sliderChanged(){if(!userBalance)return;customSellInput.value=Math.floor(userBalance*(+customSlider.value)/100);updateCustomSell()}
@@ -179,7 +191,8 @@ function loadDex(){
 
     let dot=document.getElementById("riskDot");
     dot.style.background=planImpact>=0.75?"#ff3333":planImpact>=0.25?"#ffcc00":"#00cc33";
-    document.getElementById("riskLabel").innerHTML=`<span class="semaforo-dot" style="background:${dot.style.background}"></span>Rischio: ${planImpact>=0.75?"Alto":planImpact>=0.25?"Medio":"Basso"}`;
+    document.getElementById("riskLabel").innerHTML=
+      `<span class="semaforo-dot" style="background:${dot.style.background}"></span>Rischio: ${planImpact>=0.75?"Alto":planImpact>=0.25?"Medio":"Basso"}`;
 
     let t=document.getElementById("pairs");
     t.innerHTML="<tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h%</th><th>Volume</th><th>Liquidity</th></tr>";
@@ -198,6 +211,7 @@ function loadDex(){
   });
 }
 
-loadDex();setInterval(loadDex,10000);
+loadDex();
+setInterval(loadDex,10000);
 </script>
 </body></html>
