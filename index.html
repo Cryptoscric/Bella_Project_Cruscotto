@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>BUMPER Fiodena Team Dashboard</title>
+
 <style>
     body {
         background:#0b0d10;
@@ -11,6 +12,7 @@
         margin:0;
         padding:25px;
     }
+
     h1 {
         display:flex;
         align-items:center;
@@ -19,6 +21,7 @@
         font-size:28px;
         font-weight:bold;
     }
+
     #logo {
         width:70px;
         height:70px;
@@ -26,12 +29,14 @@
         object-fit:contain;
         background:#111;
     }
+
     .grid {
         display:grid;
         grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
         gap:20px;
         margin-bottom:25px;
     }
+
     .card {
         background:#161a20;
         padding:20px;
@@ -40,41 +45,49 @@
         border:1px solid #222;
         transition:0.2s;
     }
+
     .card:hover {
         transform:scale(1.02);
         box-shadow:0 0 18px rgba(0,0,0,0.6);
     }
+
     .card h2 {
         margin:0 0 12px 0;
         font-size:18px;
         color:#9ecbff;
     }
+
     .value {
         font-size:28px;
         font-weight:bold;
         color:#ffffff;
     }
+
     .yellow {
         font-size:22px;
         color:#ffd700;
         font-weight:bold;
         margin-top:8px;
     }
+
     table {
         width:100%;
         border-collapse:collapse;
         margin-top:12px;
         font-size:15px;
     }
+
     th, td {
         padding:10px 8px;
         border-bottom:1px solid #333;
     }
+
     th {
         background:#1e222a;
         color:#9ecbff;
         font-size:15px;
     }
+
     .green { color:#00ff99; font-weight:bold; }
     .red { color:#ff4d4d; font-weight:bold; }
 </style>
@@ -86,7 +99,7 @@
     <span>BUMPER Fiodena Team Dashboard</span>
 </h1>
 
-<div id="status" class="status-ok" style="margin-bottom:20px; font-size:18px; color:#00ff99;">
+<div id="status" style="margin-bottom:20px; font-size:18px; color:#00ff99;">
     Dashboard attiva
 </div>
 
@@ -125,6 +138,11 @@
         </div>
     </div>
 
+    <div class="card">
+        <h2>Vendita Sicura (stima)</h2>
+        <div id="safeSell" class="value">–</div>
+    </div>
+
 </div>
 
 <div class="card">
@@ -150,6 +168,17 @@ function fmtUsd(v) {
     const n = Number(v);
     if (n < 1) return "$" + n.toFixed(6);
     return "$" + n.toLocaleString();
+}
+
+function fmtNum(v) {
+    return Number(v).toLocaleString();
+}
+
+function calculateSafeSell(totalLiquidity, price) {
+    if (!totalLiquidity || !price) return null;
+    const safeSellUSD = totalLiquidity * 0.02; 
+    const safeSellBUMPER = safeSellUSD / price;
+    return safeSellBUMPER;
 }
 
 async function loadDexscreener() {
@@ -195,6 +224,10 @@ async function loadDexscreener() {
             document.getElementById("sellVolume").textContent = "Vendite: " + fmtUsd(sellVol);
         }
 
+        const safeSell = calculateSafeSell(totalLiquidity, price);
+        document.getElementById("safeSell").textContent =
+            safeSell ? fmtNum(safeSell) + " BUMPER" : "Non disponibile";
+
         const table = document.getElementById("pairs");
         table.innerHTML = `
             <tr>
@@ -227,6 +260,7 @@ async function loadDexscreener() {
 function loadAll() {
     loadDexscreener();
 }
+
 loadAll();
 setInterval(loadAll, 10000);
 </script>
