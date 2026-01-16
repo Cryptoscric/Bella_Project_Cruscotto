@@ -99,7 +99,7 @@
     <span>BUMPER Fiodena Team Dashboard</span>
 </h1>
 
-<!-- 🔷 SEZIONE IPOTESI DI IMPORTO DI VENDITA -->
+<!-- 🔷 IPOTESI DI IMPORTO DI VENDITA -->
 <div style="background:#eeeeee; padding:20px; border-radius:12px; margin-bottom:25px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
     <div style="flex:1; min-width:220px;">
         <div style="font-size:20px; font-weight:bold; color:#ff3333;">
@@ -153,8 +153,8 @@
     <div class="card">
         <h2>BUY / SELL 24h (totali)</h2>
         <div class="value" style="font-size:26px;">
-            <span id="buys24">–</span> /
-            <span id="sells24">–</span>
+            <span id="buys24" class="green">–</span> /
+            <span id="sells24" class="red">–</span>
         </div>
         <div style="margin-top:12px; font-size:24px; font-weight:bold; line-height:1.5;">
             <span id="buyVolume" class="green">Acquisti: –</span><br>
@@ -261,6 +261,7 @@ async function loadDexscreener() {
                 <th>Liquidity</th>
             </tr>
         `;
+
         data.pairs.forEach(pair => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
