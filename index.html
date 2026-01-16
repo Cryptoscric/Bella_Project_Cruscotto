@@ -2,355 +2,217 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<title>BUMPER Dashboard – Solo Dexscreener</title>
+<title>BUMPER Dashboard</title>
+
 <style>
-    body { background:#050608; color:#f5f5f5; font-family:Arial, sans-serif; margin:0; padding:20px; }
-    h1 { display:flex; align-items:center; gap:10px; margin-bottom:20px; }
-    #logo { width:50px; height:50px; border-radius:50%; }
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:15px; margin-bottom:20px; }
-    .card { background:#11131a; border-radius:10px; padding:15px; box-shadow:0 0 10px rgba(0,0,0,0.4); }
-    .card h2 { margin:0 0 10px 0; font-size:16px; }
-    .value { font-size:20px; font-weight:bold; }
-    .sub { font-size:12px; color:#aaa; }
-    table { width:100%; border-collapse:collapse; margin-top:10px; font-size:13px; }
-    th, td { padding:6px 8px; border-bottom:1px solid #222; text-align:left; }
-    th { background:#181b24; }
-    .buy { color:#00ff99; }
-    .sell { color:#ff4d4d; }
+    body {
+        background:#0d0f12;
+        color:#ffffff;
+        font-family:Arial, sans-serif;
+        margin:0;
+        padding:20px;
+    }
+    h1 {
+        display:flex;
+        align-items:center;
+        gap:12px;
+        margin-bottom:20px;
+    }
+    #logo {
+        width:60px;
+        height:60px;
+        border-radius:8px;
+        object-fit:contain;
+        background:#111;
+    }
+    .grid {
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+        gap:15px;
+        margin-bottom:20px;
+    }
+    .card {
+        background:#161a20;
+        padding:15px;
+        border-radius:10px;
+        box-shadow:0 0 10px rgba(0,0,0,0.4);
+    }
+    .card h2 {
+        margin:0 0 10px 0;
+        font-size:16px;
+    }
+    .value {
+        font-size:22px;
+        font-weight:bold;
+    }
+    table {
+        width:100%;
+        border-collapse:collapse;
+        margin-top:10px;
+        font-size:14px;
+    }
+    th, td {
+        padding:6px 8px;
+        border-bottom:1px solid #333;
+    }
+    th {
+        background:#1e222a;
+    }
     .status-ok { color:#00ff99; }
     .status-err { color:#ff4d4d; }
-    button { background:#2563eb; color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; font-size:13px; }
-    button:hover { background:#1d4ed8; }
-    textarea { width:100%; height:100px; background:#050608; color:#fff; border:1px solid #333; border-radius:6px; padding:6px; font-size:12px; }
-    canvas { background:#050608; border-radius:8px; }
 </style>
+
 </head>
 <body>
 
 <h1>
-    <img id="logo" src="https://cryptologos.cc/logos/bumper-bump-logo.png" alt="BUMPER">
-    <span>Bella Bumper – Dashboard (solo Dexscreener)</span>
+    <img id="logo" src="logo.png" alt="logo">
+    <span>BUMPER Dashboard</span>
 </h1>
+
+<div id="status" class="status-err">Caricamento...</div>
 
 <div class="grid">
     <div class="card">
         <h2>Prezzo</h2>
-        <div id="price" class="value">Loading...</div>
-        <div id="price-change" class="sub"></div>
+        <div id="price" class="value">–</div>
+        <div id="price-change"></div>
     </div>
+
     <div class="card">
         <h2>Volume 24h</h2>
-        <div id="volume24" class="value">Loading...</div>
+        <div id="volume24" class="value">–</div>
     </div>
+
     <div class="card">
         <h2>Liquidità</h2>
-        <div id="liquidity" class="value">Loading...</div>
+        <div id="liquidity" class="value">–</div>
     </div>
+
     <div class="card">
         <h2>FDV</h2>
-        <div id="fdv" class="value">Loading...</div>
+        <div id="fdv" class="value">–</div>
     </div>
+
     <div class="card">
         <h2>BUY / SELL 24h</h2>
         <div class="value">
-            <span class="buy" id="buys24">–</span> /
-            <span class="sell" id="sells24">–</span>
+            <span id="buys24">–</span> /
+            <span id="sells24">–</span>
         </div>
-        <div class="sub">Numero di transazioni (se disponibile)</div>
-    </div>
-</div>
-
-<div class="grid">
-    <div class="card">
-        <h2>Volumi ultimi 10 giorni (storico locale)</h2>
-        <canvas id="chart10d" height="160"></canvas>
-        <div class="sub" id="chart-note">
-            I dati si accumulano giorno per giorno usando il volume 24h di Dexscreener.
-        </div>
-    </div>
-    <div class="card">
-        <h2>Top wallet per volumi (CSV manuale)</h2>
-        <table id="topwallet">
-            <tr><th>Wallet</th><th>Volume $</th><th>Trades</th></tr>
-        </table>
-        <div class="sub">Incolla un CSV: wallet,volume,trade</div>
-        <textarea id="wallet-csv" placeholder="esempio:
-wallet1,12345.67,10
-wallet2,9876.54,7"></textarea>
-        <button id="wallet-parse-btn">Carica wallet da CSV</button>
     </div>
 </div>
 
 <div class="card">
     <h2>Coppie DEX (Dexscreener)</h2>
     <table id="pairs">
-        <tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h %</th><th>Volume 24h</th><th>Liquidity</th></tr>
+        <tr>
+            <th>DEX</th>
+            <th>Coppia</th>
+            <th>Prezzo</th>
+            <th>24h %</th>
+            <th>Volume 24h</th>
+            <th>Liquidity</th>
+        </tr>
     </table>
 </div>
 
-<div class="card">
-    <h2>CSV & Stato</h2>
-    <button id="csv-btn">Scarica CSV</button>
-    <div id="status" class="status-err">Inizializzazione...</div>
-</div>
+<!-- Carica config.js PRIMA di tutto -->
+<script src="config.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// ================== CONFIG ==================
+// =========================
+// Controllo caricamento config.js
+// =========================
+if (typeof HELIUS_API_KEY === "undefined") {
+    document.getElementById("status").textContent =
+        "ERRORE: config.js NON caricato o variabile HELIUS_API_KEY mancante";
+    document.getElementById("status").className = "status-err";
+} else {
+    document.getElementById("status").textContent =
+        "config.js caricato correttamente";
+    document.getElementById("status").className = "status-ok";
+}
+
+// =========================
+// Dexscreener (pubblico)
+// =========================
 const TOKEN_MINT = "5SpYsFyuJ41h1Qy9eRufyqR12CmyXet2pG3EXEbok";
-const DEXSCREENER_URL = "https://api.dexscreener.com/latest/dex/tokens/" + TOKEN_MINT;
-const STORAGE_KEY_HISTORY = "bumper_10d_history";
+const DS_URL = "https://api.dexscreener.com/latest/dex/tokens/" + TOKEN_MINT;
 
-// ================== STATO ==================
-let lastSnapshot = {
-    priceUsd: null,
-    priceChange24: null,
-    volume24: null,
-    liquidity: null,
-    fdv: null,
-    buys24: null,
-    sells24: null,
-    dexPairs: [],
-    days10: [],       // [{date, volume24}]
-    topWallets: []    // [{address, volumeUsd, trades}]
-};
-
-let chart10d = null;
-
-// ================== UTILS ==================
 function fmtUsd(v) {
-    if (v === null || v === undefined) return "N/A";
+    if (!v) return "–";
     const n = Number(v);
-    if (!isFinite(n)) return "N/A";
-    if (n === 0) return "$0";
     if (n < 1) return "$" + n.toFixed(6);
-    return "$" + n.toLocaleString(undefined, {maximumFractionDigits:2});
-}
-function shortAddr(a) {
-    if (!a) return "";
-    return a.slice(0,4) + "..." + a.slice(-4);
-}
-function setStatus(msg, ok=false) {
-    const el = document.getElementById("status");
-    el.textContent = msg;
-    el.className = ok ? "status-ok" : "status-err";
-}
-function todayKey() {
-    return new Date().toISOString().slice(0,10); // YYYY-MM-DD
+    return "$" + n.toLocaleString();
 }
 
-// ================== STORICO 10 GIORNI (LOCALSTORAGE) ==================
-function loadHistory() {
+async function loadDexscreener() {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY_HISTORY);
-        if (!raw) return [];
-        const arr = JSON.parse(raw);
-        if (!Array.isArray(arr)) return [];
-        return arr;
-    } catch {
-        return [];
-    }
-}
-function saveHistory(arr) {
-    try {
-        localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(arr));
-    } catch {}
-}
-function updateHistoryWithToday(volume24) {
-    const key = todayKey();
-    let hist = loadHistory();
-    const idx = hist.findIndex(d => d.date === key);
-    if (idx >= 0) {
-        hist[idx].volume24 = volume24;
-    } else {
-        hist.push({ date:key, volume24:volume24 });
-    }
-    hist.sort((a,b) => a.date.localeCompare(b.date));
-    if (hist.length > 10) hist = hist.slice(-10);
-    saveHistory(hist);
-    lastSnapshot.days10 = hist;
-}
-
-// ================== DEXSCREENER ==================
-async function fetchDexscreener() {
-    try {
-        const res = await fetch(DEXSCREENER_URL);
+        const res = await fetch(DS_URL);
         const data = await res.json();
 
         if (!data.pairs || data.pairs.length === 0) {
-            setStatus("Nessuna coppia trovata su Dexscreener", false);
+            document.getElementById("status").textContent =
+                "Nessuna coppia trovata su Dexscreener";
+            document.getElementById("status").className = "status-err";
             return;
         }
 
-        lastSnapshot.dexPairs = data.pairs;
-
-        // prendiamo la prima coppia come "principale"
         const p = data.pairs[0];
 
-        lastSnapshot.priceUsd = p.priceUsd ? Number(p.priceUsd) : null;
-        lastSnapshot.priceChange24 = p.priceChange?.h24 ?? null;
-        lastSnapshot.volume24 = p.volume?.h24 ?? null;
-        lastSnapshot.liquidity = p.liquidity?.usd ?? null;
-        lastSnapshot.fdv = p.fdv ?? null;
-        lastSnapshot.buys24 = p.txns?.h24?.buys ?? null;
-        lastSnapshot.sells24 = p.txns?.h24?.sells ?? null;
-
-        // aggiorna UI
         document.getElementById("price").textContent =
-            lastSnapshot.priceUsd ? "$" + lastSnapshot.priceUsd.toFixed(8) : "N/A";
+            p.priceUsd ? "$" + Number(p.priceUsd).toFixed(8) : "–";
 
-        const ch = lastSnapshot.priceChange24;
         document.getElementById("price-change").textContent =
-            (ch !== null && ch !== undefined) ? `24h: ${ch}%` : "";
+            p.priceChange?.h24 !== undefined ? `24h: ${p.priceChange.h24}%` : "";
 
-        document.getElementById("volume24").textContent = fmtUsd(lastSnapshot.volume24);
-        document.getElementById("liquidity").textContent = fmtUsd(lastSnapshot.liquidity);
-        document.getElementById("fdv").textContent = fmtUsd(lastSnapshot.fdv);
+        document.getElementById("volume24").textContent = fmtUsd(p.volume?.h24);
+        document.getElementById("liquidity").textContent = fmtUsd(p.liquidity?.usd);
+        document.getElementById("fdv").textContent = fmtUsd(p.fdv);
 
-        document.getElementById("buys24").textContent =
-            (lastSnapshot.buys24 !== null) ? lastSnapshot.buys24 : "–";
-        document.getElementById("sells24").textContent =
-            (lastSnapshot.sells24 !== null) ? lastSnapshot.sells24 : "–";
+        document.getElementById("buys24").textContent = p.txns?.h24?.buys ?? "–";
+        document.getElementById("sells24").textContent = p.txns?.h24?.sells ?? "–";
 
-        // aggiorna storico 10 giorni
-        if (lastSnapshot.volume24 !== null) {
-            updateHistoryWithToday(lastSnapshot.volume24);
-        } else {
-            lastSnapshot.days10 = loadHistory();
-        }
-
-        renderChart10d();
-        renderPairsTable();
-
-        setStatus("Dexscreener OK", true);
-    } catch (e) {
-        console.error("Errore Dexscreener:", e);
-        setStatus("Errore Dexscreener – controlla rete / CORS", false);
-    }
-}
-
-// ================== RENDER COPPIE ==================
-function renderPairsTable() {
-    const table = document.getElementById("pairs");
-    table.innerHTML = `<tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h %</th><th>Volume 24h</th><th>Liquidity</th></tr>`;
-    lastSnapshot.dexPairs.forEach(p => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${p.dexId}</td>
-            <td>${p.baseToken?.symbol || ""}/${p.quoteToken?.symbol || ""}</td>
-            <td>${p.priceUsd ? "$" + Number(p.priceUsd).toFixed(8) : "N/A"}</td>
-            <td>${p.priceChange?.h24 ?? 0}%</td>
-            <td>${fmtUsd(p.volume?.h24 || 0)}</td>
-            <td>${fmtUsd(p.liquidity?.usd || 0)}</td>
+        // Tabella coppie
+        const table = document.getElementById("pairs");
+        table.innerHTML = `
+            <tr>
+                <th>DEX</th>
+                <th>Coppia</th>
+                <th>Prezzo</th>
+                <th>24h %</th>
+                <th>Volume 24h</th>
+                <th>Liquidity</th>
+            </tr>
         `;
-        table.appendChild(tr);
-    });
-}
 
-// ================== RENDER CHART 10D ==================
-function renderChart10d() {
-    const ctx = document.getElementById("chart10d").getContext("2d");
-    const labels = lastSnapshot.days10.map(d => d.date.slice(5)); // MM-DD
-    const vols = lastSnapshot.days10.map(d => d.volume24 || 0);
-
-    if (!chart10d) {
-        chart10d = new Chart(ctx, {
-            type: "bar",
-            data: {
-                labels,
-                datasets: [
-                    { label:"Volume 24h", data:vols, backgroundColor:"#00b4ff" }
-                ]
-            },
-            options: {
-                responsive:true,
-                plugins:{ legend:{ labels:{ color:"#fff" } } },
-                scales:{
-                    x:{ ticks:{ color:"#fff" } },
-                    y:{ ticks:{ color:"#fff" } }
-                }
-            }
+        data.pairs.forEach(pair => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${pair.dexId}</td>
+                <td>${pair.baseToken?.symbol}/${pair.quoteToken?.symbol}</td>
+                <td>${pair.priceUsd ? "$" + Number(pair.priceUsd).toFixed(8) : "–"}</td>
+                <td>${pair.priceChange?.h24 ?? "–"}%</td>
+                <td>${fmtUsd(pair.volume?.h24)}</td>
+                <td>${fmtUsd(pair.liquidity?.usd)}</td>
+            `;
+            table.appendChild(tr);
         });
-    } else {
-        chart10d.data.labels = labels;
-        chart10d.data.datasets[0].data = vols;
-        chart10d.update();
+
+        document.getElementById("status").textContent = "Dati caricati";
+        document.getElementById("status").className = "status-ok";
+
+    } catch (err) {
+        console.error(err);
+        document.getElementById("status").textContent =
+            "Errore nel caricamento Dexscreener";
+        document.getElementById("status").className = "status-err";
     }
 }
 
-// ================== TOP WALLET DA CSV ==================
-function parseWalletCSV(text) {
-    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l);
-    const res = [];
-    for (const line of lines) {
-        const parts = line.split(",").map(p => p.trim());
-        if (parts.length < 2) continue;
-        const address = parts[0];
-        const volume = Number(parts[1]) || 0;
-        const trades = parts[2] ? Number(parts[2]) || 0 : 0;
-        res.push({ address, volumeUsd: volume, trades });
-    }
-    res.sort((a,b) => b.volumeUsd - a.volumeUsd);
-    return res.slice(0,10);
-}
-function renderTopWallets() {
-    const table = document.getElementById("topwallet");
-    table.innerHTML = `<tr><th>Wallet</th><th>Volume $</th><th>Trades</th></tr>`;
-    lastSnapshot.topWallets.forEach(w => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${shortAddr(w.address)}</td>
-            <td>${fmtUsd(w.volumeUsd)}</td>
-            <td>${w.trades}</td>
-        `;
-        table.appendChild(tr);
-    });
-}
-
-// ================== CSV EXPORT ==================
-function downloadCSV() {
-    const rows = [];
-    rows.push(["Metric","Value"]);
-    rows.push(["Price USD", lastSnapshot.priceUsd ?? ""]);
-    rows.push(["Price Change 24h", lastSnapshot.priceChange24 ?? ""]);
-    rows.push(["Volume 24h", lastSnapshot.volume24 ?? ""]);
-    rows.push(["Liquidity", lastSnapshot.liquidity ?? ""]);
-    rows.push(["FDV", lastSnapshot.fdv ?? ""]);
-
-    rows.push([]);
-    rows.push(["Day","Volume 24h"]);
-    lastSnapshot.days10.forEach(d => {
-        rows.push([d.date, d.volume24 ?? 0]);
-    });
-
-    rows.push([]);
-    rows.push(["Wallet","Volume USD","Trades"]);
-    lastSnapshot.topWallets.forEach(w => {
-        rows.push([w.address, w.volumeUsd, w.trades]);
-    });
-
-    const csv = rows.map(r => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type:"text/csv" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "bumper_dashboard_dexscreener.csv";
-    a.click();
-}
-
-// ================== INIT ==================
-async function refreshAll() {
-    await fetchDexscreener();
-}
-
-document.getElementById("csv-btn").addEventListener("click", downloadCSV);
-document.getElementById("wallet-parse-btn").addEventListener("click", () => {
-    const txt = document.getElementById("wallet-csv").value;
-    lastSnapshot.topWallets = parseWalletCSV(txt);
-    renderTopWallets();
-});
-
-refreshAll();
-setInterval(refreshAll, 15000);
+loadDexscreener();
+setInterval(loadDexscreener, 15000);
 </script>
 
 </body>
