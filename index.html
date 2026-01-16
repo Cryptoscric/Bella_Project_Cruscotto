@@ -6,60 +6,83 @@
 
 <style>
     body {
-        background:#0d0f12;
-        color:#ffffff;
+        background:#0b0d10;
+        color:#e6e6e6;
         font-family:Arial, sans-serif;
         margin:0;
-        padding:20px;
+        padding:25px;
     }
+
     h1 {
         display:flex;
         align-items:center;
-        gap:12px;
-        margin-bottom:20px;
+        gap:15px;
+        margin-bottom:25px;
+        font-size:28px;
+        font-weight:bold;
     }
+
     #logo {
-        width:60px;
-        height:60px;
-        border-radius:8px;
+        width:70px;
+        height:70px;
+        border-radius:10px;
         object-fit:contain;
         background:#111;
     }
+
     .grid {
         display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-        gap:15px;
-        margin-bottom:20px;
+        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+        gap:20px;
+        margin-bottom:25px;
     }
+
     .card {
         background:#161a20;
-        padding:15px;
-        border-radius:10px;
-        box-shadow:0 0 10px rgba(0,0,0,0.4);
+        padding:20px;
+        border-radius:12px;
+        box-shadow:0 0 12px rgba(0,0,0,0.45);
+        border:1px solid #222;
+        transition:0.2s;
     }
+
+    .card:hover {
+        transform:scale(1.02);
+        box-shadow:0 0 18px rgba(0,0,0,0.6);
+    }
+
     .card h2 {
-        margin:0 0 10px 0;
-        font-size:16px;
+        margin:0 0 12px 0;
+        font-size:18px;
+        color:#9ecbff;
     }
+
     .value {
-        font-size:22px;
+        font-size:28px;
         font-weight:bold;
+        color:#ffffff;
     }
+
     table {
         width:100%;
         border-collapse:collapse;
-        margin-top:10px;
-        font-size:14px;
+        margin-top:12px;
+        font-size:15px;
     }
+
     th, td {
-        padding:6px 8px;
+        padding:10px 8px;
         border-bottom:1px solid #333;
     }
+
     th {
         background:#1e222a;
+        color:#9ecbff;
+        font-size:15px;
     }
-    .green { color:#00ff99; }
-    .red { color:#ff4d4d; }
+
+    .green { color:#00ff99; font-weight:bold; }
+    .red { color:#ff4d4d; font-weight:bold; }
 </style>
 </head>
 <body>
@@ -69,14 +92,16 @@
     <span>BUMPER Fiodena Team Dashboard</span>
 </h1>
 
-<div id="status" class="status-ok">Dashboard attiva</div>
+<div id="status" class="status-ok" style="margin-bottom:20px; font-size:18px; color:#00ff99;">
+    Dashboard attiva
+</div>
 
 <div class="grid">
 
     <div class="card">
         <h2>Prezzo</h2>
         <div id="price" class="value">–</div>
-        <div id="price-change"></div>
+        <div id="price-change" style="margin-top:8px; font-size:18px;"></div>
     </div>
 
     <div class="card">
@@ -96,19 +121,14 @@
 
     <div class="card">
         <h2>BUY / SELL 24h</h2>
-        <div class="value">
+        <div class="value" style="font-size:26px;">
             <span id="buys24">–</span> /
             <span id="sells24">–</span>
         </div>
-        <div style="margin-top:10px; font-size:26px; font-weight:bold; line-height:1.4;">
+        <div style="margin-top:12px; font-size:24px; font-weight:bold; line-height:1.5;">
             <span id="buyVolume" class="green">Acquisti: –</span><br>
             <span id="sellVolume" class="red">Vendite: –</span>
         </div>
-    </div>
-
-    <div class="card">
-        <h2>Total Supply (on-chain)</h2>
-        <div id="totalSupply" class="value">–</div>
     </div>
 
 </div>
@@ -138,71 +158,6 @@ function fmtUsd(v) {
     return "$" + n.toLocaleString();
 }
 
-function fmtNum(v) {
-    if (!v && v !== 0) return "–";
-    return Number(v).toLocaleString();
-}
-
-//
-// ===============================
-// SUPPLY ON-CHAIN (SPL TOKEN MINT)
-// ===============================
-//
-async function loadOnChainSupply() {
-    try {
-        const rpcUrl = "https://api.mainnet-beta.solana.com";
-
-        const res = await fetch(rpcUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                jsonrpc: "2.0",
-                id: 1,
-                method: "getAccountInfo",
-                params: [
-                    TOKEN_MINT,
-                    { "encoding": "base64" }
-                ]
-            })
-        });
-
-        const data = await res.json();
-
-        if (!data.result || !data.result.value) {
-            console.error("Mint account non trovata");
-            return null;
-        }
-
-        const b64 = data.result.value.data[0];
-        const raw = atob(b64);
-        const bytes = Uint8Array.from(raw, c => c.charCodeAt(0));
-
-        // SPL Token Mint layout:
-        // offset 36–44 = supply (u64 LE)
-        // offset 44 = decimals (u8)
-
-        const supplyBytes = bytes.slice(36, 44);
-        let supply = 0n;
-        for (let i = 0; i < 8; i++) {
-            supply += BigInt(supplyBytes[i]) << (8n * BigInt(i));
-        }
-
-        const decimals = bytes[44];
-        const totalSupply = Number(supply) / Math.pow(10, decimals);
-
-        return totalSupply;
-
-    } catch (err) {
-        console.error("Errore lettura supply on-chain:", err);
-        return null;
-    }
-}
-
-//
-// ===============================
-// DEXSCREENER
-// ===============================
-//
 async function loadDexscreener() {
     try {
         const res = await fetch(DS_URL);
@@ -277,17 +232,8 @@ async function loadDexscreener() {
     }
 }
 
-//
-// ===============================
-// LOAD ALL
-// ===============================
-//
-async function loadAll() {
+function loadAll() {
     loadDexscreener();
-
-    const supply = await loadOnChainSupply();
-    document.getElementById("totalSupply").textContent =
-        supply ? fmtNum(supply) : "Non disponibile";
 }
 
 loadAll();
