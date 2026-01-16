@@ -60,6 +60,9 @@
     }
     .status-ok { color:#00ff99; }
     .status-err { color:#ff4d4d; }
+    .green { color:#00ff99; }
+    .red { color:#ff4d4d; }
+    .yellow { color:#ffd000; }
 </style>
 </head>
 <body>
@@ -72,6 +75,7 @@
 <div id="status" class="status-err">Caricamento...</div>
 
 <div class="grid">
+
     <div class="card">
         <h2>Prezzo</h2>
         <div id="price" class="value">–</div>
@@ -79,8 +83,19 @@
     </div>
 
     <div class="card">
-        <h2>Volume 24h</h2>
+        <h2>Volume 24h (Dexscreener)</h2>
         <div id="volume24" class="value">–</div>
+    </div>
+
+    <div class="card">
+        <h2>Volume 24h (Jupiter)</h2>
+        <div id="jupVolume24" class="value">–</div>
+    </div>
+
+    <div class="card">
+        <h2>Comparativa Volume</h2>
+        <div id="compareVolume" class="value">–</div>
+        <div id="compareLabel"></div>
     </div>
 
     <div class="card">
@@ -100,8 +115,8 @@
             <span id="sells24">–</span>
         </div>
         <div style="margin-top:10px; font-size:26px; font-weight:bold; line-height:1.4;">
-            <span id="buyVolume" style="color:#00ff99;">Acquisti: –</span><br>
-            <span id="sellVolume" style="color:#ff4d4d;">Vendite: –</span>
+            <span id="buyVolume" class="green">Acquisti: –</span><br>
+            <span id="sellVolume" class="red">Vendite: –</span>
         </div>
     </div>
 
@@ -114,6 +129,7 @@
         <h2>Circulating Supply</h2>
         <div id="circulatingSupply" class="value">–</div>
     </div>
+
 </div>
 
 <div class="card">
@@ -136,7 +152,6 @@
 const TOKEN_MINT = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
 const DS_URL = "https://api.dexscreener.com/latest/dex/tokens/" + TOKEN_MINT;
 
-// Controllo config.js
 let HELIUS_KEY = null;
 if (typeof HELIUS_API_KEY !== "undefined") {
     HELIUS_KEY = HELIUS_API_KEY;
@@ -177,19 +192,42 @@ async function loadSupply() {
         );
 
         const data = await res.json();
-
         const total = data.totalSupply?.uiAmount ?? null;
 
         if (total !== null) {
             document.getElementById("totalSupply").textContent = fmtNum(total);
 
-            // Formula Circulating Supply
             const circulating = total - 100_000_000;
             document.getElementById("circulatingSupply").textContent =
                 circulating > 0 ? fmtNum(circulating) : "–";
         }
     } catch (err) {
         console.error("Errore supply:", err);
+    }
+}
+
+// ===============================
+// JUPITER VOLUME
+// ===============================
+async function loadJupiterVolume() {
+    try {
+        const res = await fetch("https://stats.jup.ag/v1/volume/tokens");
+        const data = await res.json();
+
+        const token = data.find(t => t.mint === TOKEN_MINT);
+
+        if (token) {
+            document.getElementById("jupVolume24").textContent =
+                fmtUsd(token.volume24h);
+            return token.volume24h;
+        } else {
+            document.getElementById("jupVolume24").textContent = "–";
+            return 0;
+        }
+    } catch (err) {
+        console.error("Errore Jupiter:", err);
+        document.getElementById("jupVolume24").textContent = "–";
+        return 0;
     }
 }
 
@@ -257,14 +295,43 @@ async function loadDexscreener() {
             table.appendChild(tr);
         });
 
+        return p.volume?.h24 ?? 0;
+
     } catch (err) {
         console.error("Errore Dexscreener:", err);
+        return 0;
     }
 }
 
+// ===============================
+// COMPARATIVA
+// ===============================
+async function loadComparison() {
+    const dexVol = await loadDexscreener();
+    const jupVol = await loadJupiterVolume();
+
+    if (!dexVol || !jupVol) {
+        document.getElementById("compareVolume").textContent = "–";
+        document.getElementById("compareLabel").textContent = "";
+        return;
+    }
+
+    const diff = ((jupVol - dexVol) / dexVol) * 100;
+
+    let color = "yellow";
+    if (diff > 20) color = "green";
+    if (diff < -20) color = "red";
+
+    document.getElementById("compareVolume").innerHTML =
+        `<span class="${color}">${diff.toFixed(1)}%</span>`;
+
+    document.getElementById("compareLabel").textContent =
+        `Jupiter: ${fmtUsd(jupVol)} | Dex: ${fmtUsd(dexVol)}`;
+}
+
 function loadAll() {
-    loadDexscreener();
     loadSupply();
+    loadComparison();
 }
 
 loadAll();
