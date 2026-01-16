@@ -90,6 +90,15 @@
 
     .green { color:#00cc33; font-weight:bold; }
     .red { color:#ff3333; font-weight:bold; }
+
+    .semaforo-dot {
+        display:inline-block;
+        width:14px;
+        height:14px;
+        border-radius:50%;
+        margin-right:6px;
+        vertical-align:middle;
+    }
 </style>
 </head>
 <body>
@@ -99,12 +108,12 @@
     <span>BUMPER Fiodena Team Dashboard</span>
 </h1>
 
-<!-- 🔷 IPOTESI DI IMPORTO DI VENDITA -->
-<div style="background:#eeeeee; padding:20px; border-radius:12px; margin-bottom:25px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap;">
+<!-- 🔷 PIANO DI VENDITA A BASSO IMPATTO -->
+<div style="background:#eeeeee; padding:20px; border-radius:12px; margin-bottom:25px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap;">
 
-    <div style="flex:1; min-width:220px;">
+    <div style="flex:1; min-width:260px;">
         <div style="font-size:22px; font-weight:900; color:#ff3333;">
-            Ipotesi di Importo di vendita
+            Ipotesi di piano di vendita (basso impatto)
         </div>
 
         <div id="safeSellTop" style="font-size:34px; font-weight:900; color:#00cc33; margin-top:8px;">
@@ -112,17 +121,35 @@
         </div>
 
         <div style="font-size:20px; font-weight:900; color:#00cc33;">
-            BUMPER
+            BUMPER totali
+        </div>
+
+        <div id="riskLabel" style="margin-top:12px; font-size:16px; font-weight:900; color:#333;">
+            <span id="riskDot" class="semaforo-dot" style="background:#999;"></span>
+            Rischio: –
+        </div>
+
+        <!-- LEGENDA SEMAFORO -->
+        <div style="margin-top:15px; font-size:15px; font-weight:900; color:#333;">
+            <div><span class="semaforo-dot" style="background:#00cc33;"></span> Verde: impatto &lt; 0.25%</div>
+            <div><span class="semaforo-dot" style="background:#ffcc00;"></span> Giallo: 0.25% – 0.75%</div>
+            <div><span class="semaforo-dot" style="background:#ff3333;"></span> Rosso: &gt; 0.75%</div>
         </div>
     </div>
 
-    <div style="flex:1; min-width:220px; text-align:right;">
+    <div style="flex:1; min-width:260px; text-align:right;">
         <div style="font-size:20px; font-weight:900; color:#222;">
             Equivalente: <span id="safeSellUSDC" style="color:#00cc33; font-weight:900;">–</span> USDC
         </div>
 
         <div style="font-size:18px; margin-top:10px; color:#444; font-weight:900;">
-            Ipotesi DCA: 5 tranche da <span id="dcaTranche" style="color:#00cc33; font-weight:900;">–</span> BUMPER
+            Ipotesi DCA: <span id="dcaCount" style="color:#00cc33; font-weight:900;">–</span>
+            tranche da <span id="dcaTranche" style="color:#00cc33; font-weight:900;">–</span> BUMPER
+        </div>
+
+        <div style="font-size:16px; margin-top:10px; color:#555; font-weight:900;">
+            Impatto stimato per tranche:
+            <span id="impactPerTranche" style="color:#00cc33; font-weight:900;">–</span>
         </div>
     </div>
 
@@ -200,11 +227,80 @@ function fmtNum(v) {
     return Number(v).toLocaleString();
 }
 
-function calculateSafeSell(totalLiquidity, price) {
-    if (!totalLiquidity || !price) return null;
-    const safeSellUSD = totalLiquidity * 0.02;
+function fmtPct(v) {
+    if (v === null || v === undefined) return "–";
+    return v.toFixed(2) + "%";
+}
+
+// Calcolo numero di tranche in modo dinamico per ridurre l'impatto
+function computeTrancheCount(liquidity, volume24h, buys, sells) {
+    if (!liquidity || liquidity <= 0) return 5;
+
+    const liqFactor = Math.min(5, liquidity / 100000);
+    const volFactor = Math.min(5, volume24h / 200000);
+    const sellPressure = sells / (buys + 1);
+    const pressureFactor = Math.min(5, sellPressure);
+
+    let n = Math.round(6 + pressureFactor - liqFactor - (volFactor * 0.5));
+    n = Math.max(3, Math.min(20, n));
+    return n;
+}
+
+// Calcolo piano di vendita a basso impatto
+function calculateSellPlan(liquidity, volume24h, buys, sells, price) {
+    if (!liquidity || !price) return null;
+
+    const maxPct = 0.02;
+    const safeSellUSD = liquidity * maxPct;
     const safeSellBUMPER = safeSellUSD / price;
-    return { bumper: safeSellBUMPER, usdc: safeSellUSD };
+
+    const trancheCount = computeTrancheCount(liquidity, volume24h, buys, sells);
+    const trancheBumper = safeSellBUMPER / trancheCount;
+    const trancheUSD = safeSellUSD / trancheCount;
+
+    const impactPerTranchePct = (trancheUSD / liquidity) * 100;
+
+    return {
+        safeSellBUMPER,
+        safeSellUSD,
+        trancheCount,
+        trancheBumper,
+        trancheUSD,
+        impactPerTranchePct
+    };
+}
+
+// Semaforo rischio in base all'impatto per tranche
+function updateRiskIndicator(impactPct) {
+    const dot = document.getElementById("riskDot");
+    const label = document.getElementById("riskLabel");
+
+    if (impactPct === null || impactPct === undefined) {
+        dot.style.background = "#999";
+        label.innerHTML = '<span id="riskDot" class="semaforo-dot" style="background:#999;"></span>Rischio: –';
+        return;
+    }
+
+    let color = "#00cc33";
+    let text = "Basso";
+
+    if (impactPct >= 0.75) {
+        color = "#ff3333";
+        text = "Alto";
+    } else if (impactPct >= 0.25) {
+        color = "#ffcc00";
+        text = "Medio";
+    }
+
+    dot.style.background = color;
+    label.innerHTML =
+        '<span id="riskDot" class="semaforo-dot" style="background:' +
+        color +
+        ';"></span>Rischio: ' +
+        text +
+        ' (' +
+        impactPct.toFixed(2) +
+        '% per tranche)';
 }
 
 async function loadDexscreener() {
@@ -250,11 +346,16 @@ async function loadDexscreener() {
             document.getElementById("sellVolume").textContent = "Vendite: " + fmtUsd(sellVol);
         }
 
-        const safeSell = calculateSafeSell(totalLiquidity, price);
-        if (safeSell) {
-            document.getElementById("safeSellTop").textContent = fmtNum(safeSell.bumper);
-            document.getElementById("safeSellUSDC").textContent = fmtUsd(safeSell.usdc);
-            document.getElementById("dcaTranche").textContent = fmtNum(safeSell.bumper / 5);
+        const plan = calculateSellPlan(totalLiquidity, totalVolume, totalBuys, totalSells, price);
+        if (plan) {
+            document.getElementById("safeSellTop").textContent = fmtNum(plan.safeSellBUMPER);
+            document.getElementById("safeSellUSDC").textContent = fmtUsd(plan.safeSellUSD);
+            document.getElementById("dcaCount").textContent = plan.trancheCount;
+            document.getElementById("dcaTranche").textContent = fmtNum(plan.trancheBumper);
+            document.getElementById("impactPerTranche").textContent = fmtPct(plan.impactPerTranchePct);
+            updateRiskIndicator(plan.impactPerTranchePct);
+        } else {
+            updateRiskIndicator(null);
         }
 
         const table = document.getElementById("pairs");
