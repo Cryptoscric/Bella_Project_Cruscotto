@@ -1,359 +1,4 @@
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8">
-<title>BUMPER Fiodena Team Dashboard</title>
-
-<style>
-    body {
-        background:#0b0d10;
-        color:#e6e6e6;
-        font-family:Arial, sans-serif;
-        margin:0;
-        padding:25px;
-    }
-
-    h1 {
-        display:flex;
-        align-items:center;
-        gap:15px;
-        margin-bottom:15px;
-        font-size:28px;
-        font-weight:bold;
-    }
-
-    #logo {
-        width:70px;
-        height:70px;
-        border-radius:10px;
-        object-fit:contain;
-        background:#111;
-    }
-
-    .grid {
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-        gap:20px;
-        margin-bottom:25px;
-    }
-
-    .card {
-        background:#161a20;
-        padding:20px;
-        border-radius:12px;
-        box-shadow:0 0 12px rgba(0,0,0,0.45);
-        border:1px solid #222;
-        transition:0.2s;
-    }
-
-    .card:hover {
-        transform:scale(1.02);
-        box-shadow:0 0 18px rgba(0,0,0,0.6);
-    }
-
-    .card h2 {
-        margin:0 0 12px 0;
-        font-size:18px;
-        color:#9ecbff;
-    }
-
-    .value {
-        font-size:28px;
-        font-weight:bold;
-        color:#ffffff;
-    }
-
-    .yellow {
-        font-size:22px;
-        color:#ffd700;
-        font-weight:bold;
-        margin-top:8px;
-    }
-
-    table {
-        width:100%;
-        border-collapse:collapse;
-        margin-top:12px;
-        font-size:15px;
-    }
-
-    th, td {
-        padding:10px 8px;
-        border-bottom:1px solid #333;
-    }
-
-    th {
-        background:#1e222a;
-        color:#9ecbff;
-        font-size:15px;
-    }
-
-    .green { color:#00cc33; font-weight:bold; }
-    .red { color:#ff3333; font-weight:bold; }
-
-    .semaforo-dot {
-        display:inline-block;
-        width:14px;
-        height:14px;
-        border-radius:50%;
-        margin-right:6px;
-        vertical-align:middle;
-    }
-
-    .sparkline {
-        width:120px;
-        height:30px;
-        background:#111;
-        border-radius:6px;
-        margin-top:8px;
-    }
-
-    .input-box {
-        width:100%;
-        padding:10px;
-        border-radius:8px;
-        border:1px solid #444;
-        background:#222;
-        color:white;
-        font-size:16px;
-        margin-bottom:10px;
-    }
-
-    .quick-btn {
-        padding:8px 14px;
-        margin-right:8px;
-        background:#333;
-        border:1px solid #555;
-        border-radius:6px;
-        color:white;
-        cursor:pointer;
-        font-weight:bold;
-    }
-
-    .quick-btn:hover {
-        background:#444;
-    }
-
-    .update-btn {
-        padding:10px 18px;
-        background:#00cc33;
-        border:none;
-        border-radius:8px;
-        color:black;
-        font-weight:bold;
-        cursor:pointer;
-        margin-top:10px;
-    }
-
-    .update-btn:hover {
-        background:#00e645;
-    }
-</style>
-</head>
-<body>
-
-<h1>
-    <img id="logo" src="logo.png" alt="logo">
-    <span>BUMPER Fiodena Team Dashboard</span>
-</h1>
-
-<!-- 🔷 PIANO DI VENDITA A BASSO IMPATTO -->
-<div style="background:#dddddd; padding:20px; border-radius:12px; margin-bottom:25px; display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap;">
-
-    <div style="flex:1; min-width:260px;">
-        <div style="font-size:22px; font-weight:900; color:#ff3333;">
-            Ipotesi di piano di vendita (basso impatto)
-        </div>
-
-        <div id="safeSellTop" style="font-size:34px; font-weight:900; color:#00cc33; margin-top:8px;">
-            –
-        </div>
-
-        <div style="font-size:20px; font-weight:900; color:#00cc33;">
-            BUMPER totali
-        </div>
-
-        <div id="riskLabel" style="margin-top:12px; font-size:16px; font-weight:900; color:#333;">
-            <span id="riskDot" class="semaforo-dot" style="background:#999;"></span>
-            Rischio: –
-        </div>
-
-        <!-- LEGENDA SEMAFORO -->
-        <div style="margin-top:15px; font-size:15px; font-weight:900; color:#333;">
-            <div><span class="semaforo-dot" style="background:#00cc33;"></span> Verde: impatto &lt; 0.25%</div>
-            <div><span class="semaforo-dot" style="background:#ffcc00;"></span> Giallo: 0.25% – 0.75%</div>
-            <div><span class="semaforo-dot" style="background:#ff3333;"></span> Rosso: &gt; 0.75%</div>
-        </div>
-    </div>
-
-    <div style="flex:1; min-width:260px; text-align:right;">
-        <div style="font-size:20px; font-weight:900; color:#222;">
-            Equivalente: <span id="safeSellUSDC" style="color:#00cc33; font-weight:900;">–</span> USDC
-        </div>
-
-        <div style="font-size:18px; margin-top:10px; color:#444; font-weight:900;">
-            Ipotesi DCA: <span id="dcaCount" style="color:#00cc33; font-weight:900;">–</span>
-            tranche da <span id="dcaTranche" style="color:#00cc33; font-weight:900;">–</span> BUMPER
-        </div>
-
-        <div style="font-size:16px; margin-top:10px; color:#555; font-weight:900;">
-            Impatto stimato per tranche:
-            <span id="impactPerTranche" style="color:#00cc33; font-weight:900;">–</span>
-        </div>
-
-        <div style="font-size:13px; margin-top:10px; color:#333;">
-            Prezzo stimato dopo tranche:
-            <span id="estimatedPrice" style="font-weight:bold;">–</span>
-        </div>
-    </div>
-
-</div>
-
-<!-- 🔥 CARD SEPARATA: VENDITA PERSONALIZZATA -->
-<div class="card">
-    <h2>Vendita Personalizzata</h2>
-
-    <label>Quanti BUMPER possiedi?</label>
-    <input id="userBalance" class="input-box" type="number" placeholder="Inserisci il tuo saldo BUMPER">
-
-    <button class="update-btn" onclick="updateUserBalance()">Aggiorna</button>
-
-    <hr style="margin:20px 0; border-color:#333;">
-
-    <label>Quanti BUMPER vuoi vendere?</label>
-    <input id="customSellInput" class="input-box" type="number" placeholder="Inserisci quantità da vendere" oninput="updateCustomSell()">
-
-    <input id="customSlider" type="range" min="0" max="100" value="0" style="width:100%;" oninput="sliderChanged()">
-
-    <div style="margin-top:10px;">
-        <button class="quick-btn" onclick="quickSell(10)">10%</button>
-        <button class="quick-btn" onclick="quickSell(25)">25%</button>
-        <button class="quick-btn" onclick="quickSell(50)">50%</button>
-        <button class="quick-btn" onclick="quickSell(100)">100%</button>
-    </div>
-
-    <div style="margin-top:20px; font-size:16px;">
-        <div>USDC ottenuti: <span id="customUSDC" class="green">–</span></div>
-        <div>Impatto stimato: <span id="customImpact" class="yellow">–</span></div>
-        <div>Tranche consigliate: <span id="customTranche" class="green">–</span></div>
-        <div>Per restare in verde: <span id="customGreenTranche" class="green">–</span></div>
-        <div>Confronto con piano ottimale: <span id="customDiff" class="yellow">–</span></div>
-
-        <div style="margin-top:10px; font-size:13px;">
-            Prezzo stimato dopo vendita:
-            <span id="customPrice" style="font-weight:bold;">–</span>
-        </div>
-
-        <canvas id="sparkline" class="sparkline"></canvas>
-    </div>
-</div>
-
-<div id="status" style="margin:20px 0; font-size:18px; color:#00ff99;">
-    Dashboard attiva
-</div>
-
-<div class="grid">
-
-    <div class="card">
-        <h2>Prezzo (miglior coppia)</h2>
-        <div id="price" class="value">–</div>
-        <div id="price-change" class="yellow">–</div>
-    </div>
-
-    <div class="card">
-        <h2>Volume 24h (totale)</h2>
-        <div id="volume24" class="value">–</div>
-    </div>
-
-    <div class="card">
-        <h2>Liquidità Totale</h2>
-        <div id="liquidity" class="value">–</div>
-    </div>
-
-    <div class="card">
-        <h2>FDV (miglior coppia)</h2>
-        <div id="fdv" class="value">–</div>
-    </div>
-
-    <div class="card">
-        <h2>BUY / SELL 24h (totali)</h2>
-
-        <div class="value" style="font-size:26px;">
-            <span id="buys24" class="green">–</span> /
-            <span id="sells24" class="red">–</span>
-        </div>
-
-        <div style="margin-top:12px; font-size:24px; font-weight:bold; line-height:1.5;">
-            <span id="buyVolume" class="green">Acquisti: –</span><br>
-            <span id="sellVolume" class="red">Vendite: –</span>
-        </div>
-    </div>
-
-</div>
-
-<div class="card">
-    <h2>Coppie DEX (Dexscreener)</h2>
-    <table id="pairs">
-        <tr>
-            <th>DEX</th>
-            <th>Coppia</th>
-            <th>Prezzo</th>
-            <th>24h %</th>
-            <th>Volume 24h</th>
-            <th>Liquidity</th>
-        </tr>
-    </table>
-</div>
-
-<script>
-const TOKEN_MINT = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
-const DS_URL = "https://api.dexscreener.com/latest/dex/tokens/" + TOKEN_MINT;
-
-let userBalance = 0;
-let globalPrice = 0;
-let globalLiquidity = 0;
-let globalVolume = 0;
-let globalBuys = 0;
-let globalSells = 0;
-let planImpactPerTranche = 0;
-let planSafeSellBUMPER = 0;
-
-function fmtUsd(v) {
-    if (!v) return "–";
-    const n = Number(v);
-    if (n < 1) return "$" + n.toFixed(6);
-    return "$" + n.toLocaleString();
-}
-
-function fmtNum(v) {
-    return Number(v).toLocaleString();
-}
-
-function fmtPct(v) {
-    if (v === null || v === undefined || isNaN(v)) return "–";
-    return v.toFixed(2) + "%";
-}
-
-function computeTrancheCount(liquidity, volume24h, buys, sells) {
-    if (!liquidity || liquidity <= 0) return 5;
-
-    const liqFactor = Math.min(5, liquidity / 100000);
-    const volFactor = Math.min(5, volume24h / 200000);
-    const sellPressure = sells / (buys + 1);
-    const pressureFactor = Math.min(5, sellPressure);
-
-    let n = Math.round(6 + pressureFactor - liqFactor - (volFactor * 0.5));
-    n = Math.max(3, Math.min(20, n));
-    return n;
-}
-
-function calculateSellPlan(liquidity, volume24h, buys, sells, price) {
-    if (!liquidity || !price) return null;
-
-    const maxPct = 0.02;
-    const safeSellUSD = liquidity * maxPct;
-    const safeSellBUMPER = safeSellUSD / price;<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8">
-<title>BUMPER Dashboard</title>
+<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>BUMPER Dashboard</title>
 <style>
 body{background:#0b0d10;color:#e6e6e6;font-family:Arial;padding:25px;margin:0}
 h1{display:flex;align-items:center;gap:15px;font-size:28px;font-weight:bold}
@@ -394,7 +39,21 @@ th{background:#1e222a;color:#9ecbff}
 </div>
 </div>
 
-<!-- VENDITA PERSONALIZZATA -->
+<!-- CARDS DATI -->
+<div class="card"><h2>Prezzo</h2><div id="price" class="value">–</div><div id="price-change" class="yellow">–</div></div>
+<div class="card"><h2>Volume 24h</h2><div id="volume24" class="value">–</div></div>
+<div class="card"><h2>Liquidità</h2><div id="liquidity" class="value">–</div></div>
+<div class="card"><h2>FDV</h2><div id="fdv" class="value">–</div></div>
+
+<!-- DEX -->
+<div class="card">
+<h2>Coppie DEX</h2>
+<table id="pairs">
+<tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h%</th><th>Volume</th><th>Liquidity</th></tr>
+</table>
+</div>
+
+<!-- VENDITA PERSONALIZZATA (SPOSTATA QUI) -->
 <div class="card">
 <h2>Vendita Personalizzata</h2>
 
@@ -426,19 +85,6 @@ th{background:#1e222a;color:#9ecbff}
 </div>
 </div>
 
-<!-- DATI -->
-<div class="card"><h2>Prezzo</h2><div id="price" class="value">–</div><div id="price-change" class="yellow">–</div></div>
-<div class="card"><h2>Volume 24h</h2><div id="volume24" class="value">–</div></div>
-<div class="card"><h2>Liquidità</h2><div id="liquidity" class="value">–</div></div>
-<div class="card"><h2>FDV</h2><div id="fdv" class="value">–</div></div>
-
-<div class="card">
-<h2>Coppie DEX</h2>
-<table id="pairs">
-<tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h%</th><th>Volume</th><th>Liquidity</th></tr>
-</table>
-</div>
-
 <script>
 const TOKEN="5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
 const URL="https://api.dexscreener.com/latest/dex/tokens/"+TOKEN;
@@ -448,32 +94,23 @@ let planImpact=0,planSafeSell=0;
 
 function fmtUsd(v){if(!v)return"–";v=+v;return v<1?"$"+v.toFixed(6):"$"+v.toLocaleString()}
 function fmtNum(v){return(+v).toLocaleString()}
+function signed(v){if(v===null||isNaN(v))return"–";let pos=v>=0,txt=v.toFixed(2)+"% "+(pos?"(positivo)":"(negativo)");return `<span style="color:${pos?"#00cc33":"#ff3333"};font-weight:bold">${txt}</span>`}
 
-function signed(v){
-if(v===null||isNaN(v))return"–";
-let pos=v>=0,txt=v.toFixed(2)+"% "+(pos?"(positivo)":"(negativo)");
-return `<span style="color:${pos?"#00cc33":"#ff3333"};font-weight:bold">${txt}</span>`;
-}
-
-function updateUserBalance(){userBalance=+document.getElementById("userBalance").value;updateCustomSell()}
-function sliderChanged(){if(!userBalance)return;let s=+customSlider.value;customSellInput.value=Math.floor(userBalance*s/100);updateCustomSell()}
+function updateUserBalance(){userBalance=+userBalance.value;updateCustomSell()}
+function sliderChanged(){if(!userBalance)return;customSellInput.value=Math.floor(userBalance*(+customSlider.value)/100);updateCustomSell()}
 function quickSell(p){if(!userBalance)return;customSellInput.value=Math.floor(userBalance*p/100);customSlider.value=p;updateCustomSell()}
 
 function drawSparkline(v){
-let c=document.getElementById("sparkline"),x=c.getContext("2d");
-x.clearRect(0,0,c.width,c.height);
-if(!v||isNaN(v))return;
-let max=1.5,y=c.height-(Math.min(v,max)/max)*c.height;
-x.strokeStyle=v>=0.75?"#ff3333":v>=0.25?"#ffcc00":"#00cc33";
-x.lineWidth=2;x.beginPath();x.moveTo(5,y);x.lineTo(c.width-5,y);x.stroke();
+let c=sparkline,x=c.getContext("2d");x.clearRect(0,0,c.width,c.height);
+if(!v||isNaN(v))return;let max=1.5,y=c.height-(Math.min(v,max)/max)*c.height;
+x.strokeStyle=v>=0.75?"#ff3333":v>=0.25?"#ffcc00":"#00cc33";x.lineWidth=2;x.beginPath();x.moveTo(5,y);x.lineTo(c.width-5,y);x.stroke();
 }
 
 function updateCustomSell(){
 let amt=+customSellInput.value;
 if(!amt||!globalPrice||!globalLiquidity){
 customUSDC.textContent="–";customImpact.innerHTML="–";customTranche.textContent="–";
-customGreenTranche.textContent="–";customDiff.innerHTML="–";customPrice.textContent="–";
-drawSparkline(null);return;}
+customGreenTranche.textContent="–";customDiff.innerHTML="–";customPrice.textContent="–";drawSparkline(null);return;}
 
 let usd=amt*globalPrice,impact=usd/globalLiquidity*100;
 customUSDC.textContent=fmtUsd(usd);
@@ -524,11 +161,11 @@ dcaTranche.textContent=fmtNum(trancheB);
 impactPerTranche.innerHTML=signed(planImpact);
 estimatedPrice.textContent="$"+(globalPrice*(1-planImpact/100)).toFixed(8);
 
-let dot=document.getElementById("riskDot");
+let dot=riskDot;
 dot.style.background=planImpact>=0.75?"#ff3333":planImpact>=0.25?"#ffcc00":"#00cc33";
 riskLabel.innerHTML=`<span class="semaforo-dot" style="background:${dot.style.background}"></span>Rischio: ${planImpact>=0.75?"Alto":planImpact>=0.25?"Medio":"Basso"}`;
 
-let t=document.getElementById("pairs");
+let t=pairs;
 t.innerHTML="<tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h%</th><th>Volume</th><th>Liquidity</th></tr>";
 d.pairs.forEach(p=>{
 t.innerHTML+=`<tr>
