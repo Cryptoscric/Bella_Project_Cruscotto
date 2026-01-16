@@ -71,7 +71,7 @@
     <span>BUMPER Fiodena Team Dashboard</span>
 </h1>
 
-<div id="status" class="status-err">Caricamento...</div>
+<div id="status" class="status-ok">Dashboard attiva</div>
 
 <div class="grid">
 
@@ -109,12 +109,12 @@
     </div>
 
     <div class="card">
-        <h2>Total Supply</h2>
+        <h2>Total Supply (calcolata)</h2>
         <div id="totalSupply" class="value">–</div>
     </div>
 
     <div class="card">
-        <h2>Circulating Supply</h2>
+        <h2>Circulating Supply (calcolata)</h2>
         <div id="circulatingSupply" class="value">–</div>
     </div>
 
@@ -134,22 +134,9 @@
     </table>
 </div>
 
-<script src="config.js"></script>
-
 <script>
 const TOKEN_MINT = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
 const DS_URL = "https://api.dexscreener.com/latest/dex/tokens/" + TOKEN_MINT;
-
-let HELIUS_KEY = null;
-if (typeof HELIUS_API_KEY !== "undefined") {
-    HELIUS_KEY = HELIUS_API_KEY;
-    document.getElementById("status").textContent = "config.js caricato correttamente";
-    document.getElementById("status").className = "status-ok";
-} else {
-    document.getElementById("status").textContent =
-        "Attenzione: config.js non trovato (supply non disponibile)";
-    document.getElementById("status").className = "status-err";
-}
 
 function fmtUsd(v) {
     if (!v) return "–";
@@ -164,38 +151,7 @@ function fmtNum(v) {
 }
 
 // ===============================
-// SUPPLY via Helius REST API
-// ===============================
-async function loadSupply() {
-    if (!HELIUS_KEY) return;
-
-    try {
-        const res = await fetch(
-            "https://api.helius.xyz/v0/token-supply?api-key=" + HELIUS_KEY,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ mint: TOKEN_MINT })
-            }
-        );
-
-        const data = await res.json();
-        const total = data.totalSupply?.uiAmount ?? null;
-
-        if (total !== null) {
-            document.getElementById("totalSupply").textContent = fmtNum(total);
-
-            const circulating = total - 100_000_000;
-            document.getElementById("circulatingSupply").textContent =
-                circulating > 0 ? fmtNum(circulating) : "–";
-        }
-    } catch (err) {
-        console.error("Errore supply:", err);
-    }
-}
-
-// ===============================
-// DEXSCREENER
+// DEXSCREENER + SUPPLY CALCOLATA
 // ===============================
 async function loadDexscreener() {
     try {
@@ -206,26 +162,34 @@ async function loadDexscreener() {
 
         const p = data.pairs[0];
 
+        // Prezzo
+        const price = p.priceUsd ? Number(p.priceUsd) : null;
         document.getElementById("price").textContent =
-            p.priceUsd ? "$" + Number(p.priceUsd).toFixed(8) : "–";
+            price ? "$" + price.toFixed(8) : "–";
 
         document.getElementById("price-change").textContent =
             p.priceChange?.h24 !== undefined ? `24h: ${p.priceChange.h24}%` : "";
 
-        document.getElementById("volume24").textContent = fmtUsd(p.volume?.h24);
-        document.getElementById("liquidity").textContent = fmtUsd(p.liquidity?.usd);
-        document.getElementById("fdv").textContent = fmtUsd(p.fdv);
+        // Volume
+        const vol24 = p.volume?.h24 ?? null;
+        document.getElementById("volume24").textContent = fmtUsd(vol24);
 
+        // Liquidity
+        document.getElementById("liquidity").textContent = fmtUsd(p.liquidity?.usd);
+
+        // FDV
+        const fdv = p.fdv ?? null;
+        document.getElementById("fdv").textContent = fmtUsd(fdv);
+
+        // BUY / SELL
         const buys = p.txns?.h24?.buys ?? 0;
         const sells = p.txns?.h24?.sells ?? 0;
-        const totalVol = p.volume?.h24 ?? 0;
-
         document.getElementById("buys24").textContent = buys;
         document.getElementById("sells24").textContent = sells;
 
-        if (buys + sells > 0 && totalVol > 0) {
-            const buyVol = totalVol * (buys / (buys + sells));
-            const sellVol = totalVol * (sells / (buys + sells));
+        if (buys + sells > 0 && vol24 > 0) {
+            const buyVol = vol24 * (buys / (buys + sells));
+            const sellVol = vol24 * (sells / (buys + sells));
 
             document.getElementById("buyVolume").textContent =
                 "Acquisti: " + fmtUsd(buyVol);
@@ -233,6 +197,25 @@ async function loadDexscreener() {
                 "Vendite: " + fmtUsd(sellVol);
         }
 
+        // ===============================
+        // SUPPLY CALCOLATA (FDV / PREZZO)
+        // ===============================
+        if (fdv && price) {
+            const totalSupply = fdv / price;
+            document.getElementById("totalSupply").textContent =
+                fmtNum(totalSupply);
+
+            const circulating = totalSupply - 100_000_000;
+            document.getElementById("circulatingSupply").textContent =
+                circulating > 0 ? fmtNum(circulating) : "Non disponibile";
+        } else {
+            document.getElementById("totalSupply").textContent = "Non disponibile";
+            document.getElementById("circulatingSupply").textContent = "Non disponibile";
+        }
+
+        // ===============================
+        // TABELLA COPPIE
+        // ===============================
         const table = document.getElementById("pairs");
         table.innerHTML = `
             <tr>
@@ -265,7 +248,6 @@ async function loadDexscreener() {
 
 function loadAll() {
     loadDexscreener();
-    loadSupply();
 }
 
 loadAll();
