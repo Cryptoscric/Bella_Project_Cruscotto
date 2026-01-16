@@ -17,7 +17,7 @@
         display:flex;
         align-items:center;
         gap:15px;
-        margin-bottom:25px;
+        margin-bottom:15px;
         font-size:28px;
         font-weight:bold;
     }
@@ -99,6 +99,19 @@
     <span>BUMPER Fiodena Team Dashboard</span>
 </h1>
 
+<!-- ⭐ SEZIONE VENDITA SICURA (IN ALTO) -->
+<div style="background:#cceeff; padding:20px; border-radius:12px; margin-bottom:25px;">
+    <div style="font-size:20px; font-weight:bold; color:#ffd700;">
+        Vendita Sicura (stima)
+    </div>
+    <div id="safeSellTop" style="font-size:32px; font-weight:bold; color:#00cc66; margin-top:8px;">
+        –
+    </div>
+    <div style="font-size:18px; font-weight:bold; color:#00cc66;">
+        BUMPER
+    </div>
+</div>
+
 <div id="status" style="margin-bottom:20px; font-size:18px; color:#00ff99;">
     Dashboard attiva
 </div>
@@ -138,11 +151,6 @@
         </div>
     </div>
 
-    <div class="card">
-        <h2>Vendita Sicura (stima)</h2>
-        <div id="safeSell" class="value">–</div>
-    </div>
-
 </div>
 
 <div class="card">
@@ -176,7 +184,7 @@ function fmtNum(v) {
 
 function calculateSafeSell(totalLiquidity, price) {
     if (!totalLiquidity || !price) return null;
-    const safeSellUSD = totalLiquidity * 0.02; 
+    const safeSellUSD = totalLiquidity * 0.02;
     const safeSellBUMPER = safeSellUSD / price;
     return safeSellBUMPER;
 }
@@ -225,8 +233,8 @@ async function loadDexscreener() {
         }
 
         const safeSell = calculateSafeSell(totalLiquidity, price);
-        document.getElementById("safeSell").textContent =
-            safeSell ? fmtNum(safeSell) + " BUMPER" : "Non disponibile";
+        document.getElementById("safeSellTop").textContent =
+            safeSell ? fmtNum(safeSell) : "Non disponibile";
 
         const table = document.getElementById("pairs");
         table.innerHTML = `
