@@ -62,7 +62,6 @@
     .status-err { color:#ff4d4d; }
     .green { color:#00ff99; }
     .red { color:#ff4d4d; }
-    .yellow { color:#ffd000; }
 </style>
 </head>
 <body>
@@ -83,19 +82,8 @@
     </div>
 
     <div class="card">
-        <h2>Volume 24h (Dexscreener)</h2>
+        <h2>Volume 24h</h2>
         <div id="volume24" class="value">–</div>
-    </div>
-
-    <div class="card">
-        <h2>Volume 24h (Jupiter)</h2>
-        <div id="jupVolume24" class="value">–</div>
-    </div>
-
-    <div class="card">
-        <h2>Comparativa Volume</h2>
-        <div id="compareVolume" class="value">–</div>
-        <div id="compareLabel"></div>
     </div>
 
     <div class="card">
@@ -207,31 +195,6 @@ async function loadSupply() {
 }
 
 // ===============================
-// JUPITER VOLUME
-// ===============================
-async function loadJupiterVolume() {
-    try {
-        const res = await fetch("https://stats.jup.ag/v1/volume/tokens");
-        const data = await res.json();
-
-        const token = data.find(t => t.mint === TOKEN_MINT);
-
-        if (token) {
-            document.getElementById("jupVolume24").textContent =
-                fmtUsd(token.volume24h);
-            return token.volume24h;
-        } else {
-            document.getElementById("jupVolume24").textContent = "–";
-            return 0;
-        }
-    } catch (err) {
-        console.error("Errore Jupiter:", err);
-        document.getElementById("jupVolume24").textContent = "–";
-        return 0;
-    }
-}
-
-// ===============================
 // DEXSCREENER
 // ===============================
 async function loadDexscreener() {
@@ -295,43 +258,14 @@ async function loadDexscreener() {
             table.appendChild(tr);
         });
 
-        return p.volume?.h24 ?? 0;
-
     } catch (err) {
         console.error("Errore Dexscreener:", err);
-        return 0;
     }
-}
-
-// ===============================
-// COMPARATIVA
-// ===============================
-async function loadComparison() {
-    const dexVol = await loadDexscreener();
-    const jupVol = await loadJupiterVolume();
-
-    if (!dexVol || !jupVol) {
-        document.getElementById("compareVolume").textContent = "–";
-        document.getElementById("compareLabel").textContent = "";
-        return;
-    }
-
-    const diff = ((jupVol - dexVol) / dexVol) * 100;
-
-    let color = "yellow";
-    if (diff > 20) color = "green";
-    if (diff < -20) color = "red";
-
-    document.getElementById("compareVolume").innerHTML =
-        `<span class="${color}">${diff.toFixed(1)}%</span>`;
-
-    document.getElementById("compareLabel").textContent =
-        `Jupiter: ${fmtUsd(jupVol)} | Dex: ${fmtUsd(dexVol)}`;
 }
 
 function loadAll() {
+    loadDexscreener();
     loadSupply();
-    loadComparison();
 }
 
 loadAll();
