@@ -2,10 +2,10 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>BUMPER Dashboard</title>
+  <title>BUMPER Dashboard – SPA</title>
 
   <style>
-    body {
+    body{
       background:#0b0d10;
       color:#e6e6e6;
       font-family:Arial;
@@ -13,16 +13,15 @@
       margin:0;
     }
 
-    /* MENU IN ALTO A DESTRA */
-    .menu {
+    /* MENU IN ALTO A DESTRA – PILL TRASPARENTI */
+    .menu{
       position:absolute;
       top:20px;
       right:30px;
       display:flex;
       gap:12px;
     }
-
-    .pill {
+    .pill{
       padding:8px 16px;
       border:2px solid #9ecbff;
       border-radius:20px;
@@ -30,66 +29,60 @@
       text-decoration:none;
       font-weight:bold;
       transition:0.2s;
+      cursor:pointer;
     }
-
-    .pill:hover {
+    .pill:hover{
       background:#9ecbff22;
       color:white;
       border-color:white;
     }
-
-    /* PULSANTE ATTIVO */
-    .active {
-      border-color:white !important;
-      color:white !important;
+    .pill.active{
+      border-color:white;
+      color:white;
       background:#9ecbff22;
       cursor:default;
     }
 
     /* HEADER */
-    h1 {
+    h1{
       display:flex;
       align-items:center;
       gap:15px;
       font-size:28px;
       font-weight:bold;
     }
-
-    #logo {
+    #logo{
       width:70px;
       height:70px;
       border-radius:10px;
       background:#111;
     }
 
-    /* CARD */
-    .card {
+    /* CARD GENERICA */
+    .card{
       background:#161a20;
       padding:20px;
       border-radius:12px;
       margin-bottom:20px;
       border:1px solid #222;
     }
-
-    .value {
+    .value{
       font-size:28px;
       font-weight:bold;
     }
-
-    .green { color:#00cc33; font-weight:bold; }
-    .red { color:#ff3333; font-weight:bold; }
-    .yellow { color:#ffd700; font-weight:bold; }
+    .green{color:#00cc33;font-weight:bold;}
+    .red{color:#ff3333;font-weight:bold;}
+    .yellow{color:#ffd700;font-weight:bold;}
 
     /* TITOLI INTERNI CON LINEA SPESSA */
-    .section-title {
+    .section-title{
       text-align:center;
       font-weight:900;
       font-size:20px;
       margin:14px 0 10px 0;
     }
-
     .section-title::before,
-    .section-title::after {
+    .section-title::after{
       content:"";
       display:inline-block;
       width:28%;
@@ -99,7 +92,7 @@
     }
 
     /* SPARKLINE */
-    .sparkline {
+    .sparkline{
       width:120px;
       height:30px;
       background:#111;
@@ -108,135 +101,491 @@
     }
 
     /* TABELLA DEX */
-    table {
+    table{
       width:100%;
       border-collapse:collapse;
       margin-top:12px;
       font-size:16px;
     }
-
-    th, td {
+    th,td{
       padding:10px;
       border-bottom:1px solid #333;
     }
-
-    th {
+    th{
       background:#1e222a;
       color:#9ecbff;
       font-size:15px;
     }
+    tr:nth-child(odd){background:#1a1d23;}
+    tr:nth-child(even){background:#22262d;}
 
-    tr:nth-child(odd) { background:#1a1d23; }
-    tr:nth-child(even) { background:#22262d; }
-
-    .semaforo-dot {
+    .semaforo-dot{
       width:14px;
       height:14px;
       border-radius:50%;
       display:inline-block;
       margin-right:6px;
     }
+
+    /* INPUT / BOTTONI VENDITA */
+    .input-box{
+      width:100%;
+      padding:10px;
+      border-radius:8px;
+      border:1px solid #444;
+      background:#222;
+      color:white;
+      font-size:16px;
+      margin-bottom:10px;
+    }
+    .quick-btn{
+      padding:8px 14px;
+      margin-right:8px;
+      background:#333;
+      border:1px solid #555;
+      border-radius:6px;
+      color:white;
+      cursor:pointer;
+      font-weight:bold;
+    }
+    .update-btn{
+      padding:10px 18px;
+      background:#00cc33;
+      border:none;
+      border-radius:8px;
+      color:black;
+      font-weight:bold;
+      cursor:pointer;
+    }
+
+    /* VISTE SPA */
+    .view{display:none;}
+    .view.active{display:block;}
   </style>
 </head>
-
 <body>
 
-  <!-- MENU -->
+  <!-- MENU SPA -->
   <div class="menu">
-    <a href="index.html" class="pill active">Dashboard</a>
-    <a href="vendita.html" class="pill">Vendita</a>
+    <a class="pill active" data-view="dashboard">Dashboard</a>
+    <a class="pill" data-view="vendita">Vendita</a>
   </div>
 
-  <!-- HEADER -->
+  <!-- HEADER COMUNE -->
   <h1>
     <img id="logo" src="logo.png">
     <span>BUMPER Dashboard</span>
   </h1>
 
-  <!-- PIANO DI VENDITA -->
-  <div style="background:#dddddd;padding:20px;border-radius:12px;margin-bottom:25px;display:flex;justify-content:space-between;flex-wrap:wrap">
-    <div>
-      <div style="font-size:22px;font-weight:900;color:#ff3333">Piano di vendita (basso impatto)</div>
-      <div id="safeSellTop" style="font-size:34px;font-weight:900;color:#00cc33;margin-top:8px">–</div>
-      <div style="font-size:20px;font-weight:900;color:#00cc33">BUMPER totali</div>
-      <div id="riskLabel" style="margin-top:12px;font-size:16px;font-weight:900;color:#333">
-        <span id="riskDot" class="semaforo-dot" style="background:#999"></span>Rischio: –
+  <!-- VIEW DASHBOARD -->
+  <div id="viewDashboard" class="view active">
+
+    <!-- PIANO DI VENDITA -->
+    <div style="background:#dddddd;padding:20px;border-radius:12px;margin-bottom:25px;display:flex;justify-content:space-between;flex-wrap:wrap">
+      <div>
+        <div style="font-size:22px;font-weight:900;color:#ff3333">Piano di vendita (basso impatto)</div>
+        <div id="safeSellTop" style="font-size:34px;font-weight:900;color:#00cc33;margin-top:8px">–</div>
+        <div style="font-size:20px;font-weight:900;color:#00cc33">BUMPER totali</div>
+        <div id="riskLabel" style="margin-top:12px;font-size:16px;font-weight:900;color:#333">
+          <span id="riskDot" class="semaforo-dot" style="background:#999"></span>Rischio: –
+        </div>
+      </div>
+
+      <div style="text-align:right">
+        <div style="font-size:20px;font-weight:900;color:#222">Equivalente: <span id="safeSellUSDC" style="color:#00cc33">–</span> USDC</div>
+        <div style="font-size:18px;margin-top:10px;color:#444;font-weight:900">DCA: <span id="dcaCount">–</span> × <span id="dcaTranche">–</span></div>
+        <div style="font-size:16px;margin-top:10px;color:#555;font-weight:900">Impatto per tranche: <span id="impactPerTranche">–</span></div>
+        <div style="font-size:13px;margin-top:10px;color:#333">Prezzo dopo tranche: <span id="estimatedPrice">–</span></div>
       </div>
     </div>
 
-    <div style="text-align:right">
-      <div style="font-size:20px;font-weight:900;color:#222">Equivalente: <span id="safeSellUSDC" style="color:#00cc33">–</span> USDC</div>
-      <div style="font-size:18px;margin-top:10px;color:#444;font-weight:900">DCA: <span id="dcaCount">–</span> × <span id="dcaTranche">–</span></div>
-      <div style="font-size:16px;margin-top:10px;color:#555;font-weight:900">Impatto per tranche: <span id="impactPerTranche">–</span></div>
-      <div style="font-size:13px;margin-top:10px;color:#333">Prezzo dopo tranche: <span id="estimatedPrice">–</span></div>
+    <!-- CARDS DATI -->
+    <div class="card" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px">
+      <div>
+        <h2>Prezzo</h2>
+        <div id="price" class="value">–</div>
+        <div id="priceChange" class="yellow">–</div>
+      </div>
+      <div>
+        <h2>Volume 24h</h2>
+        <div id="volume24" class="value">–</div>
+      </div>
+      <div>
+        <h2>Liquidità</h2>
+        <div id="liquidity" class="value">–</div>
+      </div>
+      <div>
+        <h2>FDV</h2>
+        <div id="fdv" class="value">–</div>
+      </div>
     </div>
+
+    <!-- MEGA-CARD BUY/SELL + VOLUMI -->
+    <div class="card">
+
+      <div class="section-title">BUY/SELL</div>
+
+      <div id="bs24" style="margin-top:6px;font-size:18px"></div>
+      <div id="bs6"  style="margin-top:6px;font-size:18px"></div>
+      <div id="bs1"  style="margin-top:6px;font-size:18px"></div>
+
+      <div id="sentiment" style="margin-top:12px;font-size:20px;font-weight:bold"></div>
+
+      <div style="margin-top:16px">
+        <div style="color:#00cc33;font-weight:bold">BUY</div>
+        <div id="barBuy" style="height:10px;background:#00cc33;width:0%;border-radius:4px"></div>
+
+        <div style="color:#ff3333;font-weight:bold;margin-top:12px">SELL</div>
+        <div id="barSell" style="height:10px;background:#ff3333;width:0%;border-radius:4px"></div>
+      </div>
+
+      <canvas id="sparkBS" class="sparkline" style="margin-top:16px"></canvas>
+
+      <div class="section-title" style="margin-top:24px">VOLUMI</div>
+
+      <div id="vol1"  style="margin-top:6px;font-size:18px"></div>
+      <div id="vol6"  style="margin-top:6px;font-size:18px"></div>
+      <div id="vol24" style="margin-top:6px;font-size:18px"></div>
+      <div id="vol48" style="margin-top:6px;font-size:18px"></div>
+      <div id="vol72" style="margin-top:6px;font-size:18px"></div>
+
+    </div>
+
+    <!-- TABELLA DEX -->
+    <div class="card">
+      <h2>Coppie DEX</h2>
+      <table id="pairs">
+        <tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h%</th><th>Volume</th><th>Liquidity</th></tr>
+      </table>
+    </div>
+
   </div>
 
-  <!-- CARDS DATI -->
-  <div class="card" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:20px">
-    <div>
-      <h2>Prezzo</h2>
-      <div id="price" class="value">–</div>
-      <div id="priceChange" class="yellow">–</div>
+  <!-- VIEW VENDITA PERSONALIZZATA -->
+  <div id="viewVendita" class="view">
+
+    <div class="card">
+      <h2>Vendita Personalizzata</h2>
+
+      <label>Quanti BUMPER possiedi?</label>
+      <input id="userBalance" class="input-box" type="number" placeholder="Inserisci saldo">
+      <button class="update-btn" onclick="updateUserBalance()">Aggiorna</button>
+
+      <hr style="border-color:#333;margin:20px 0">
+
+      <label>Quanti BUMPER vuoi vendere?</label>
+      <input id="customSellInput" class="input-box" type="number" oninput="updateCustomSell()">
+      <input id="customSlider" type="range" min="0" max="100" value="0" style="width:100%" oninput="sliderChanged()">
+
+      <div style="margin-top:10px">
+        <button class="quick-btn" onclick="quickSell(10)">10%</button>
+        <button class="quick-btn" onclick="quickSell(25)">25%</button>
+        <button class="quick-btn" onclick="quickSell(50)">50%</button>
+        <button class="quick-btn" onclick="quickSell(100)">100%</button>
+      </div>
+
+      <div style="margin-top:20px;font-size:16px">
+        <div>USDC ottenuti: <span id="customUSDC" class="green">–</span></div>
+        <div>Impatto stimato: <span id="customImpact">–</span></div>
+        <div>Tranche consigliate: <span id="customTranche" class="green">–</span></div>
+        <div>Per restare in verde: <span id="customGreenTranche" class="green">–</span></div>
+        <div>Confronto con piano ottimale: <span id="customDiff">–</span></div>
+        <div style="margin-top:10px;font-size:13px">Prezzo dopo vendita: <span id="customPrice">–</span></div>
+        <canvas id="sparkline" class="sparkline"></canvas>
+      </div>
     </div>
-    <div>
-      <h2>Volume 24h</h2>
-      <div id="volume24" class="value">–</div>
-    </div>
-    <div>
-      <h2>Liquidità</h2>
-      <div id="liquidity" class="value">–</div>
-    </div>
-    <div>
-      <h2>FDV</h2>
-      <div id="fdv" class="value">–</div>
-    </div>
-  </div>
-
-  <!-- MEGA-CARD BUY/SELL + VOLUMI -->
-  <div class="card">
-
-    <div class="section-title">BUY/SELL</div>
-
-    <div id="bs24" style="margin-top:6px;font-size:18px"></div>
-    <div id="bs6"  style="margin-top:6px;font-size:18px"></div>
-    <div id="bs1"  style="margin-top:6px;font-size:18px"></div>
-
-    <div id="sentiment" style="margin-top:12px;font-size:20px;font-weight:bold"></div>
-
-    <div style="margin-top:16px">
-      <div style="color:#00cc33;font-weight:bold">BUY</div>
-      <div id="barBuy" style="height:10px;background:#00cc33;width:0%;border-radius:4px"></div>
-
-      <div style="color:#ff3333;font-weight:bold;margin-top:12px">SELL</div>
-      <div id="barSell" style="height:10px;background:#ff3333;width:0%;border-radius:4px"></div>
-    </div>
-
-    <canvas id="sparkBS" class="sparkline" style="margin-top:16px"></canvas>
-
-    <div class="section-title" style="margin-top:24px">VOLUMI</div>
-
-    <div id="vol1"  style="margin-top:6px;font-size:18px"></div>
-    <div id="vol6"  style="margin-top:6px;font-size:18px"></div>
-    <div id="vol24" style="margin-top:6px;font-size:18px"></div>
-    <div id="vol48" style="margin-top:6px;font-size:18px"></div>
-    <div id="vol72" style="margin-top:6px;font-size:18px"></div>
 
   </div>
 
-  <!-- TABELLA DEX -->
-  <div class="card">
-    <h2>Coppie DEX</h2>
-    <table id="pairs">
-      <tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h%</th><th>Volume</th><th>Liquidity</th></tr>
-    </table>
-  </div>
-
-  <!-- SCRIPT (identico a prima, senza la parte Vendita Personalizzata) -->
   <script>
-    /* Tutto il tuo JS rimane identico, tranne la parte della vendita personalizzata che ora è in vendita.html */
-    /* ... (JS completo qui, identico alla tua versione attuale) ... */
-  </script>
+    /* CONFIG */
+    const TOKEN="5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
+    const URL="https://api.dexscreener.com/latest/dex/tokens/"+TOKEN;
 
+    /* STATO CONDIVISO (DATA BRIDGE) */
+    let userBalance=0;
+    let globalPrice=0;
+    let globalLiquidity=0;
+    let globalVolume=0;
+    let planImpact=0;
+    let planSafeSell=0;
+
+    /* UTILITIES */
+    function fmtUsd(v){
+      if(!v)return"–";
+      v=+v;
+      return v<1?"$"+v.toFixed(2):"$"+v.toLocaleString();
+    }
+    function fmtNum(v){return(+v).toLocaleString();}
+    function signed(v){
+      if(v===null||isNaN(v))return"–";
+      let pos=v>=0;
+      let txt=v.toFixed(2)+"% "+(pos?"(sotto soglia)":"(sopra soglia)");
+      return `<span style="color:${pos?"#00cc33":"#ff3333"};font-weight:bold">${txt}</span>`;
+    }
+
+    function drawSpark(c,val){
+      let x=c.getContext("2d");
+      x.clearRect(0,0,c.width,c.height);
+      if(!val||isNaN(val))return;
+      let max=1.5,y=c.height-(Math.min(val,max)/max)*c.height;
+      x.strokeStyle=val>=0.75?"#ff3333":val>=0.25?"#ffcc00":"#00cc33";
+      x.lineWidth=2;
+      x.beginPath();x.moveTo(5,y);x.lineTo(c.width-5,y);x.stroke();
+    }
+
+    /* VENDITA PERSONALIZZATA */
+    function updateUserBalance(){
+      userBalance=+document.getElementById("userBalance").value;
+      updateCustomSell();
+    }
+    function sliderChanged(){
+      if(!userBalance)return;
+      customSellInput.value=Math.floor(userBalance*(+customSlider.value)/100);
+      updateCustomSell();
+    }
+    function quickSell(p){
+      if(!userBalance)return;
+      customSellInput.value=Math.floor(userBalance*p/100);
+      customSlider.value=p;
+      updateCustomSell();
+    }
+    function updateCustomSell(){
+      let amt=+document.getElementById("customSellInput").value;
+      if(!amt||!globalPrice||!globalLiquidity){
+        document.getElementById("customUSDC").textContent="–";
+        document.getElementById("customImpact").innerHTML="–";
+        document.getElementById("customTranche").textContent="–";
+        document.getElementById("customGreenTranche").textContent="–";
+        document.getElementById("customDiff").innerHTML="–";
+        document.getElementById("customPrice").textContent="–";
+        drawSpark(document.getElementById("sparkline"),null);
+        return;
+      }
+
+      let usd=amt*globalPrice;
+      let impact=usd/globalLiquidity*100;
+
+      document.getElementById("customUSDC").textContent=fmtUsd(usd);
+      document.getElementById("customImpact").innerHTML=signed(impact);
+
+      let tr=Math.max(1,Math.ceil(impact/0.25));
+      document.getElementById("customTranche").textContent=tr;
+      document.getElementById("customGreenTranche").textContent=tr;
+
+      let diff=impact-planImpact;
+      document.getElementById("customDiff").innerHTML=signed(diff);
+
+      document.getElementById("customPrice").textContent="$"+(globalPrice*(1-impact/100)).toFixed(8);
+      drawSpark(document.getElementById("sparkline"),impact);
+    }
+
+    /* LOGICA DCA */
+    function computeTranche(liq,vol,b,s){
+      let f1=Math.min(5,liq/100000);
+      let f2=Math.min(5,vol/200000);
+      let p=s/(b+1);
+      let f3=Math.min(5,p);
+      let n=Math.round(6+f3-f1-(f2*0.5));
+      return Math.max(3,Math.min(20,n));
+    }
+
+    /* CARICAMENTO DEX + POPOLAMENTO DASHBOARD + DATA BRIDGE */
+    function loadDex(){
+      fetch(URL).then(r=>r.json()).then(d=>{
+        if(!d.pairs)return;
+
+        let best=d.pairs.sort((a,b)=>(b.liquidity?.usd??0)-(a.liquidity?.usd??0))[0];
+        globalPrice=+best.priceUsd||0;
+
+        document.getElementById("price").textContent="$"+globalPrice.toFixed(8);
+        document.getElementById("priceChange").textContent=(best.priceChange?.h24??"–")+"%";
+
+        let TL=0,TV=0;
+        let B24=0,S24=0,B6=0,S6=0,B1=0,S1=0;
+
+        d.pairs.forEach(p=>{
+          TL+=+(p.liquidity?.usd??0);
+          TV+=+(p.volume?.h24??0);
+
+          B24+=p.txns?.h24?.buys??0;
+          S24+=p.txns?.h24?.sells??0;
+
+          B6+=p.txns?.h6?.buys??0;
+          S6+=p.txns?.h6?.sells??0;
+
+          B1+=p.txns?.h1?.buys??0;
+          S1+=p.txns?.h1?.sells??0;
+        });
+
+        globalLiquidity=TL;
+        globalVolume=TV;
+
+        document.getElementById("liquidity").textContent=fmtUsd(TL);
+        document.getElementById("volume24").textContent=fmtUsd(TV);
+        document.getElementById("fdv").textContent=fmtUsd(best.fdv);
+
+        /* BUY/SELL USDT PER FINESTRA */
+        function splitVolume(p,keyVol,keyTx){
+          let vol=p.volume?.[keyVol]??0;
+          let buys=p.txns?.[keyTx]?.buys??0;
+          let sells=p.txns?.[keyTx]?.sells??0;
+          let tot=buys+sells;
+          if(!tot||!vol)return{vb:0,vs:0};
+          return{
+            vb:vol*(buys/tot),
+            vs:vol*(sells/tot)
+          };
+        }
+
+        let V24_BUY=0,V24_SELL=0,V6_BUY=0,V6_SELL=0,V1_BUY=0,V1_SELL=0;
+        d.pairs.forEach(p=>{
+          let s24=splitVolume(p,"h24","h24");
+          V24_BUY+=s24.vb; V24_SELL+=s24.vs;
+          let s6=splitVolume(p,"h6","h6");
+          V6_BUY+=s6.vb; V6_SELL+=s6.vs;
+          let s1=splitVolume(p,"h1","h1");
+          V1_BUY+=s1.vb; V1_SELL+=s1.vs;
+        });
+
+        /* BUY/SELL ANALYTICS */
+        document.getElementById("bs24").innerHTML=
+          `<b>24h:</b> BUY <span class="green">${B24}</span> `+
+          `<span style="color:#ffffff">(${fmtUsd(V24_BUY)})</span> — `+
+          `SELL <span class="red">${S24}</span> `+
+          `<span style="color:#ffffff">(${fmtUsd(V24_SELL)})</span>`;
+
+        document.getElementById("bs6").innerHTML=
+          `<b>6h:</b> BUY <span class="green">${B6}</span> `+
+          `<span style="color:#ffffff">(${fmtUsd(V6_BUY)})</span> — `+
+          `SELL <span class="red">${S6}</span> `+
+          `<span style="color:#ffffff">(${fmtUsd(V6_SELL)})</span>`;
+
+        document.getElementById("bs1").innerHTML=
+          `<b>1h:</b> BUY <span class="green">${B1}</span> `+
+          `<span style="color:#ffffff">(${fmtUsd(V1_BUY)})</span> — `+
+          `SELL <span class="red">${S1}</span> `+
+          `<span style="color:#ffffff">(${fmtUsd(V1_SELL)})</span>`;
+
+        /* VOLUMI 1h, 6h, 24h, 48h, 72h */
+        let V24=TV;
+        let V6=d.pairs.reduce((a,p)=>a+(p.volume?.h6??0),0);
+        let V1=d.pairs.reduce((a,p)=>a+(p.volume?.h1??0),0);
+        let V24_prev=V24-V6+V1;
+        let V48=V24+V24_prev;
+        let V72=V24+V24_prev+V24_prev;
+
+        let tot24=V24_BUY+V24_SELL;
+        let ratioBuy24=tot24?V24_BUY/tot24:0.5;
+        let ratioSell24=1-ratioBuy24;
+
+        let V24prev_BUY=V24_prev*ratioBuy24;
+        let V24prev_SELL=V24_prev*ratioSell24;
+
+        let V48_BUY=V24_BUY+V24prev_BUY;
+        let V48_SELL=V24_SELL+V24prev_SELL;
+
+        let V72_BUY=V24_BUY+V24prev_BUY+V24prev_BUY;
+        let V72_SELL=V24_SELL+V24prev_SELL+V24prev_SELL;
+
+        document.getElementById("vol1").innerHTML=
+          `<b>Volume 1h:</b> BUY <span class="green">${fmtUsd(V1_BUY)}</span> — `+
+          `SELL <span class="red">${fmtUsd(V1_SELL)}</span>`;
+
+        document.getElementById("vol6").innerHTML=
+          `<b>Volume 6h:</b> BUY <span class="green">${fmtUsd(V6_BUY)}</span> — `+
+          `SELL <span class="red">${fmtUsd(V6_SELL)}</span>`;
+
+        document.getElementById("vol24").innerHTML=
+          `<b>Volume 24h:</b> BUY <span class="green">${fmtUsd(V24_BUY)}</span> — `+
+          `SELL <span class="red">${fmtUsd(V24_SELL)}</span>`;
+
+        document.getElementById("vol48").innerHTML=
+          `<b>Volume 48h:</b> BUY <span class="green">${fmtUsd(V48_BUY)}</span> — `+
+          `SELL <span class="red">${fmtUsd(V48_SELL)}</span>`;
+
+        document.getElementById("vol72").innerHTML=
+          `<b>Volume 72h:</b> BUY <span class="green">${fmtUsd(V72_BUY)}</span> — `+
+          `SELL <span class="red">${fmtUsd(V72_SELL)}</span>`;
+
+        /* SENTIMENT + BARRE + SPARK */
+        let sentiment=B24>S24?"VERDE (buy > sell)":B24<S24?"ROSSO (sell > buy)":"GIALLO (equilibrato)";
+        let color=B24>S24?"#00cc33":B24<S24?"#ff3333":"#ffcc00";
+        document.getElementById("sentiment").innerHTML=
+          `Sentiment: <span style="color:${color}">${sentiment}</span>`;
+
+        let total=B24+S24;
+        let buyPct=total?(B24/total)*100:0;
+        let sellPct=total?(S24/total)*100:0;
+
+        document.getElementById("barBuy").style.width=buyPct+"%";
+        document.getElementById("barSell").style.width=sellPct+"%";
+
+        drawSpark(document.getElementById("sparkBS"),buyPct/100);
+
+        /* PIANO DI VENDITA */
+        let planUSD=TL*0.02;
+        planSafeSell=planUSD/globalPrice;
+        let tr=computeTranche(TL,TV,B24,S24);
+        let trancheB=planSafeSell/tr;
+        planImpact=(planUSD/tr)/TL*100;
+
+        document.getElementById("safeSellTop").textContent=fmtNum(planSafeSell);
+        document.getElementById("safeSellUSDC").textContent=fmtUsd(planUSD);
+        document.getElementById("dcaCount").textContent=tr;
+        document.getElementById("dcaTranche").textContent=fmtNum(trancheB);
+        document.getElementById("impactPerTranche").innerHTML=signed(planImpact);
+        document.getElementById("estimatedPrice").textContent="$"+(globalPrice*(1-planImpact/100)).toFixed(8);
+
+        let dot=document.getElementById("riskDot");
+        dot.style.background=planImpact>=0.75?"#ff3333":planImpact>=0.25?"#ffcc00":"#00cc33";
+        document.getElementById("riskLabel").innerHTML=
+          `<span class="semaforo-dot" style="background:${dot.style.background}"></span>`+
+          `Rischio: ${planImpact>=0.75?"Alto":planImpact>=0.25?"Medio":"Basso"}`;
+
+        /* TABELLA DEX */
+        let t=document.getElementById("pairs");
+        t.innerHTML="<tr><th>DEX</th><th>Coppia</th><th>Prezzo</th><th>24h%</th><th>Volume</th><th>Liquidity</th></tr>";
+        d.pairs.forEach(p=>{
+          t.innerHTML+=`<tr>
+<td>${p.dexId}</td>
+<td>${p.baseToken?.symbol}/${p.quoteToken?.symbol}</td>
+<td>${p.priceUsd?"$"+(+p.priceUsd).toFixed(8):"–"}</td>
+<td>${p.priceChange?.h24??"–"}%</td>
+<td>${fmtUsd(p.volume?.h24)}</td>
+<td>${fmtUsd(p.liquidity?.usd)}</td>
+</tr>`;
+        });
+
+        /* AGGIORNA VENDITA PERSONALIZZATA SE LA VIEW È APERTA */
+        if(document.getElementById("viewVendita").classList.contains("active")){
+          updateCustomSell();
+        }
+      });
+    }
+
+    /* SPA: SWITCH VISTE */
+    document.querySelectorAll(".pill").forEach(btn=>{
+      btn.addEventListener("click",e=>{
+        e.preventDefault();
+        let view=btn.getAttribute("data-view");
+        if(!view)return;
+
+        document.querySelectorAll(".pill").forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+
+        document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+        document.getElementById("view"+view.charAt(0).toUpperCase()+view.slice(1)).classList.add("active");
+
+        if(view==="vendita"){
+          updateCustomSell();
+        }
+      });
+    });
+
+    /* AVVIO */
+    loadDex();
+    setInterval(loadDex,10000);
+  </script>
 </body>
 </html>
