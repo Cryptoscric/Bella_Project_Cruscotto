@@ -67,7 +67,7 @@
 
 <h1>
     <img id="logo" src="logo.png" alt="logo">
-    <span>BUMPER Dashboard</span>
+    <span>BUMPER Fiodena Team Dashboard</span>
 </h1>
 
 <div id="status" class="status-err">Caricamento...</div>
@@ -96,9 +96,17 @@
 
     <div class="card">
         <h2>BUY / SELL 24h</h2>
+
+        <!-- Riga originale -->
         <div class="value">
             <span id="buys24">–</span> /
             <span id="sells24">–</span>
+        </div>
+
+        <!-- NUOVA RIGA GRANDE -->
+        <div style="margin-top:10px; font-size:26px; font-weight:bold; line-height:1.4;">
+            <span id="buyVolume" style="color:#00ff99;">Acquisti: –</span><br>
+            <span id="sellVolume" style="color:#ff4d4d;">Vendite: –</span>
         </div>
     </div>
 </div>
@@ -174,6 +182,13 @@ async function loadDexscreener() {
         document.getElementById("buys24").textContent = p.txns?.h24?.buys ?? "–";
         document.getElementById("sells24").textContent = p.txns?.h24?.sells ?? "–";
 
+        // NUOVA RIGA GRANDE BUY/SELL
+        document.getElementById("buyVolume").textContent =
+            "Acquisti: " + (p.volume?.h24Buy ? fmtUsd(p.volume.h24Buy) : "–");
+
+        document.getElementById("sellVolume").textContent =
+            "Vendite: " + (p.volume?.h24Sell ? fmtUsd(p.volume.h24Sell) : "–");
+
         // Tabella coppie
         const table = document.getElementById("pairs");
         table.innerHTML = `
@@ -212,7 +227,7 @@ async function loadDexscreener() {
 }
 
 loadDexscreener();
-setInterval(loadDexscreener, 15000);
+setInterval(loadDexscreener, 10000); // REFRESH OGNI 10 SECONDI
 </script>
 
 </body>
