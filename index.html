@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>BUMPER Fiodena Team Dashboard</title>
-
 <style>
     body {
         background:#0d0f12;
@@ -61,7 +60,6 @@
     .status-ok { color:#00ff99; }
     .status-err { color:#ff4d4d; }
 </style>
-
 </head>
 <body>
 
@@ -96,14 +94,10 @@
 
     <div class="card">
         <h2>BUY / SELL 24h</h2>
-
-        <!-- Riga originale -->
         <div class="value">
             <span id="buys24">–</span> /
             <span id="sells24">–</span>
         </div>
-
-        <!-- NUOVA RIGA GRANDE -->
         <div style="margin-top:10px; font-size:26px; font-weight:bold; line-height:1.4;">
             <span id="buyVolume" style="color:#00ff99;">Acquisti: –</span><br>
             <span id="sellVolume" style="color:#ff4d4d;">Vendite: –</span>
@@ -125,13 +119,8 @@
     </table>
 </div>
 
-<!-- Carica config.js PRIMA del codice -->
 <script src="config.js"></script>
-
 <script>
-// =========================
-// Controllo caricamento config.js
-// =========================
 if (typeof HELIUS_API_KEY === "undefined") {
     document.getElementById("status").textContent =
         "ERRORE: config.js NON caricato o variabile HELIUS_API_KEY mancante";
@@ -142,9 +131,6 @@ if (typeof HELIUS_API_KEY === "undefined") {
     document.getElementById("status").className = "status-ok";
 }
 
-// =========================
-// Dexscreener (pubblico)
-// =========================
 const TOKEN_MINT = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
 const DS_URL = "https://api.dexscreener.com/latest/dex/tokens/" + TOKEN_MINT;
 
@@ -182,14 +168,12 @@ async function loadDexscreener() {
         document.getElementById("buys24").textContent = p.txns?.h24?.buys ?? "–";
         document.getElementById("sells24").textContent = p.txns?.h24?.sells ?? "–";
 
-        // NUOVA RIGA GRANDE BUY/SELL
         document.getElementById("buyVolume").textContent =
             "Acquisti: " + (p.volume?.h24Buy ? fmtUsd(p.volume.h24Buy) : "–");
 
         document.getElementById("sellVolume").textContent =
             "Vendite: " + (p.volume?.h24Sell ? fmtUsd(p.volume.h24Sell) : "–");
 
-        // Tabella coppie
         const table = document.getElementById("pairs");
         table.innerHTML = `
             <tr>
@@ -201,7 +185,6 @@ async function loadDexscreener() {
                 <th>Liquidity</th>
             </tr>
         `;
-
         data.pairs.forEach(pair => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
@@ -227,7 +210,7 @@ async function loadDexscreener() {
 }
 
 loadDexscreener();
-setInterval(loadDexscreener, 10000); // REFRESH OGNI 10 SECONDI
+setInterval(loadDexscreener, 10000);
 </script>
 
 </body>
