@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>BUMPER Fiodena Team Dashboard</title>
-
 <style>
     body {
         background:#0d0f12;
@@ -61,7 +60,6 @@
     .status-ok { color:#00ff99; }
     .status-err { color:#ff4d4d; }
 </style>
-
 </head>
 <body>
 
@@ -96,16 +94,24 @@
 
     <div class="card">
         <h2>BUY / SELL 24h</h2>
-
         <div class="value">
             <span id="buys24">–</span> /
             <span id="sells24">–</span>
         </div>
-
         <div style="margin-top:10px; font-size:26px; font-weight:bold; line-height:1.4;">
             <span id="buyVolume" style="color:#00ff99;">Acquisti: –</span><br>
             <span id="sellVolume" style="color:#ff4d4d;">Vendite: –</span>
         </div>
+    </div>
+
+    <div class="card">
+        <h2>Total Supply</h2>
+        <div id="totalSupply" class="value">–</div>
+    </div>
+
+    <div class="card">
+        <h2>Circulating Supply</h2>
+        <div id="circulatingSupply" class="value">–</div>
     </div>
 </div>
 
@@ -126,9 +132,6 @@
 <script src="config.js"></script>
 
 <script>
-// =========================
-// Controllo caricamento config.js
-// =========================
 if (typeof HELIUS_API_KEY === "undefined") {
     document.getElementById("status").textContent =
         "ERRORE: config.js NON caricato o variabile HELIUS_API_KEY mancante";
@@ -139,17 +142,54 @@ if (typeof HELIUS_API_KEY === "undefined") {
     document.getElementById("status").className = "status-ok";
 }
 
-// =========================
-// Dexscreener (pubblico)
-// =========================
 const TOKEN_MINT = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
 const DS_URL = "https://api.dexscreener.com/latest/dex/tokens/" + TOKEN_MINT;
+const HELIUS_RPC = "https://mainnet.helius-rpc.com/?api-key=" + HELIUS_API_KEY;
 
 function fmtUsd(v) {
     if (!v) return "–";
     const n = Number(v);
     if (n < 1) return "$" + n.toFixed(6);
     return "$" + n.toLocaleString();
+}
+
+function fmtNum(v) {
+    if (!v) return "–";
+    return Number(v).toLocaleString();
+}
+
+async function loadSupply() {
+    try {
+        const res = await fetch(HELIUS_RPC, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                jsonrpc: "2.0",
+                id: "1",
+                method: "getTokenSupply",
+                params: [TOKEN_MINT]
+            })
+        });
+
+        const data = await res.json();
+        const supply = data.result?.uiAmount ?? null;
+
+        if (supply !== null) {
+            document.getElementById("totalSupply").textContent = fmtNum(supply);
+
+            // Circulating = Total − 100 milioni
+            const circulating = supply - 100_000_000;
+            document.getElementById("circulatingSupply").textContent =
+                circulating > 0 ? fmtNum(circulating) : "–";
+        } else {
+            document.getElementById("totalSupply").textContent = "–";
+            document.getElementById("circulatingSupply").textContent = "–";
+        }
+    } catch (err) {
+        console.error("Errore supply:", err);
+        document.getElementById("totalSupply").textContent = "–";
+        document.getElementById("circulatingSupply").textContent = "–";
+    }
 }
 
 async function loadDexscreener() {
@@ -179,69 +219,5 @@ async function loadDexscreener() {
         document.getElementById("buys24").textContent = p.txns?.h24?.buys ?? "–";
         document.getElementById("sells24").textContent = p.txns?.h24?.sells ?? "–";
 
-        // =========================
-        // CALCOLO BUY/SELL VOLUME
-        // =========================
         const buys = p.txns?.h24?.buys ?? 0;
-        const sells = p.txns?.h24?.sells ?? 0;
-        const totalVol = p.volume?.h24 ?? 0;
-
-        if (buys + sells > 0 && totalVol > 0) {
-            const buyVol = totalVol * (buys / (buys + sells));
-            const sellVol = totalVol * (sells / (buys + sells));
-
-            document.getElementById("buyVolume").textContent =
-                "Acquisti: " + fmtUsd(buyVol);
-
-            document.getElementById("sellVolume").textContent =
-                "Vendite: " + fmtUsd(sellVol);
-        } else {
-            document.getElementById("buyVolume").textContent = "Acquisti: –";
-            document.getElementById("sellVolume").textContent = "Vendite: –";
-        }
-
-        // =========================
-        // TABELLA COPPIE
-        // =========================
-        const table = document.getElementById("pairs");
-        table.innerHTML = `
-            <tr>
-                <th>DEX</th>
-                <th>Coppia</th>
-                <th>Prezzo</th>
-                <th>24h %</th>
-                <th>Volume 24h</th>
-                <th>Liquidity</th>
-            </tr>
-        `;
-
-        data.pairs.forEach(pair => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${pair.dexId}</td>
-                <td>${pair.baseToken?.symbol}/${pair.quoteToken?.symbol}</td>
-                <td>${pair.priceUsd ? "$" + Number(pair.priceUsd).toFixed(8) : "–"}</td>
-                <td>${pair.priceChange?.h24 ?? "–"}%</td>
-                <td>${fmtUsd(pair.volume?.h24)}</td>
-                <td>${fmtUsd(pair.liquidity?.usd)}</td>
-            `;
-            table.appendChild(tr);
-        });
-
-        document.getElementById("status").textContent = "Dati caricati";
-        document.getElementById("status").className = "status-ok";
-
-    } catch (err) {
-        console.error(err);
-        document.getElementById("status").textContent =
-            "Errore nel caricamento Dexscreener";
-        document.getElementById("status").className = "status-err";
-    }
-}
-
-loadDexscreener();
-setInterval(loadDexscreener, 10000); // REFRESH OGNI 10 SECONDI
-</script>
-
-</body>
-</html>
+        const sells = p.txns?.h24?.sells ?? 0
