@@ -2,108 +2,70 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>BUMPER OS – Jupiter DCA Plan</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
+  <title>Jupiter Setup Plan</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.08); }
-    body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; min-height: 100vh; }
-    
-    .menu { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 0; }
-    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); transition: 0.3s; }
+    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.1); }
+    body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; }
+    .menu { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 30px; }
+    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; background: rgba(255, 255, 255, 0.03); }
     .pill.active { background: var(--accent); color: #000; border-color: #fff; }
-    
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; backdrop-filter: blur(10px); }
-    .value { font-family: 'JetBrains Mono'; font-size: 26px; font-weight: 800; color: #fff; }
-    
-    .jupiter-box { background: rgba(107, 182, 255, 0.05); border: 1px solid var(--accent); border-radius: 15px; padding: 20px; margin-top: 15px; }
-    .label-mini { font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-    
-    .status-bar { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; margin-top: 15px; overflow: hidden; }
-    .status-fill { height: 100%; width: 30%; background: var(--green); transition: 1s; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
+    .jupiter-box { background: rgba(107, 182, 255, 0.05); border: 1px solid var(--accent); border-radius: 15px; padding: 20px; font-family: 'JetBrains Mono'; line-height: 2; }
+    .value { font-size: 24px; font-weight: 800; color: #fff; }
     .green { color: var(--green); }
   </style>
 </head>
 <body>
-
   <div class="menu">
     <a href="index.html" class="pill">TERMINAL</a>
     <a href="vendita.html" class="pill">STRATEGY</a>
     <a href="piano.html" class="pill active">PLAN</a>
   </div>
 
-  <h1 style="font-weight:900; letter-spacing:-1px; margin-bottom:30px">JUPITER <span style="color:var(--accent)">DCA SETUP</span></h1>
+  <h1 style="font-weight:900; margin-bottom:20px">JUPITER <span style="color:var(--accent)">DCA SETUP</span></h1>
 
   <div class="card">
-    <div class="label-mini">Capacità di Uscita Sicura (Impact < 0.25%)</div>
-    <div id="safeValue" class="value" style="margin-top:10px">$0.00</div>
-    <div class="status-bar"><div id="statusFill" class="status-fill"></div></div>
-  </div>
-
-  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
-    <div class="card">
-      <div class="label-mini">Tranche Totali</div>
-      <div id="trancheCount" class="value" style="color:var(--accent)">--</div>
-    </div>
-    <div class="card">
-      <div class="label-mini">Size per Tranche</div>
-      <div id="trancheSize" class="value" style="color:var(--accent)">--</div>
-    </div>
+    <div style="font-size:10px; font-weight:800; color:#64748b">SAFE EXIT CAPACITY (MAX 0.18% IMPACT)</div>
+    <div id="safe" class="value" style="margin-top:10px">$0.00</div>
   </div>
 
   <div class="card">
-    <div class="label-mini">Parametri da inserire su Jupiter.ag</div>
-    <div id="jupiterInstructions" class="jupiter-box">
-      <p style="color:#64748b; font-size:14px">Caricamento dati in corso...</p>
-    </div>
+    <div style="font-size:11px; font-weight:800; margin-bottom:15px; color:var(--accent)">PARAMETRI DA INSERIRE SU JUPITER.AG</div>
+    <div id="jup" class="jupiter-box">Inserisci il saldo nella pagina Strategy per vedere il piano...</div>
     <div style="margin-top:15px; font-size:12px; color:#64748b">
-      💡 <i>Questi parametri assicurano che ogni vendita automatica di Jupiter non "dumpi" il prezzo, mantenendo lo slippage nella zona sicura del 0.21%.</i>
+      💡 Con questi parametri, Jupiter venderà in modo "invisibile", permettendo alla pool di rigenerarsi tra un ordine e l'altro.
     </div>
   </div>
 
   <script>
-    function updatePlan() {
-      // Recupero dati salvati dalle altre pagine
+    function update() {
       const price = parseFloat(localStorage.getItem("globalPrice") || 0);
       const liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
-      const userBal = parseFloat(localStorage.getItem("userBumperBalance") || 0);
+      const bal = parseFloat(localStorage.getItem("userBumperBalance") || 0);
 
-      if (price > 0 && liq > 0) {
-        // Calcolo limite 0.25% impatto
-        const safeUsd = liq * 0.0025; 
-        const safeTokens = safeUsd / price;
-        
-        document.getElementById("safeValue").textContent = "$" + safeUsd.toLocaleString(undefined, {maximumFractionDigits:2});
+      if(price && liq) {
+        const safeUsd = liq * 0.0018; // Limite prudente 0.18%
+        document.getElementById("safe").innerText = "$"+safeUsd.toLocaleString(undefined,{maximumFractionDigits:2});
 
-        if (userBal > 0) {
-          const totalValueUsd = userBal * price;
-          const tranches = Math.ceil(totalValueUsd / safeUsd);
-          const sizePerTranche = userBal / tranches;
+        if(bal > 0) {
+          const totalVal = bal * price;
+          const tranches = Math.ceil(totalVal / safeUsd);
+          const size = bal / tranches;
 
-          document.getElementById("trancheCount").textContent = tranches + " Step";
-          document.getElementById("trancheSize").textContent = Math.floor(sizePerTranche).toLocaleString() + " BP";
-
-          // Generazione istruzioni Jupiter
-          document.getElementById("jupiterInstructions").innerHTML = `
-            <div style="display:grid; grid-template-columns: 1fr; gap:10px; font-family:'JetBrains Mono'; font-size:14px">
-              <div>🔹 SELL AMOUNT: <b style="color:white">${Math.floor(sizePerTranche).toLocaleString()} BUMPER</b></div>
-              <div>🔹 EVERY: <b style="color:white">15 MINUTES</b> (Consigliato)</div>
-              <div>🔹 NO. OF ORDERS: <b style="color:white">${tranches}</b></div>
-              <div style="margin-top:10px; border-top:1px solid rgba(255,255,255,0.1); pt-10">
-                🔹 MAX SLIPPAGE: <b class="green">0.3% (Fixed)</b>
-              </div>
+          document.getElementById("jup").innerHTML = `
+            🔹 SELL TOTAL: <b style="color:white">${bal.toLocaleString()} BUMPER</b><br>
+            🔹 EVERY: <b style="color:white">15 MINUTES</b><br>
+            🔹 NO. OF ORDERS: <b style="color:white">${tranches}</b><br>
+            <div style="border-top:1px solid rgba(255,255,255,0.1); margin-top:10px; padding-top:10px">
+              🔹 SELL PER ORDER: <b class="green">${Math.floor(size).toLocaleString()} BP</b><br>
+              🔹 MAX SLIPPAGE: <b class="green">0.3% (Fixed)</b>
             </div>
-          `;
-        } else {
-          document.getElementById("jupiterInstructions").innerHTML = `
-            <p style="color:var(--red)">Inserisci il tuo saldo nella pagina <b>STRATEGY</b> per calcolare il piano.</p>
           `;
         }
       }
     }
-
-    // Aggiorna ogni 5 secondi per riflettere i cambi di prezzo live
-    setInterval(updatePlan, 5000);
-    window.onload = updatePlan;
+    update(); setInterval(update, 5000);
   </script>
 </body>
 </html>
