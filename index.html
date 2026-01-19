@@ -44,7 +44,7 @@
     <img src="logo.png" style="width:60px; height:60px; border-radius:15px; box-shadow: 0 0 30px rgba(107,182,255,0.2)">
     <div>
       <h1 style="margin:0; font-size:32px; font-weight:900;">BUMPER <span style="color:var(--accent)">OS</span></h1>
-      <div style="font-size:12px; color:#64748b"><span style="color:var(--green)">●</span> REAL-TIME MARKET DATA</div>
+      <div style="font-size:12px; color:#64748b"><span style="color:var(--green)">●</span> REAL-TIME MARKET DATA (VOLUME WEIGHTED)</div>
     </div>
   </header>
 
@@ -114,7 +114,7 @@
         document.getElementById("priceChange").className = best.priceChange.h24 >= 0 ? 'green' : 'red';
         document.getElementById("fdv").textContent = "FDV: " + fmtUsd(best.fdv || 0);
 
-        // CALCOLO VOLUMI BUY/SELL
+        // CALCOLO VOLUMI BUY/SELL E CONTEGGIO TX
         let V24B=0, V24S=0, B24=0, S24=0;
         d.pairs.forEach(p => {
           const b = p.txns?.h24?.buys || 0;
@@ -127,7 +127,8 @@
           B24 += b; S24 += s;
         });
 
-        updateSentiment(B24, S24);
+        // AGGIORNAMENTO SENTIMENT (Basato sui volumi monetari)
+        updateSentiment(V24B, V24S, B24, S24);
         
         document.getElementById("bs-details").innerHTML = `
           24H BUY: <span class="green">${fmtUsd(V24B)}</span><br>
@@ -152,15 +153,32 @@
       } catch(e) { console.error("Error fetching data", e); }
     }
 
-    function updateSentiment(b, s) {
-      document.getElementById("sentimentLabel").innerHTML = b > s ? '<span class="green">BULLISH</span>' : '<span class="red">BEARISH</span>';
-      document.getElementById("bs-counts").innerHTML = `BUY TX: ${b}<br>SELL TX: ${s}`;
+    function updateSentiment(volBuy, volSell, countBuy, countSell) {
+      // LOGICA CORRETTA: Sentiment basato sul peso dei volumi $
+      const isBullish = volBuy > volSell;
+      
+      document.getElementById("sentimentLabel").innerHTML = isBullish ? 
+        '<span style="color:var(--green)">BULLISH</span>' : 
+        '<span style="color:var(--red)">BEARISH</span>';
+      
+      document.getElementById("bs-counts").innerHTML = `BUY TX: ${countBuy}<br>SELL TX: ${countSell}`;
       
       if (state.chart) state.chart.destroy();
       state.chart = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
-        data: { datasets: [{ data: [b, s], backgroundColor: ['#4aff8a', '#ff5c5c'], borderWidth: 0 }] },
-        options: { cutout: '75%', plugins: { legend: { display: false } }, maintainAspectRatio: false }
+        data: { 
+            datasets: [{ 
+                data: [volBuy, volSell], 
+                backgroundColor: ['#4aff8a', '#ff5c5c'], 
+                borderWidth: 0 
+            }] 
+        },
+        options: { 
+            cutout: '75%', 
+            plugins: { legend: { display: false } }, 
+            maintainAspectRatio: false,
+            animation: { duration: 500 }
+        }
       });
     }
 
