@@ -9,19 +9,28 @@
   <style>
     :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.08); }
     body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; min-height: 100vh; }
+    
     .menu { position: sticky; top: 0; display: flex; justify-content: flex-end; gap: 12px; z-index: 1000; padding: 15px 0; }
     .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); transition: 0.3s; }
     .pill:hover, .pill.active { background: var(--accent); color: #000; border-color: #fff; box-shadow: 0 0 20px rgba(107, 182, 255, 0.4); }
+    
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; backdrop-filter: blur(10px); transition: 0.3s; margin-bottom: 20px; }
-    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .card:hover { border-color: var(--accent); }
+    
     .value { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 800; }
     .section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #64748b; margin-bottom: 15px; display: block; }
+    
     .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    
     table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
     th { padding: 12px; font-size: 12px; color: #64748b; text-align: left; }
     td { padding: 16px; background: rgba(255,255,255,0.02); font-family: 'JetBrains Mono'; }
+    
     .green { color: var(--green); } .red { color: var(--red); }
-    @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+    .chart-container { width: 80px; height: 80px; position: relative; }
+    
+    @media (max-width: 900px) { .dashboard-grid, .dual-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -35,7 +44,7 @@
     <img src="logo.png" style="width:60px; height:60px; border-radius:15px; box-shadow: 0 0 30px rgba(107,182,255,0.2)">
     <div>
       <h1 style="margin:0; font-size:32px; font-weight:900;">BUMPER <span style="color:var(--accent)">OS</span></h1>
-      <div style="font-size:12px; color:#64748b">SYSTEMS ONLINE - REAL-TIME FEED</div>
+      <div style="font-size:12px; color:#64748b"><span style="color:var(--green)">●</span> REAL-TIME MARKET DATA</div>
     </div>
   </header>
 
@@ -53,13 +62,27 @@
     <div class="card">
       <span class="section-title">24h Sentiment</span>
       <div style="display:flex; align-items:center; gap:20px">
-        <canvas id="pieChart" style="max-width:70px"></canvas>
-        <div id="sentimentLabel" style="font-weight:900">--</div>
+        <div class="chart-container"><canvas id="pieChart"></canvas></div>
+        <div>
+          <div id="sentimentLabel" style="font-size:18px; font-weight:900">--</div>
+          <div id="bs-counts" style="font-size:11px; color:#64748b; font-family:'JetBrains Mono'"></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="card" style="margin-top:20px">
+  <div class="dual-grid">
+    <div class="card">
+      <span class="section-title">Volume Analytics (USDT)</span>
+      <div id="bs-details" style="font-size:13px; line-height:2.2; font-family:'JetBrains Mono'"></div>
+    </div>
+    <div class="card">
+      <span class="section-title">Timeframe Projections</span>
+      <div id="vol-projections" style="font-size:13px; line-height:2.2; font-family:'JetBrains Mono'"></div>
+    </div>
+  </div>
+
+  <div class="card">
     <span class="section-title">DEX Execution Hub</span>
     <table>
       <thead><tr><th>DEX</th><th>POOL</th><th>PRICE</th><th>24H%</th><th>LIQUIDITY</th></tr></thead>
@@ -69,7 +92,8 @@
 
   <script>
     const TOKEN = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
-    let state = { chart: null };
+    let state = { chart: null, price: 0, liq: 0 };
+    const fmtUsd = (v) => v < 1 ? "$" + v.toFixed(6) : "$" + (+v).toLocaleString();
 
     async function loadDex() {
       try {
@@ -77,36 +101,66 @@
         const d = await r.json();
         const best = d.pairs.sort((a,b) => (b.liquidity?.usd||0) - (a.liquidity?.usd||0))[0];
         
-        const price = +best.priceUsd;
-        const liq = d.pairs.reduce((a,p) => a + (p.liquidity?.usd||0), 0);
+        state.price = +best.priceUsd;
+        state.liq = d.pairs.reduce((a,p) => a + (p.liquidity?.usd||0), 0);
+        let vol24 = d.pairs.reduce((a,p) => a + (p.volume?.h24||0), 0);
 
-        // SALVATAGGIO PER ALTRE PAGINE
-        localStorage.setItem("globalPrice", price);
-        localStorage.setItem("globalLiquidity", liq);
+        localStorage.setItem("globalPrice", state.price);
+        localStorage.setItem("globalLiquidity", state.liq);
 
-        document.getElementById("price").textContent = "$" + price.toFixed(8);
-        document.getElementById("liquidity").textContent = "$" + liq.toLocaleString();
+        document.getElementById("price").textContent = "$" + state.price.toFixed(8);
+        document.getElementById("liquidity").textContent = fmtUsd(state.liq);
         document.getElementById("priceChange").textContent = (best.priceChange.h24) + "%";
         document.getElementById("priceChange").className = best.priceChange.h24 >= 0 ? 'green' : 'red';
-        document.getElementById("fdv").textContent = "FDV: $" + (best.fdv || 0).toLocaleString();
+        document.getElementById("fdv").textContent = "FDV: " + fmtUsd(best.fdv || 0);
 
-        updateSentiment(best.txns.h24.buys, best.txns.h24.sells);
+        // CALCOLO VOLUMI BUY/SELL
+        let V24B=0, V24S=0, B24=0, S24=0;
+        d.pairs.forEach(p => {
+          const b = p.txns?.h24?.buys || 0;
+          const s = p.txns?.h24?.sells || 0;
+          const t = b + s;
+          if(t > 0) {
+            V24B += (p.volume.h24 * (b/t));
+            V24S += (p.volume.h24 * (s/t));
+          }
+          B24 += b; S24 += s;
+        });
+
+        updateSentiment(B24, S24);
         
+        document.getElementById("bs-details").innerHTML = `
+          24H BUY: <span class="green">${fmtUsd(V24B)}</span><br>
+          24H SELL: <span class="red">${fmtUsd(V24S)}</span><br>
+          TOTAL: <b>${fmtUsd(V24B + V24S)}</b>
+        `;
+
+        // PROIEZIONI
+        let ratioB = V24B / (V24B + V24S) || 0.5;
+        const p = (h, mult) => {
+          let vTotal = vol24 * mult;
+          return `<b>${h}H:</b> <span class="green">▲ ${fmtUsd(vTotal * ratioB)}</span> | <span class="red">▼ ${fmtUsd(vTotal * (1-ratioB))}</span>`;
+        };
+        document.getElementById("vol-projections").innerHTML = `${p(24, 1)}<br>${p(48, 1.8)}<br>${p(72, 2.5)}<br>${p(96, 3.2)}`;
+
         document.getElementById("pairsTable").innerHTML = d.pairs.slice(0,5).map(p => `
           <tr><td>${p.dexId.toUpperCase()}</td><td>${p.quoteToken.symbol}</td>
           <td>$${(+p.priceUsd).toFixed(6)}</td><td class="${p.priceChange.h24>=0?'green':'red'}">${p.priceChange.h24}%</td>
-          <td>$${(p.liquidity?.usd || 0).toLocaleString()}</td></tr>
+          <td>${fmtUsd(p.liquidity?.usd || 0)}</td></tr>
         `).join('');
-      } catch(e) { console.error("Error fetching data"); }
+
+      } catch(e) { console.error("Error fetching data", e); }
     }
 
     function updateSentiment(b, s) {
       document.getElementById("sentimentLabel").innerHTML = b > s ? '<span class="green">BULLISH</span>' : '<span class="red">BEARISH</span>';
+      document.getElementById("bs-counts").innerHTML = `BUY TX: ${b}<br>SELL TX: ${s}`;
+      
       if (state.chart) state.chart.destroy();
       state.chart = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
         data: { datasets: [{ data: [b, s], backgroundColor: ['#4aff8a', '#ff5c5c'], borderWidth: 0 }] },
-        options: { cutout: '70%', plugins: { legend: { display: false } } }
+        options: { cutout: '75%', plugins: { legend: { display: false } }, maintainAspectRatio: false }
       });
     }
 
