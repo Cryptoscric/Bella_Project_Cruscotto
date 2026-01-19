@@ -2,22 +2,36 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>BUMPER OS – Strategy Simulator</title>
+  <title>BUMPER OS – DCA Strategy Simulator</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
   <style>
     :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.08); }
     body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; }
+    
     .menu { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 0; }
     .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; transition: 0.3s; }
     .pill.active { background: var(--accent); color: #000; border-color: #fff; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 30px; max-width: 600px; margin: 40px auto; backdrop-filter: blur(10px); }
-    input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-family: 'JetBrains Mono'; margin: 10px 0; box-sizing: border-box; }
-    .quick-btn { padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; border-radius: 8px; cursor: pointer; margin-right: 5px; }
-    .result-box { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-top: 20px; }
-    .green { color: var(--green); } .red { color: var(--red); }
+    
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 30px; max-width: 700px; margin: 20px auto; backdrop-filter: blur(10px); }
+    
+    .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+    label { font-size: 11px; color: #64748b; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 8px; }
+    input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-family: 'JetBrains Mono'; box-sizing: border-box; outline: none; transition: 0.3s; }
+    input:focus { border-color: var(--accent); }
+
+    .summary-card { background: rgba(255,255,255,0.03); border-radius: 15px; padding: 20px; border-left: 4px solid var(--accent); margin-bottom: 20px; }
+    
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+    th { text-align: left; color: #64748b; padding-bottom: 10px; font-size: 11px; }
+    td { padding: 12px 0; border-top: 1px solid var(--border); font-family: 'JetBrains Mono'; }
+    
+    .status-tag { padding: 4px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; }
+    .tag-safe { background: rgba(74, 255, 138, 0.1); color: var(--green); }
+    .tag-risk { background: rgba(255, 92, 92, 0.1); color: var(--red); }
   </style>
 </head>
 <body>
+
   <div class="menu">
     <a href="index.html" class="pill">TERMINAL</a>
     <a href="vendita.html" class="pill active">STRATEGY</a>
@@ -25,81 +39,112 @@
   </div>
 
   <div class="card">
-    <span style="text-transform:uppercase; color:var(--accent); font-weight:800; font-size:12px">Exit Strategy Simulator</span>
-    <h2 style="margin: 10px 0 30px 0">Simulatore Vendita</h2>
+    <h2 style="margin: 0 0 25px 0; font-weight: 900;">DCA Exit Simulator</h2>
 
-    <label style="font-size:11px; color:#64748b">IL TUO SALDO (BUMPER)</label>
-    <input id="userBalance" type="number" placeholder="0.00" oninput="saveBalance()">
-
-    <label style="font-size:11px; color:#64748b">QUANTITÀ DA VENDERE</label>
-    <input id="sellInput" type="number" placeholder="0.00" oninput="calculate()">
-    
-    <div style="margin-bottom:20px">
-      <button class="quick-btn" onclick="setQuick(25)">25%</button>
-      <button class="quick-btn" onclick="setQuick(50)">50%</button>
-      <button class="quick-btn" onclick="setQuick(100)">MAX</button>
+    <div class="input-group">
+      <div>
+        <label>Totale BUMPER da vendere</label>
+        <input id="totalToSell" type="number" placeholder="Es. 1000000" oninput="runSimulation()">
+      </div>
+      <div>
+        <label>Numero Operazioni (Tranche)</label>
+        <input id="numTranches" type="number" placeholder="Es. 5" oninput="runSimulation()">
+      </div>
     </div>
 
-    <div id="results" class="result-box" style="display:none">
-      <div style="display:flex; justify-content:space-between; margin-bottom:10px">
-        <span>Valore Stimato:</span><span id="resUSDC" class="green">--</span>
+    <div id="simulationResult" style="display:none">
+      <div class="summary-card">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <div>
+            <span style="font-size:12px; color:#64748b">Impatto per singola operazione</span>
+            <div id="singleImpact" style="font-size:24px; font-weight:800">0%</div>
+          </div>
+          <div style="text-align:right">
+            <span id="strategyRating" class="status-tag tag-safe">STRATEGIA SICURA</span>
+          </div>
+        </div>
       </div>
-      <div style="display:flex; justify-content:space-between; margin-bottom:10px">
-        <span>Impatto Prezzo:</span><span id="resImpact">--</span>
-      </div>
-      <div style="display:flex; justify-content:space-between; border-top:1px solid var(--border); pt-10; margin-top:10px">
-        <span style="font-size:12px; color:#64748b">Prezzo Post-Vendita:</span><span id="resNewPrice" style="font-size:12px">--</span>
+
+      <label>Proiezione DCA Step-by-Step</label>
+      <table id="dcaTable">
+        <thead>
+          <tr>
+            <th>STEP</th>
+            <th>SIZE (BP)</th>
+            <th>USDC RICEVUTI</th>
+            <th>NUOVO PREZZO</th>
+            <th>IMPATTO</th>
+          </tr>
+        </thead>
+        <tbody>
+          </tbody>
+      </table>
+      <div style="margin-top:20px; font-size:12px; color:#64748b; text-align:center">
+        L'impatto totale cumulativo stimato è del <b id="totalImpact" class="red">--</b>
       </div>
     </div>
   </div>
 
   <script>
-    let price = 0, liq = 0;
-
-    function sync() {
-      price = parseFloat(localStorage.getItem("globalPrice") || 0);
-      liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
-      if(document.getElementById("sellInput").value) calculate();
-    }
-
-    function saveBalance() {
-      localStorage.setItem("userBumperBalance", document.getElementById("userBalance").value);
-      calculate();
-    }
-
-    function setQuick(p) {
-      const bal = parseFloat(document.getElementById("userBalance").value || 0);
-      document.getElementById("sellInput").value = (bal * p / 100).toFixed(2);
-      calculate();
-    }
-
-    function calculate() {
-      const amt = parseFloat(document.getElementById("sellInput").value || 0);
-      const resDiv = document.getElementById("results");
+    function runSimulation() {
+      const total = parseFloat(document.getElementById("totalToSell").value || 0);
+      const tranches = parseInt(document.getElementById("numTranches").value || 0);
+      const price = parseFloat(localStorage.getItem("globalPrice") || 0);
+      const liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
       
-      if(amt > 0 && price > 0) {
+      const resDiv = document.getElementById("simulationResult");
+      const tbody = document.querySelector("#dcaTable tbody");
+
+      if (total > 0 && tranches > 0 && price > 0) {
         resDiv.style.display = "block";
-        const usd = amt * price;
-        const impact = (usd / (liq / 2)) * 100; // Modello XYK semplificato
+        tbody.innerHTML = "";
         
-        document.getElementById("resUSDC").textContent = "$" + usd.toLocaleString(undefined, {minimumFractionDigits: 2});
-        document.getElementById("resImpact").textContent = impact.toFixed(2) + "%";
-        document.getElementById("resImpact").className = impact > 1 ? "red" : "green";
-        document.getElementById("resNewPrice").textContent = "$" + (price * (1 - impact/100)).toFixed(8);
+        let currentPrice = price;
+        const sizePerTranche = total / tranches;
+        const singleUsdValue = sizePerTranche * price;
+        const singleImpact = (singleUsdValue / (liq / 2)) * 100;
+        
+        // UI Header Update
+        document.getElementById("singleImpact").textContent = singleImpact.toFixed(3) + "%";
+        const rating = document.getElementById("strategyRating");
+        if(singleImpact > 0.25) {
+          rating.textContent = "STRATEGIA RISCHIOSA";
+          rating.className = "status-tag tag-risk";
+          document.getElementById("singleImpact").className = "red";
+        } else {
+          rating.textContent = "STRATEGIA SICURA";
+          rating.className = "status-tag tag-safe";
+          document.getElementById("singleImpact").className = "green";
+        }
+
+        // Generazione Tabella
+        for (let i = 1; i <= tranches; i++) {
+          let stepUsdc = sizePerTranche * currentPrice;
+          let stepImpact = (stepUsdc / (liq / 2)) * 100;
+          currentPrice = currentPrice * (1 - stepImpact / 100);
+
+          const row = `<tr>
+            <td>#${i}</td>
+            <td>${Math.floor(sizePerTranche).toLocaleString()}</td>
+            <td class="green">$${stepUsdc.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
+            <td>$${currentPrice.toFixed(8)}</td>
+            <td class="${stepImpact > 0.25 ? 'red' : ''}">${stepImpact.toFixed(3)}%</td>
+          </tr>`;
+          tbody.innerHTML += row;
+        }
+        
+        const totalCumulImpact = ((price - currentPrice) / price * 100);
+        document.getElementById("totalImpact").textContent = totalCumulImpact.toFixed(2) + "%";
+        
       } else {
         resDiv.style.display = "none";
       }
     }
 
-    window.onload = () => {
-      document.getElementById("userBalance").value = localStorage.getItem("userBumperBalance") || "";
-      sync();
-      setInterval(sync, 5000);
-    };
+    // Sincronizzazione con Dashboard
+    setInterval(() => {
+        if(document.getElementById("totalToSell").value) runSimulation();
+    }, 5000);
   </script>
-</body>
-</html>
-  </script>
-
 </body>
 </html>
