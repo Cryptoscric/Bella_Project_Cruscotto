@@ -17,14 +17,18 @@
     .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
     label { font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 8px; letter-spacing: 1px; }
     input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-family: 'JetBrains Mono'; box-sizing: border-box; outline: none; transition: 0.3s; }
-    input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(107, 182, 255, 0.1); }
+    input:focus { border-color: var(--accent); }
 
-    .summary-card { background: rgba(255,255,255,0.03); border-radius: 15px; padding: 25px; border-top: 1px solid var(--border); margin-bottom: 25px; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 20px; align-items: center; }
+    .summary-card { background: rgba(255,255,255,0.03); border-radius: 15px; padding: 25px; border-top: 1px solid var(--border); margin-bottom: 15px; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 20px; align-items: center; }
     
+    /* NUOVO BOX RIDUZIONE TOTALE */
+    .total-impact-box { background: rgba(255, 92, 92, 0.05); border: 1px dashed var(--red); border-radius: 12px; padding: 15px; text-align: center; margin-bottom: 25px; }
+    .impact-value { font-family: 'JetBrains Mono'; font-size: 20px; font-weight: 800; margin-left: 10px; }
+
     .stat-label { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
     .stat-value { font-family: 'JetBrains Mono'; font-weight: 800; }
 
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
     th { text-align: left; color: #64748b; padding-bottom: 12px; font-size: 10px; text-transform: uppercase; }
     td { padding: 14px 0; border-top: 1px solid var(--border); font-family: 'JetBrains Mono'; }
     
@@ -60,6 +64,7 @@
     </div>
 
     <div id="simulationResult" style="display:none">
+      
       <div class="summary-card">
         <div>
           <div class="stat-label">Impatto per Step</div>
@@ -75,7 +80,12 @@
         </div>
       </div>
 
-      <label>Dettaglio Operazioni</label>
+      <div class="total-impact-box">
+        <span style="font-size:12px; color:#94a3b8; font-weight: 700;">RIDUZIONE TOTALE VALORE DI MERCATO:</span>
+        <span id="totalImpact" class="impact-value red">0.00%</span>
+      </div>
+
+      <label>Dettaglio Operazioni Sequenziali</label>
       <table id="dcaTable">
         <thead>
           <tr>
@@ -88,11 +98,6 @@
         </thead>
         <tbody></tbody>
       </table>
-      
-      <div style="margin-top:25px; padding:15px; background:rgba(0,0,0,0.2); border-radius:10px; text-align:center; border:1px dashed var(--border)">
-        <span style="font-size:12px; color:#64748b">Riduzione totale del valore di mercato:</span>
-        <b id="totalImpact" class="red" style="font-family:'JetBrains Mono'; margin-left:10px">0.00%</b>
-      </div>
     </div>
   </div>
 
@@ -132,7 +137,7 @@
           impactEl.className = "stat-value green";
         }
 
-        // Simula la catena di vendite
+        // Loop di simulazione
         for (let i = 1; i <= tranches; i++) {
           let stepUsdc = sizePerTranche * currentPrice;
           let stepImpact = (stepUsdc / (liq / 2)) * 100;
@@ -152,12 +157,23 @@
         const totalCumulImpact = ((price - currentPrice) / price * 100);
         document.getElementById("totalImpact").textContent = totalCumulImpact.toFixed(2) + "%";
         
+        // Cambio colore dinamico al box riduzione se < 2% (opzionale)
+        const impactBox = document.querySelector(".total-impact-box");
+        if(totalCumulImpact < 2) {
+            impactBox.style.borderColor = "var(--green)";
+            impactBox.style.background = "rgba(74, 255, 138, 0.05)";
+            document.getElementById("totalImpact").className = "impact-value green";
+        } else {
+            impactBox.style.borderColor = "var(--red)";
+            impactBox.style.background = "rgba(255, 92, 92, 0.05)";
+            document.getElementById("totalImpact").className = "impact-value red";
+        }
+        
       } else {
         resDiv.style.display = "none";
       }
     }
 
-    // Refresh automatico se i dati di mercato cambiano nella dashboard
     setInterval(() => {
         if(document.getElementById("totalToSell").value) runSimulation();
     }, 5000);
