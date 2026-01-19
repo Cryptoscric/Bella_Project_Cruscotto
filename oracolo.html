@@ -2,32 +2,36 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>BUMPER OS – Technical Oracle</title>
+  <title>BUMPER OS – Quant Oracle</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.9); --accent: #a855f7; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.1); }
-    body { background: #05060b; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; }
+    :root { --bg: #05060b; --card-bg: rgba(10, 14, 23, 0.95); --accent: #a855f7; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.05); }
+    body { background: #05060b; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; font-size: 14px; }
     
-    .menu { display: flex; justify-content: flex-end; gap: 12px; padding-bottom: 30px; }
-    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; background: rgba(255, 255, 255, 0.03); transition: 0.3s; }
-    .pill.active { background: var(--accent); color: #fff; border-color: #fff; }
+    .menu { display: flex; justify-content: flex-end; gap: 12px; padding-bottom: 20px; }
+    .pill { padding: 8px 18px; border: 1px solid var(--border); border-radius: 10px; color: #64748b; text-decoration: none; font-weight: 700; font-size: 12px; transition: 0.3s; }
+    .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 35px; max-width: 850px; margin: 0 auto; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; padding: 30px; max-width: 950px; margin: 0 auto; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
     
-    .header-tech { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
-    .verdict-text { font-family: 'JetBrains Mono'; font-size: 32px; font-weight: 800; text-transform: uppercase; margin: 10px 0; }
-
-    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 25px 0; }
-    .m-card { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
-    .m-label { font-size: 9px; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
-    .m-value { font-family: 'JetBrains Mono'; font-size: 18px; font-weight: 700; }
-
-    /* REAL TERMINAL LOG */
-    .terminal-header { background: #1a1f35; padding: 8px 15px; border-radius: 10px 10px 0 0; font-family: 'JetBrains Mono'; font-size: 10px; color: #64748b; border: 1px solid var(--border); border-bottom: none; display: flex; justify-content: space-between; }
-    .terminal-body { background: #000; border-radius: 0 0 10px 10px; padding: 20px; font-family: 'JetBrains Mono'; font-size: 11px; color: #4aff8a; text-align: left; height: 180px; overflow-y: auto; border: 1px solid var(--border); line-height: 1.5; }
+    .grid-main { display: grid; grid-template-columns: 1fr 300px; gap: 25px; }
     
-    .green { color: var(--green); } .red { color: var(--red); } .purple { color: var(--accent); }
-    .dim { color: #64748b; }
+    .metric-box { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .label { font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: block; }
+    .big-value { font-family: 'JetBrains Mono'; font-size: 24px; font-weight: 700; color: #fff; }
+
+    /* TABELLA SLIPPAGE REALISTICA */
+    .slip-table { width: 100%; margin-top: 15px; border-collapse: collapse; }
+    .slip-table td { padding: 10px 0; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono'; font-size: 12px; }
+    .slip-table tr:last-child td { border: none; }
+
+    .terminal-output { background: #000; border-radius: 8px; padding: 15px; font-family: 'JetBrains Mono'; font-size: 11px; color: #4aff8a; height: 250px; overflow-y: auto; line-height: 1.6; border: 1px solid var(--border); }
+    
+    .tag { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; }
+    .tag-green { background: rgba(74, 255, 138, 0.1); color: var(--green); }
+    .tag-red { background: rgba(255, 92, 92, 0.1); color: var(--red); }
+
+    .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -40,98 +44,108 @@
   </nav>
 
   <div class="card">
-    <div class="header-tech">
-      <div style="font-size: 10px; font-weight: 800; color: #64748b; letter-spacing: 2px;">QUANTITATIVE ANALYSIS ENGINE</div>
-      <div id="verdict" class="verdict-text">INITIALIZING...</div>
-      <div id="sub-verdict" style="font-size: 13px; color: #94a3b8;">Calcolo indicatori di rischio basati su Liquidità e Slippage</div>
+    <div class="status-header">
+      <div>
+        <h2 style="margin:0; font-weight:900;">QUANT ENGINE v4.0</h2>
+        <div id="lastUpdate" style="font-size:10px; color:#64748b; font-family:'JetBrains Mono'">SYNCING...</div>
+      </div>
+      <div id="marketStatus" class="tag tag-green">DATA STREAM ACTIVE</div>
     </div>
 
-    <div class="metrics-grid">
-      <div class="m-card">
-        <div class="m-label">Liq/Mcap Ratio</div>
-        <div id="liqRatio" class="m-value">--</div>
-      </div>
-      <div class="m-card">
-        <div class="m-label">1% Depth (Est.)</div>
-        <div id="depth" class="m-value">--</div>
-      </div>
-      <div class="m-card">
-        <div class="m-label">Volatility Risk</div>
-        <div id="volRisk" class="m-value">--</div>
-      </div>
-    </div>
+    <div class="grid-main">
+      <div class="left-col">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px">
+          <div class="metric-box">
+            <span class="label">Whale Cushion (5% Impact)</span>
+            <div id="cushionValue" class="big-value">$0</div>
+            <span style="font-size:10px; color:#64748b">Capitale necessario per dump critico</span>
+          </div>
+          <div class="metric-box">
+            <span class="label">Liquidity Efficiency</span>
+            <div id="effScore" class="big-value">0.00</div>
+            <span id="effLabel" style="font-size:10px; color:var(--accent)">Analisi stabilità pool</span>
+          </div>
+        </div>
 
-    <div class="terminal-header">
-      <span>REAL-TIME COMPUTATION LOG</span>
-      <span id="log-status">ACTIVE</span>
-    </div>
-    <div class="terminal-body" id="log">
-      > In attesa di dati dal Terminale...
+        <div class="metric-box">
+          <span class="label">Slippage Projection Curve</span>
+          <table class="slip-table">
+            <tr><td>Order $500</td><td id="slip500" class="green">--</td><td class="dim">Est. Price Post: <span id="p500">--</span></td></tr>
+            <tr><td>Order $2,500</td><td id="slip2500">--</td><td class="dim">Est. Price Post: <span id="p2500">--</span></td></tr>
+            <tr><td>Order $10,000</td><td id="slip10000" class="red">--</td><td class="dim">Est. Price Post: <span id="p10000">--</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="right-col">
+        <span class="label">Live Compute Log</span>
+        <div id="log" class="terminal-output"></div>
+      </div>
     </div>
   </div>
 
   <script>
-    function updateLog(msg) {
+    function updateLog(msg, color = '#4aff8a') {
       const log = document.getElementById("log");
-      const time = new Date().toLocaleTimeString();
-      log.innerHTML += `<div style="margin-bottom:4px"><span class="dim">[${time}]</span> ${msg}</div>`;
+      const time = new Date().toLocaleTimeString('it-IT', { hour12: false });
+      log.innerHTML += `<div><span style="color:#64748b">[${time}]</span> <span style="color:${color}">${msg}</span></div>`;
       log.scrollTop = log.scrollHeight;
     }
 
-    function consultOracle() {
+    function runAnalysis() {
       const price = parseFloat(localStorage.getItem("globalPrice") || 0);
       const liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
       
-      if (price === 0 || liq === 0) return;
-
-      const log = document.getElementById("log");
-      log.innerHTML = ""; // Pulisce per mostrare calcoli reali correnti
-
-      updateLog("Fetch dati completato.");
-      
-      // 1. Calcolo Slippage Reale (quanto sposta il prezzo una vendita da 1000$)
-      const testAmount = 1000;
-      const poolSide = liq / 2;
-      const slippage1k = (testAmount / poolSide) * 100;
-      updateLog(`Calcolo Price Impact (1k USD): <span class="purple">${slippage1k.toFixed(4)}%</span>`);
-
-      // 2. Calcolo 1% Depth (quanti $ servono per muovere il prezzo dell'1%)
-      const depth1perc = poolSide * 0.01;
-      document.getElementById("depth").textContent = "$" + depth1perc.toLocaleString(undefined, {maximumFractionDigits:0});
-      updateLog(`Calcolo 1% Depth: <span class="purple">$${depth1perc.toFixed(2)}</span>`);
-
-      // 3. Rapporto Liquidità / Prezzo (Indicatori di salute)
-      // Usiamo una formula semplificata del Mcap se non abbiamo la supply
-      const liqHealth = (liq > 200000) ? "STABLE" : "THIN";
-      document.getElementById("liqRatio").textContent = liqHealth;
-
-      // 4. Calcolo Rischio Volatilità
-      let riskScore = "LOW";
-      let riskColor = "green";
-      if (slippage1k > 0.1) { riskScore = "MEDIUM"; riskColor = "purple"; }
-      if (slippage1k > 0.5) { riskScore = "HIGH"; riskColor = "red"; }
-      document.getElementById("volRisk").textContent = riskScore;
-      document.getElementById("volRisk").className = "m-value " + riskColor;
-
-      // Verdetto Tecnico
-      const v = document.getElementById("verdict");
-      if (slippage1k < 0.05) {
-        v.textContent = "HIGH LIQUIDITY";
-        v.className = "verdict-text green";
-        updateLog("Analisi terminata: Asset altamente liquido. Esecuzione trade sicura.");
-      } else if (slippage1k < 0.2) {
-        v.textContent = "MODERATE RISK";
-        v.className = "verdict-text purple";
-        updateLog("Analisi terminata: Liquidità sufficiente per piccoli trade. Attenzione a ordini > $5k.");
-      } else {
-        v.textContent = "LOW LIQUIDITY";
-        v.className = "verdict-text red";
-        updateLog("WARNING: Slippage elevato rilevato. Rischio volatilità estrema.");
+      if (price === 0 || liq === 0) {
+        document.getElementById("log").innerHTML = "> In attesa di segnale dal Terminale...";
+        return;
       }
+
+      document.getElementById("log").innerHTML = "";
+      document.getElementById("lastUpdate").textContent = "LAST COMPUTE: " + new Date().toLocaleTimeString();
+
+      const poolSide = liq / 2; // Lato USDC/SOL
+      updateLog("INIT: Analisi pool DEX rilevata.");
+      updateLog(`DATA: Liquidity side stimata: $${poolSide.toLocaleString()}`);
+
+      // 1. Whale Cushion: Quanti $ per muovere il prezzo del 5%?
+      // Formula: PoolSide * 0.05
+      const cushion = poolSide * 0.05;
+      document.getElementById("cushionValue").textContent = "$" + Math.floor(cushion).toLocaleString();
+      updateLog(`CALC: Whale Cushion (5%) a $${cushion.toFixed(2)}`);
+
+      // 2. Slippage Curve
+      const amounts = [500, 2500, 10000];
+      const targets = ["slip500", "slip2500", "slip10000"];
+      const prices = ["p500", "p2500", "p10000"];
+
+      amounts.forEach((amt, i) => {
+        const impact = (amt / poolSide) * 100;
+        const postPrice = price * (1 - impact/100);
+        
+        const el = document.getElementById(targets[i]);
+        el.textContent = impact.toFixed(3) + "%";
+        el.className = impact > 0.5 ? 'red' : (impact > 0.1 ? 'purple' : 'green');
+        
+        document.getElementById(prices[i]).textContent = "$" + postPrice.toFixed(8);
+      });
+      updateLog("CALC: Curva di slippage aggiornata.");
+
+      // 3. Efficiency Score (Qualità della liquidità)
+      // Un punteggio basato su quanto è profonda la pool rispetto a ordini standard
+      const efficiency = (poolSide / 50000); // 50k come benchmark di stabilità
+      document.getElementById("effScore").textContent = efficiency.toFixed(2);
+      
+      let status = "LOW STABILITY";
+      if (efficiency > 5) status = "OPTIMAL";
+      else if (efficiency > 2) status = "MODERATE";
+      
+      document.getElementById("effLabel").textContent = "DEX STATUS: " + status;
+      updateLog(`RESULT: Status mercato impostato su ${status}`, efficiency > 2 ? '#4aff8a' : '#ff5c5c');
     }
 
-    window.addEventListener('storage', consultOracle);
-    window.onload = consultOracle;
+    window.addEventListener('storage', runAnalysis);
+    window.onload = runAnalysis;
   </script>
 </body>
 </html>
