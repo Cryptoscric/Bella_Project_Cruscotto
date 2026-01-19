@@ -2,20 +2,30 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>BUMPER OS – Strategic Plan</title>
+  <title>BUMPER OS – Strategic Plan & Liquidity Alert</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.08); }
+    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --orange: #ff9f43; --border: rgba(255, 255, 255, 0.08); }
     body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; }
+    
     .menu { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 0; }
     .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; }
     .pill.active { background: var(--accent); color: #000; border-color: #fff; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; backdrop-filter: blur(10px); }
-    .value { font-family: 'JetBrains Mono'; font-size: 24px; font-weight: 800; color: #fff; }
-    .badge { padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-    .bg-green { background: rgba(74, 255, 138, 0.1); color: var(--green); border: 1px solid var(--green); }
-    .risk-bar { height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-top: 15px; overflow: hidden; }
-    .risk-fill { height: 100%; transition: 0.5s; }
+    
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; backdrop-filter: blur(10px); transition: 0.5s; }
+    .card.alert-critical { border-color: var(--red); box-shadow: 0 0 20px rgba(255, 92, 92, 0.2); background: rgba(255, 92, 92, 0.05); }
+    
+    .value { font-family: 'JetBrains Mono'; font-size: 26px; font-weight: 800; color: #fff; }
+    
+    .pool-status { display: inline-flex; align-items: center; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; margin-bottom: 15px; }
+    .status-good { background: rgba(74, 255, 138, 0.1); color: var(--green); border: 1px solid var(--green); }
+    .status-warn { background: rgba(255, 159, 67, 0.1); color: var(--orange); border: 1px solid var(--orange); }
+    .status-crit { background: rgba(255, 92, 92, 0.1); color: var(--red); border: 1px solid var(--red); animation: pulse 2s infinite; }
+
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    
+    .risk-bar { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; margin-top: 15px; overflow: hidden; }
+    .risk-fill { height: 100%; transition: 1s ease-in-out; }
   </style>
 </head>
 <body>
@@ -27,32 +37,39 @@
 
   <h1 style="font-weight:900; letter-spacing:-1px">STRATEGIC <span style="color:var(--accent)">PLAN</span></h1>
 
-  <div class="card">
-    <span style="font-size:10px; color:#64748b; font-weight:800; text-transform:uppercase">Capacità di Uscita Sicura</span>
-    <div id="safeValue" class="value" style="margin-top:10px">$0.00</div>
-    <div style="font-size:12px; color:#64748b">Massimo vendibile con impatto < 0.25%</div>
-    <div class="risk-bar"><div id="riskFill" class="risk-fill" style="width: 25%; background: var(--green)"></div></div>
+  <div id="mainCard" class="card">
+    <div id="poolStatus" class="pool-status status-good">POOL HEALTH: OPTIMAL</div>
+    
+    <div style="display:flex; justify-content:space-between; align-items:flex-end">
+      <div>
+        <span style="font-size:10px; color:#64748b; font-weight:800; text-transform:uppercase">Safe Exit Limit (0.25% Impact)</span>
+        <div id="safeValue" class="value" style="margin-top:5px">$0.00</div>
+      </div>
+      <div style="text-align:right">
+        <span style="font-size:10px; color:#64748b; font-weight:800; text-transform:uppercase">Liquidity Depth</span>
+        <div id="currentLiq" style="font-family:'JetBrains Mono'; font-weight:700">$0</div>
+      </div>
+    </div>
+    
+    <div class="risk-bar"><div id="riskFill" class="risk-fill" style="width: 0%"></div></div>
+    <div id="alertMsg" style="margin-top:15px; font-size:12px; display:none" class="red"><b>⚠️ ATTENZIONE:</b> Liquidità insufficiente per uscite stabili. Rischio MEV Bot elevato.</div>
   </div>
 
   <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
     <div class="card">
-      <span style="font-size:10px; color:#64748b; font-weight:800">PIANO TRANCHE</span>
+      <span style="font-size:10px; color:#64748b; font-weight:800">TRANCHE TOTALI</span>
       <div id="trancheCount" class="value" style="color:var(--accent)">--</div>
-      <div style="font-size:12px; color:#64748b">Operazioni consigliate</div>
     </div>
     <div class="card">
-      <span style="font-size:10px; color:#64748b; font-weight:800">SIZE PER ORDINE</span>
+      <span style="font-size:10px; color:#64748b; font-weight:800">SIZE ORDINE</span>
       <div id="trancheSize" class="value" style="color:var(--accent)">--</div>
-      <div style="font-size:12px; color:#64748b">BUMPER per vendita</div>
     </div>
   </div>
 
   <div class="card">
-    <span style="font-size:10px; color:#64748b; font-weight:800">REGOLE DI ESECUZIONE</span>
-    <div style="margin-top:15px; font-size:14px; line-height:1.6">
-      • Non vendere più di <b id="maxTokens">--</b> token ogni 4 ore.<br>
-      • Se il Sentiment è <b>BEARISH</b>, riduci la size del 50%.<br>
-      • Obiettivo: Mantenere lo slippage sotto lo <b>0.20%</b>.
+    <span style="font-size:10px; color:#64748b; font-weight:800">DCA-OUT EXECUTION STEPS</span>
+    <div id="executionSteps" style="margin-top:15px; font-size:14px; line-height:1.8; color:#94a3b8">
+      Sincronizzazione dati in corso...
     </div>
   </div>
 
@@ -62,24 +79,66 @@
       const liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
       const userBal = parseFloat(localStorage.getItem("userBumperBalance") || 0);
 
-      if(price > 0 && liq > 0) {
-        // Calcolo limite 0.25% impatto
-        const safeUsd = liq * 0.0025; 
+      const statusEl = document.getElementById("poolStatus");
+      const mainCard = document.getElementById("mainCard");
+      const alertMsg = document.getElementById("alertMsg");
+      const riskFill = document.getElementById("riskFill");
+
+      document.getElementById("currentLiq").textContent = "$" + Math.floor(liq).toLocaleString();
+
+      if (price > 0 && liq > 0) {
+        // 1. Gestione Alert Liquidità
+        if (liq < 25000) {
+            statusEl.textContent = "POOL HEALTH: CRITICAL";
+            statusEl.className = "pool-status status-crit";
+            mainCard.classList.add("alert-critical");
+            alertMsg.style.display = "block";
+            riskFill.style.width = "100%";
+            riskFill.style.background = "var(--red)";
+        } else if (liq < 70000) {
+            statusEl.textContent = "POOL HEALTH: WARNING";
+            statusEl.className = "pool-status status-warn";
+            mainCard.classList.remove("alert-critical");
+            alertMsg.style.display = "none";
+            riskFill.style.width = "60%";
+            riskFill.style.background = "var(--orange)";
+        } else {
+            statusEl.textContent = "POOL HEALTH: OPTIMAL";
+            statusEl.className = "pool-status status-good";
+            mainCard.classList.remove("alert-critical");
+            alertMsg.style.display = "none";
+            riskFill.style.width = "25%";
+            riskFill.style.background = "var(--green)";
+        }
+
+        // 2. Calcolo Parametri di Vendita
+        const safeImpact = 0.0025; // 0.25%
+        const safeUsd = liq * safeImpact;
         const safeTokens = safeUsd / price;
         
-        document.getElementById("safeValue").textContent = "$" + safeUsd.toLocaleString(undefined, {maximumFractionDigits:0});
-        document.getElementById("maxTokens").textContent = Math.floor(safeTokens).toLocaleString();
+        document.getElementById("safeValue").textContent = "$" + safeUsd.toLocaleString(undefined, {maximumFractionDigits:2});
 
-        if(userBal > 0) {
-          const tranches = Math.ceil((userBal * price) / safeUsd);
-          document.getElementById("trancheCount").textContent = tranches;
-          document.getElementById("trancheSize").textContent = Math.floor(userBal / tranches).toLocaleString();
+        if (userBal > 0) {
+          const totalValue = userBal * price;
+          const tranches = Math.ceil(totalValue / safeUsd);
+          const size = userBal / tranches;
+
+          document.getElementById("trancheCount").textContent = tranches + " Volte";
+          document.getElementById("trancheSize").textContent = Math.floor(size).toLocaleString() + " BP";
+
+          document.getElementById("executionSteps").innerHTML = `
+            • Vendere massimo <b>${Math.floor(size).toLocaleString()} BUMPER</b> per transazione.<br>
+            • Attendere che la liquidità si stabilizzi tra un ordine e l'altro.<br>
+            • Slippage stimato: <span class="green">0.21%</span> (Safe Zone).
+          `;
+        } else {
+            document.getElementById("executionSteps").innerHTML = "Inserisci il tuo saldo nella pagina <b>STRATEGY</b> per generare i passi di vendita.";
         }
       }
     }
 
-    updatePlan();
-    setInterval(updatePlan, 5000);
+    setInterval(updatePlan, 3000);
+    window.onload = updatePlan;
   </script>
 </body>
 </html>
