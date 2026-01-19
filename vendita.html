@@ -2,48 +2,24 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>BUMPER OS – DCA Strategy Simulator</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
+  <title>DCA Strategy Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --orange: #ff9f43; --border: rgba(255, 255, 255, 0.08); }
-    body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; }
-    
-    .menu { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 0; }
-    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; transition: 0.3s; }
+    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.1); }
+    body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; padding: 20px; }
+    .menu { display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 30px; }
+    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; background: rgba(255, 255, 255, 0.03); }
     .pill.active { background: var(--accent); color: #000; border-color: #fff; }
-    
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 30px; max-width: 800px; margin: 20px auto; backdrop-filter: blur(10px); }
-    
-    .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-    label { font-size: 10px; color: #64748b; font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 8px; letter-spacing: 1px; }
-    input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-family: 'JetBrains Mono'; box-sizing: border-box; outline: none; }
-
-    .summary-card { background: rgba(255,255,255,0.03); border-radius: 15px; padding: 25px; border-top: 1px solid var(--border); margin-bottom: 15px; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 20px; align-items: center; }
-    
-    /* STILE NOTE TECNICHE */
-    .tech-note { background: rgba(0, 0, 0, 0.25); border-left: 3px solid var(--accent); border-radius: 8px; padding: 15px; margin-bottom: 15px; font-size: 13px; color: #94a3b8; line-height: 1.4; }
-    .tech-note b { color: #fff; font-family: 'JetBrains Mono'; }
-    
-    .note-critical { border-left-color: var(--red); background: rgba(255, 92, 92, 0.05); animation: pulse-border 2s infinite; }
-    .note-warning { border-left-color: var(--orange); background: rgba(255, 159, 67, 0.05); }
-
-    @keyframes pulse-border { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-
-    .stat-label { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
-    .stat-value { font-family: 'JetBrains Mono'; font-weight: 800; }
-
-    table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    th { text-align: left; color: #64748b; padding-bottom: 12px; font-size: 10px; text-transform: uppercase; }
-    td { padding: 14px 0; border-top: 1px solid var(--border); font-family: 'JetBrains Mono'; }
-    
-    .status-tag { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 900; }
-    .tag-safe { background: rgba(74, 255, 138, 0.1); color: var(--green); border: 1px solid var(--green); }
-    .tag-risk { background: rgba(255, 92, 92, 0.1); color: var(--red); border: 1px solid var(--red); }
-    .green { color: var(--green); } .red { color: var(--red); } .orange { color: var(--orange); }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 30px; max-width: 800px; margin: auto; }
+    .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+    input { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 10px; color: #fff; font-family: 'JetBrains Mono'; box-sizing: border-box; }
+    .note { background: rgba(0,0,0,0.3); border-left: 4px solid var(--accent); padding: 15px; margin: 20px 0; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 20px; }
+    td, th { padding: 12px 5px; border-bottom: 1px solid var(--border); font-family: 'JetBrains Mono'; text-align: left; }
+    .red { color: var(--red); } .green { color: var(--green); }
   </style>
 </head>
 <body>
-
   <div class="menu">
     <a href="index.html" class="pill">TERMINAL</a>
     <a href="vendita.html" class="pill active">STRATEGY</a>
@@ -51,148 +27,68 @@
   </div>
 
   <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px">
-        <h2 style="margin:0; font-weight: 900;">DCA Exit Simulator</h2>
-        <div id="strategyRating" class="status-tag tag-safe">ATTESA DATI</div>
-    </div>
-
-    <div class="input-group">
+    <h2 style="margin:0">DCA Exit Simulator</h2>
+    <div class="input-grid">
       <div>
-        <label>Totale BUMPER da liquidare</label>
-        <input id="totalToSell" type="number" placeholder="Es. 1000000" oninput="runSimulation()">
+        <label style="font-size:10px; font-weight:800; color:#64748b">BUMPER TOTALI</label>
+        <input id="total" type="number" oninput="sim()">
       </div>
       <div>
-        <label>Numero Tranche (DCA Step)</label>
-        <input id="numTranches" type="number" placeholder="Es. 10" oninput="runSimulation()">
+        <label style="font-size:10px; font-weight:800; color:#64748b">NUMERO TRANCHE</label>
+        <input id="steps" type="number" oninput="sim()">
       </div>
     </div>
 
-    <div id="simulationResult" style="display:none">
-      
-      <div class="summary-card">
-        <div>
-          <div class="stat-label">Impatto per Step</div>
-          <div id="singleImpact" class="stat-value" style="font-size: 26px;">0.00%</div>
+    <div id="res" style="display:none">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; text-align:center; margin-bottom:20px">
+        <div class="card" style="padding:15px">
+            <div style="font-size:10px; color:#64748b">PREZZO INIZIALE</div>
+            <div id="pStart" style="font-family:'JetBrains Mono'; font-weight:800">--</div>
         </div>
-        <div>
-          <div class="stat-label">Prezzo Iniziale</div>
-          <div id="startPrice" class="stat-value" style="color:#94a3b8">$0.000000</div>
-        </div>
-        <div>
-          <div class="stat-label">Prezzo Finale</div>
-          <div id="endPrice" class="stat-value" style="color:var(--accent)">$0.000000</div>
+        <div class="card" style="padding:15px">
+            <div style="font-size:10px; color:#64748b">PREZZO FINALE</div>
+            <div id="pEnd" style="font-family:'JetBrains Mono'; font-weight:800; color:var(--accent)">--</div>
         </div>
       </div>
 
-      <div id="liqNote" class="tech-note" style="display:none">
-        <span id="liqNoteTitle" style="font-size: 11px; font-weight: 800; display: block; margin-bottom: 5px;">ALERT LIQUIDITÀ</span>
-        La liquidità attuale della pool è <b>$<span id="currLiqVal">0</span></b>. L'impatto reale potrebbe essere superiore al simulato a causa della bassa profondità.
+      <div class="note">
+        <b>STRATEGIC NOTE:</b> L'esecuzione di questo piano comporterà una riduzione totale del valore di mercato stimata al <b id="totImpact" class="red">0.00%</b>.
       </div>
 
-      <div class="tech-note">
-        <span style="font-size: 11px; font-weight: 800; color: var(--accent); display: block; margin-bottom: 5px;">STRATEGIC NOTE</span>
-        L'esecuzione di questo piano comporterà una <b>riduzione totale del valore di mercato</b> stimata al <b id="totalImpact" class="red">0.00%</b>. 
-      </div>
-
-      <label>Analisi Sequenziale Operazioni</label>
-      <table id="dcaTable">
-        <thead>
-          <tr>
-            <th>Step</th>
-            <th>Size BP</th>
-            <th>USDC Est.</th>
-            <th>Impact</th>
-            <th>Prezzo Post</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
+      <table>
+        <thead><tr><th>STEP</th><th>SIZE</th><th>USDC</th><th>IMPACT</th><th>PREZZO</th></tr></thead>
+        <tbody id="tbody"></tbody>
       </table>
     </div>
   </div>
 
   <script>
-    function runSimulation() {
-      const total = parseFloat(document.getElementById("totalToSell").value || 0);
-      const tranches = parseInt(document.getElementById("numTranches").value || 0);
-      const price = parseFloat(localStorage.getItem("globalPrice") || 0);
-      const liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
+    function sim() {
+      const tot = parseFloat(document.getElementById("total").value);
+      const steps = parseInt(document.getElementById("steps").value);
+      const price = parseFloat(localStorage.getItem("globalPrice"));
+      const liq = parseFloat(localStorage.getItem("globalLiquidity"));
       
-      const resDiv = document.getElementById("simulationResult");
-      const tbody = document.querySelector("#dcaTable tbody");
-      const liqNote = document.getElementById("liqNote");
+      if(!tot || !steps || !price) return;
+      document.getElementById("res").style.display = "block";
+      localStorage.setItem("userBumperBalance", tot);
 
-      if (total > 0 && tranches > 0 && price > 0) {
-        resDiv.style.display = "block";
-        tbody.innerHTML = "";
-        
-        // GESTIONE NOTA LIQUIDITÀ
-        document.getElementById("currLiqVal").textContent = Math.floor(liq).toLocaleString();
-        if (liq < 50000) {
-            liqNote.style.display = "block";
-            if (liq < 25000) {
-                liqNote.className = "tech-note note-critical";
-                document.getElementById("liqNoteTitle").style.color = "var(--red)";
-                document.getElementById("liqNoteTitle").textContent = "⚠️ CRITICAL LIQUIDITY ALERT";
-            } else {
-                liqNote.className = "tech-note note-warning";
-                document.getElementById("liqNoteTitle").style.color = "var(--orange)";
-                document.getElementById("liqNoteTitle").textContent = "⚠️ LOW LIQUIDITY WARNING";
-            }
-        } else {
-            liqNote.style.display = "none";
-        }
+      let curP = price, tbody = document.getElementById("tbody");
+      tbody.innerHTML = "";
+      document.getElementById("pStart").innerText = "$"+price.toFixed(8);
 
-        document.getElementById("startPrice").textContent = "$" + price.toFixed(8);
-        
-        let currentPrice = price;
-        const sizePerTranche = total / tranches;
-        const singleUsdValue = sizePerTranche * price;
-        const singleImpact = (singleUsdValue / (liq / 2)) * 100;
-        
-        const impactEl = document.getElementById("singleImpact");
-        impactEl.textContent = singleImpact.toFixed(3) + "%";
-        
-        const rating = document.getElementById("strategyRating");
-        if(singleImpact > 0.25) {
-          rating.textContent = "STRATEGIA AGGRESSIVA";
-          rating.className = "status-tag tag-risk";
-          impactEl.className = "stat-value red";
-        } else {
-          rating.textContent = "STRATEGIA OTTIMIZZATA";
-          rating.className = "status-tag tag-safe";
-          impactEl.className = "stat-value green";
-        }
-
-        for (let i = 1; i <= tranches; i++) {
-          let stepUsdc = sizePerTranche * currentPrice;
-          let stepImpact = (stepUsdc / (liq / 2)) * 100;
-          currentPrice = currentPrice * (1 - stepImpact / 100);
-
-          const row = `<tr>
-            <td style="color:#64748b">#${i}</td>
-            <td>${Math.floor(sizePerTranche).toLocaleString()}</td>
-            <td class="green">$${stepUsdc.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
-            <td class="${stepImpact > 0.25 ? 'red' : ''}">${stepImpact.toFixed(3)}%</td>
-            <td>$${currentPrice.toFixed(8)}</td>
-          </tr>`;
-          tbody.innerHTML += row;
-        }
-        
-        document.getElementById("endPrice").textContent = "$" + currentPrice.toFixed(8);
-        const totalCumulImpact = ((price - currentPrice) / price * 100);
-        
-        const impactDisplay = document.getElementById("totalImpact");
-        impactDisplay.textContent = totalCumulImpact.toFixed(2) + "%";
-        impactDisplay.className = totalCumulImpact > 3 ? "red" : "green";
-        
-      } else {
-        resDiv.style.display = "none";
+      for(let i=1; i<=steps; i++) {
+        let size = tot/steps;
+        let usdc = size * curP;
+        let impact = (usdc / (liq/2)) * 100;
+        curP = curP * (1 - impact/100);
+        tbody.innerHTML += `<tr><td>#${i}</td><td>${Math.floor(size).toLocaleString()}</td><td class="green">$${usdc.toFixed(2)}</td><td class="${impact>0.18?'red':''}">${impact.toFixed(3)}%</td><td>$${curP.toFixed(8)}</td></tr>`;
       }
+      document.getElementById("pEnd").innerText = "$"+curP.toFixed(8);
+      let totalImp = ((price - curP)/price*100);
+      document.getElementById("totImpact").innerText = totalImp.toFixed(2)+"%";
+      document.getElementById("totImpact").className = totalImp > 2 ? "red" : "green";
     }
-
-    setInterval(() => {
-        if(document.getElementById("totalToSell").value) runSimulation();
-    }, 5000);
   </script>
 </body>
 </html>
