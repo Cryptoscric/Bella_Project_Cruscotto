@@ -5,7 +5,7 @@
   <title>BUMPER OS – DCA Strategy Simulator</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.08); }
+    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --orange: #ff9f43; --border: rgba(255, 255, 255, 0.08); }
     body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; }
     
     .menu { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 0; }
@@ -20,9 +20,14 @@
 
     .summary-card { background: rgba(255,255,255,0.03); border-radius: 15px; padding: 25px; border-top: 1px solid var(--border); margin-bottom: 15px; display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 20px; align-items: center; }
     
-    /* STILE NOTA TECNICA */
-    .tech-note { background: rgba(0, 0, 0, 0.25); border-left: 3px solid var(--accent); border-radius: 8px; padding: 15px; margin-bottom: 25px; font-size: 13px; color: #94a3b8; line-height: 1.4; }
+    /* STILE NOTE TECNICHE */
+    .tech-note { background: rgba(0, 0, 0, 0.25); border-left: 3px solid var(--accent); border-radius: 8px; padding: 15px; margin-bottom: 15px; font-size: 13px; color: #94a3b8; line-height: 1.4; }
     .tech-note b { color: #fff; font-family: 'JetBrains Mono'; }
+    
+    .note-critical { border-left-color: var(--red); background: rgba(255, 92, 92, 0.05); animation: pulse-border 2s infinite; }
+    .note-warning { border-left-color: var(--orange); background: rgba(255, 159, 67, 0.05); }
+
+    @keyframes pulse-border { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
     .stat-label { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
     .stat-value { font-family: 'JetBrains Mono'; font-weight: 800; }
@@ -34,7 +39,7 @@
     .status-tag { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 900; }
     .tag-safe { background: rgba(74, 255, 138, 0.1); color: var(--green); border: 1px solid var(--green); }
     .tag-risk { background: rgba(255, 92, 92, 0.1); color: var(--red); border: 1px solid var(--red); }
-    .green { color: var(--green); } .red { color: var(--red); }
+    .green { color: var(--green); } .red { color: var(--red); } .orange { color: var(--orange); }
   </style>
 </head>
 <body>
@@ -79,10 +84,14 @@
         </div>
       </div>
 
+      <div id="liqNote" class="tech-note" style="display:none">
+        <span id="liqNoteTitle" style="font-size: 11px; font-weight: 800; display: block; margin-bottom: 5px;">ALERT LIQUIDITÀ</span>
+        La liquidità attuale della pool è <b>$<span id="currLiqVal">0</span></b>. L'impatto reale potrebbe essere superiore al simulato a causa della bassa profondità.
+      </div>
+
       <div class="tech-note">
         <span style="font-size: 11px; font-weight: 800; color: var(--accent); display: block; margin-bottom: 5px;">STRATEGIC NOTE</span>
         L'esecuzione di questo piano comporterà una <b>riduzione totale del valore di mercato</b> stimata al <b id="totalImpact" class="red">0.00%</b>. 
-        Si raccomanda di monitorare la profondità della pool tra uno step e l'altro.
       </div>
 
       <label>Analisi Sequenziale Operazioni</label>
@@ -110,11 +119,29 @@
       
       const resDiv = document.getElementById("simulationResult");
       const tbody = document.querySelector("#dcaTable tbody");
+      const liqNote = document.getElementById("liqNote");
 
       if (total > 0 && tranches > 0 && price > 0) {
         resDiv.style.display = "block";
         tbody.innerHTML = "";
         
+        // GESTIONE NOTA LIQUIDITÀ
+        document.getElementById("currLiqVal").textContent = Math.floor(liq).toLocaleString();
+        if (liq < 50000) {
+            liqNote.style.display = "block";
+            if (liq < 25000) {
+                liqNote.className = "tech-note note-critical";
+                document.getElementById("liqNoteTitle").style.color = "var(--red)";
+                document.getElementById("liqNoteTitle").textContent = "⚠️ CRITICAL LIQUIDITY ALERT";
+            } else {
+                liqNote.className = "tech-note note-warning";
+                document.getElementById("liqNoteTitle").style.color = "var(--orange)";
+                document.getElementById("liqNoteTitle").textContent = "⚠️ LOW LIQUIDITY WARNING";
+            }
+        } else {
+            liqNote.style.display = "none";
+        }
+
         document.getElementById("startPrice").textContent = "$" + price.toFixed(8);
         
         let currentPrice = price;
