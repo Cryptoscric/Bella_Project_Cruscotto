@@ -2,14 +2,15 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>BUMPER OS – Advanced Quant Oracle</title>
+  <title>BUMPER OS – Oracolo Quantitativo Avanzato</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
   <style>
     :root { --bg: #030407; --card-bg: rgba(13, 17, 28, 0.98); --accent: #a855f7; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.05); }
     body { background: var(--bg); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; font-size: 13px; }
     
     .menu { display: flex; justify-content: flex-end; gap: 12px; padding-bottom: 20px; }
-    .pill { padding: 8px 18px; border: 1px solid var(--border); border-radius: 10px; color: #64748b; text-decoration: none; font-weight: 700; font-size: 12px; }
+    .pill { padding: 8px 18px; border: 1px solid var(--border); border-radius: 10px; color: #64748b; text-decoration: none; font-weight: 700; font-size: 12px; transition: 0.3s; }
+    .pill:hover { border-color: var(--accent); color: #fff; }
     .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 30px; max-width: 1100px; margin: 0 auto; box-shadow: 0 40px 100px rgba(0,0,0,0.7); }
@@ -39,20 +40,20 @@
 <body>
 
   <nav class="menu">
-    <a href="index.html" class="pill">TERMINAL</a>
-    <a href="vendita.html" class="pill">STRATEGY</a>
-    <a href="piano.html" class="pill">PLAN</a>
+    <a href="index.html" class="pill">TERMINALE</a>
+    <a href="vendita.html" class="pill">STRATEGIA</a>
+    <a href="piano.html" class="pill">PIANO</a>
     <a href="oracolo.html" class="pill active">ORACOLO</a>
   </nav>
 
   <div class="card">
     <div class="header-info">
       <div>
-        <h1 style="margin:0; font-weight:900; letter-spacing:-1px">QUANTUM <span style="color:var(--accent)">ANALYSIS</span></h1>
-        <span id="timestamp" class="dim" style="font-family:'JetBrains Mono'; font-size:10px">RECALCULATING REAL-TIME...</span>
+        <h1 style="margin:0; font-weight:900; letter-spacing:-1px">ANALISI <span style="color:var(--accent)">QUANTISTICA</span></h1>
+        <span id="timestamp" class="dim" style="font-family:'JetBrains Mono'; font-size:10px">RICALCOLO IN TEMPO REALE...</span>
       </div>
       <div style="text-align:right">
-        <span class="label">Volatility Coefficient</span>
+        <span class="label">Coefficiente Volatilità</span>
         <div id="volCoeff" class="value" style="font-size:16px">0.00</div>
       </div>
     </div>
@@ -61,37 +62,37 @@
       <div class="left-panel">
         <div class="stats-grid">
           <div class="metric-box">
-            <span class="label">10% Sell Wall Pressure</span>
+            <span class="label">Pressione Vendita al 10%</span>
             <div id="wall10" class="value">$0</div>
             <div class="risk-bar"><div id="wallFill" class="risk-fill" style="width: 50%"></div></div>
           </div>
           <div class="metric-box">
-            <span class="label">Est. Buy-Back Power</span>
+            <span class="label">Potenza di Riacquisto Est.</span>
             <div id="buyBack" class="value">$0</div>
-            <span class="dim" style="font-size:9px">Capacità di riassorbimento dump</span>
+            <span class="dim" style="font-size:9px">Capacità di assorbimento del mercato</span>
           </div>
         </div>
 
         <div class="metric-box" style="margin-bottom: 20px;">
-          <span class="label">Depth Analysis & Order Impact</span>
+          <span class="label">Analisi Profondità e Impatto Ordini</span>
           <table class="data-table">
-            <tr><td>Retail Order ($250)</td><td id="slip250" class="green">--</td><td class="dim">Slippage: <span id="s250">--</span></td></tr>
-            <tr><td>Trader Order ($1,000)</td><td id="slip1000">--</td><td class="dim">Slippage: <span id="s1000">--</span></td></tr>
-            <tr><td>Whale Order ($5,000)</td><td id="slip5000" class="red">--</td><td class="dim">Slippage: <span id="s5000">--</span></td></tr>
-            <tr><td>Institutional ($20,000)</td><td id="slip20000" class="red" style="font-weight:bold">--</td><td class="dim">Slippage: <span id="s20000">--</span></td></tr>
+            <tr><td>Ordine Retail ($250)</td><td id="slip250" class="green">--</td><td class="dim">Slippage: <span id="s250">--</span></td></tr>
+            <tr><td>Ordine Trader ($1,000)</td><td id="slip1000">--</td><td class="dim">Slippage: <span id="s1000">--</span></td></tr>
+            <tr><td>Ordine Balena ($5,000)</td><td id="slip5000" class="red">--</td><td class="dim">Slippage: <span id="s5000">--</span></td></tr>
+            <tr><td>Istituzionale ($20,000)</td><td id="slip20000" class="red" style="font-weight:bold">--</td><td class="dim">Slippage: <span id="s20000">--</span></td></tr>
           </table>
         </div>
 
         <div class="metric-box">
-            <span class="label">Market Resilience Score</span>
+            <span class="label">Punteggio Resilienza Mercato</span>
             <div id="resilience" class="value" style="font-size:28px">--</div>
-            <p id="resilienceDesc" class="dim" style="margin:5px 0 0; font-size:11px">Calcolo solidità pool vs volume storico...</p>
+            <p id="resilienceDesc" class="dim" style="margin:5px 0 0; font-size:11px">Calcolo solidità pool rispetto ai volumi...</p>
         </div>
       </div>
 
       <div class="right-panel">
         <div class="terminal-container">
-          <div class="terminal-header">EXECUTION LOG & MATH OPS</div>
+          <div class="terminal-header">LOG DI ESECUZIONE E OPERAZIONI MATEMATICHE</div>
           <div id="log" class="terminal-body"></div>
         </div>
       </div>
@@ -114,28 +115,27 @@
 
       const log = document.getElementById("log");
       log.innerHTML = "";
-      document.getElementById("timestamp").textContent = "LAST COMPUTE: " + new Date().toLocaleTimeString();
+      document.getElementById("timestamp").textContent = "ULTIMO CALCOLO: " + new Date().toLocaleTimeString();
 
       const poolSide = liq / 2;
       
-      // 1. Sell Wall Pressure (10%)
+      // 1. Pressione Vendita (10%)
       const wall10 = poolSide * 0.10;
       document.getElementById("wall10").textContent = "$" + Math.floor(wall10).toLocaleString();
-      updateLog(`MATH: 10% Depth calculated at $${wall10.toFixed(2)}`);
+      updateLog(`MATEMATICA: Profondità al 10% calcolata a $${wall10.toFixed(2)}`);
 
-      // 2. Volatility Coefficient (Price/Liquidity ratio)
+      // 2. Coefficiente Volatilità
       const volCoeff = (price * 1000000) / poolSide;
       document.getElementById("volCoeff").textContent = volCoeff.toFixed(6);
-      updateLog(`MATH: Volatility Coeff updated to ${volCoeff.toFixed(8)}`);
+      updateLog(`MATEMATICA: Coeff. Volatilità aggiornato a ${volCoeff.toFixed(8)}`);
 
-      // 3. Order Impact Table
+      // 3. Tabella Impatto Ordini
       const orders = [250, 1000, 5000, 20000];
       const targets = ["slip250", "slip1000", "slip5000", "slip20000"];
       const slips = ["s250", "s1000", "s5000", "s20000"];
 
       orders.forEach((amt, i) => {
         const impact = (amt / poolSide) * 100;
-        const postPrice = price * (1 - impact/100);
         
         const el = document.getElementById(targets[i]);
         el.textContent = "$" + Math.floor(amt).toLocaleString();
@@ -145,19 +145,18 @@
         slipEl.className = impact > 1 ? 'red' : (impact > 0.2 ? 'purple' : 'green');
       });
 
-      // 4. Resilience Score
-      // Score da 0 a 100 basato su quanto la wall 10% è alta
+      // 4. Punteggio Resilienza
       const resilience = Math.min(100, (wall10 / 5000) * 100);
       const resEl = document.getElementById("resilience");
       resEl.textContent = resilience.toFixed(1) + "%";
       resEl.className = "value " + (resilience > 60 ? 'green' : (resilience > 30 ? 'purple' : 'red'));
       
       document.getElementById("resilienceDesc").textContent = resilience > 60 ? 
-        "STRUTTURA SOLIDA: Il pool regge vendite istituzionali." : 
+        "STRUTTURA SOLIDA: Il pool supporta vendite istituzionali." : 
         "STRUTTURA FRAGILE: Rischio di flash-crash elevato.";
       
-      updateLog(`RESULT: Resilience Score finalizzato al ${resilience.toFixed(1)}%`);
-      updateLog(`CHECK: Analisi terminata. Sistema stabile.`);
+      updateLog(`RISULTATO: Punteggio Resilienza finalizzato al ${resilience.toFixed(1)}%`);
+      updateLog(`VERIFICA: Analisi terminata. Parametri di sistema nominali.`);
     }
 
     window.addEventListener('storage', runAnalysis);
