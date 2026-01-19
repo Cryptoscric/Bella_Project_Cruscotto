@@ -2,183 +2,84 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BUMPER OS – Strategic Plan</title>
-
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
-
   <style>
-    :root {
-      --bg: #05060b;
-      --card-bg: rgba(13, 17, 28, 0.7);
-      --accent: #6bb6ff;
-      --green: #4aff8a;
-      --red: #ff5c5c;
-      --border: rgba(255, 255, 255, 0.08);
-      --text-main: #e2e8f0;
-      --text-dim: #64748b;
-    }
-
-    body {
-      background: radial-gradient(circle at top right, #1a1f35, #05060b 60%);
-      color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      margin: 0; padding: 15px; min-height: 100vh;
-    }
-
-    .menu { position: sticky; top: 0; display: flex; justify-content: flex-end; gap: 10px; z-index: 1000; padding: 10px 0; }
-    .pill {
-      padding: 8px 16px; border: 1px solid var(--border); border-radius: 12px;
-      color: var(--text-dim); text-decoration: none; font-weight: 700; font-size: 12px;
-      background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px);
-    }
+    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.08); }
+    body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; }
+    .menu { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 0; }
+    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; }
     .pill.active { background: var(--accent); color: #000; border-color: #fff; }
-
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 15px; backdrop-filter: blur(10px); }
-    .section-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 15px; display: block; }
-    .value { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -1px; }
-
-    .badge { display: inline-flex; align-items:center; padding: 6px 12px; border-radius: 8px; font-weight: 800; font-size: 11px; }
-    .badge.green { background: rgba(74, 255, 138, 0.1); border: 1px solid var(--green); color: var(--green); }
-    .badge.yellow { background: rgba(255, 216, 107, 0.1); border: 1px solid #ffd86b; color: #ffd86b; }
-    .badge.red { background: rgba(255, 92, 92, 0.1); border: 1px solid var(--red); color: var(--red); }
-
-    .text-box { background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border); padding: 15px; border-radius: 12px; line-height: 1.5; font-size: 14px; color: #94a3b8; }
-    .green { color: var(--green); }
-    .red { color: var(--red); }
-    
-    canvas#sparkImpact { width: 100%; height: 60px; background: rgba(0,0,0,0.3); border-radius: 10px; margin-top: 10px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 25px; margin-bottom: 20px; backdrop-filter: blur(10px); }
+    .value { font-family: 'JetBrains Mono'; font-size: 24px; font-weight: 800; color: #fff; }
+    .badge { padding: 5px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .bg-green { background: rgba(74, 255, 138, 0.1); color: var(--green); border: 1px solid var(--green); }
+    .risk-bar { height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; margin-top: 15px; overflow: hidden; }
+    .risk-fill { height: 100%; transition: 0.5s; }
   </style>
 </head>
-
 <body>
-
   <div class="menu">
-    <a class="pill" href="index.html">TERMINAL</a>
-    <a class="pill" href="index.html">STRATEGY</a>
-    <a class="pill active" href="piano.html">PLAN</a>
+    <a href="index.html" class="pill">TERMINAL</a>
+    <a href="vendita.html" class="pill">STRATEGY</a>
+    <a href="piano.html" class="pill active">PLAN</a>
   </div>
 
-  <div style="display:flex; align-items:center; gap:15px; margin-bottom:25px">
-    <img id="logo" src="logo.png" style="width:45px; height:45px; border-radius:10px;">
-    <div>
-      <h1 style="margin:0; font-size:22px; font-weight:900;">PLAN <span style="color:var(--accent)">OS</span></h1>
-      <div id="status" style="font-size:10px; color:var(--green)">● DATI SINCRONIZZATI</div>
+  <h1 style="font-weight:900; letter-spacing:-1px">STRATEGIC <span style="color:var(--accent)">PLAN</span></h1>
+
+  <div class="card">
+    <span style="font-size:10px; color:#64748b; font-weight:800; text-transform:uppercase">Capacità di Uscita Sicura</span>
+    <div id="safeValue" class="value" style="margin-top:10px">$0.00</div>
+    <div style="font-size:12px; color:#64748b">Massimo vendibile con impatto < 0.25%</div>
+    <div class="risk-bar"><div id="riskFill" class="risk-fill" style="width: 25%; background: var(--green)"></div></div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
+    <div class="card">
+      <span style="font-size:10px; color:#64748b; font-weight:800">PIANO TRANCHE</span>
+      <div id="trancheCount" class="value" style="color:var(--accent)">--</div>
+      <div style="font-size:12px; color:#64748b">Operazioni consigliate</div>
+    </div>
+    <div class="card">
+      <span style="font-size:10px; color:#64748b; font-weight:800">SIZE PER ORDINE</span>
+      <div id="trancheSize" class="value" style="color:var(--accent)">--</div>
+      <div style="font-size:12px; color:#64748b">BUMPER per vendita</div>
     </div>
   </div>
 
   <div class="card">
-    <span class="section-title">Parametri di Vendita Sicura</span>
-    <div id="safeSellTop" class="value">0</div>
-    <div style="margin: 5px 0 15px 0; font-size:12px; color:var(--text-dim)">BUMPER vendibili (Low Impact)</div>
-    <div style="font-size:18px; font-weight:700;">Valore: <span id="safeSellUSDC" class="green">$0.00</span></div>
-    
-    <div style="display:flex; align-items:center; gap:10px; margin-top:15px">
-      <span id="riskBadge" class="badge">Rischio: --</span>
-      <span style="font-size:12px">Impatto: <span id="impactPerTranche">--</span></span>
-    </div>
-    <canvas id="sparkImpact"></canvas>
-  </div>
-
-  <div class="card">
-    <span class="section-title">Strategia di Uscita</span>
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px">
-      <div>
-        <div style="font-size:10px; color:var(--text-dim)">TRANCHE</div>
-        <div id="dcaCount" style="font-size:20px; font-weight:800; color:var(--accent)">0</div>
-      </div>
-      <div>
-        <div style="font-size:10px; color:var(--text-dim)">SIZE</div>
-        <div id="dcaTranche" style="font-size:20px; font-weight:800; color:var(--accent)">0</div>
-      </div>
-    </div>
-    <div class="text-box" id="strategyText">Inizializzazione...</div>
-  </div>
-
-  <div class="card">
-    <span class="section-title">Note Critiche</span>
-    <div class="text-box" style="font-size:12px">
-      • Target Impact: < <b>0.25%</b><br>
-      • Monitorare Sentiment prima di ogni vendita.<br>
-      • Se Volatilità ↑, ridurre Size del <b>30%</b>.
+    <span style="font-size:10px; color:#64748b; font-weight:800">REGOLE DI ESECUZIONE</span>
+    <div style="margin-top:15px; font-size:14px; line-height:1.6">
+      • Non vendere più di <b id="maxTokens">--</b> token ogni 4 ore.<br>
+      • Se il Sentiment è <b>BEARISH</b>, riduci la size del 50%.<br>
+      • Obiettivo: Mantenere lo slippage sotto lo <b>0.20%</b>.
     </div>
   </div>
 
   <script>
-    const TOKEN_ADDR = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
+    function updatePlan() {
+      const price = parseFloat(localStorage.getItem("globalPrice") || 0);
+      const liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
+      const userBal = parseFloat(localStorage.getItem("userBumperBalance") || 0);
 
-    async function syncData() {
-      document.getElementById('status').innerHTML = "○ AGGIORNAMENTO...";
-      try {
-        // 1. Prova a scaricare i dati freschi (necessario per Mobile)
-        const response = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${TOKEN_ADDR}`);
-        const data = await response.json();
+      if(price > 0 && liq > 0) {
+        // Calcolo limite 0.25% impatto
+        const safeUsd = liq * 0.0025; 
+        const safeTokens = safeUsd / price;
         
-        if (data.pairs && data.pairs[0]) {
-          const pair = data.pairs[0];
-          const price = parseFloat(pair.priceUsd);
-          const liq = data.pairs.reduce((a, p) => a + (p.liquidity?.usd || 0), 0);
-          
-          // 2. Calcola i parametri (logica originale)
-          const safeSellTokens = (liq * 0.02) / price; // Esempio 2% della liq
-          const impact = 0.20; // Soglia target
-          const tr = 6; // Numero tranche standard
-          const trancheB = safeSellTokens / tr;
+        document.getElementById("safeValue").textContent = "$" + safeUsd.toLocaleString(undefined, {maximumFractionDigits:0});
+        document.getElementById("maxTokens").textContent = Math.floor(safeTokens).toLocaleString();
 
-          // 3. Renderizza i valori
-          render(price, liq, impact, safeSellTokens, tr, trancheB);
-          document.getElementById('status').innerHTML = "● DATI LIVE";
-          document.getElementById('status').style.color = "var(--green)";
+        if(userBal > 0) {
+          const tranches = Math.ceil((userBal * price) / safeUsd);
+          document.getElementById("trancheCount").textContent = tranches;
+          document.getElementById("trancheSize").textContent = Math.floor(userBal / tranches).toLocaleString();
         }
-      } catch (e) {
-        // Se non c'è internet o errore, prova a leggere quelli vecchi
-        console.log("Offline mode");
-        loadFromStorage();
       }
     }
 
-    function render(price, liq, impact, safe, tr, trancheB) {
-      document.getElementById("safeSellTop").textContent = Math.floor(safe).toLocaleString();
-      document.getElementById("safeSellUSDC").textContent = "$" + (safe * price).toLocaleString(undefined, {minimumFractionDigits: 2});
-      document.getElementById("dcaCount").textContent = tr;
-      document.getElementById("dcaTranche").textContent = Math.floor(trancheB).toLocaleString();
-      
-      const impactEl = document.getElementById("impactPerTranche");
-      impactEl.textContent = impact.toFixed(2) + "%";
-      impactEl.className = impact < 0.25 ? "green" : "red";
-
-      const badge = document.getElementById("riskBadge");
-      badge.className = impact < 0.25 ? "badge green" : "badge yellow";
-      badge.textContent = impact < 0.25 ? "RISCHIO: BASSO" : "RISCHIO: MEDIO";
-
-      document.getElementById("strategyText").innerHTML = `Con liquidità a <b>$${Math.floor(liq).toLocaleString()}</b>, vendere in <b>${tr} tranche</b> da <b>${Math.floor(trancheB).toLocaleString()} BUMPER</b>.`;
-
-      drawSpark(impact);
-    }
-
-    function drawSpark(impact) {
-      const c = document.getElementById("sparkImpact");
-      const x = c.getContext("2d");
-      const w = c.width = c.offsetWidth;
-      const h = c.height = c.offsetHeight;
-      x.clearRect(0,0,w,h);
-      x.strokeStyle = "#6bb6ff";
-      x.lineWidth = 3;
-      x.beginPath();
-      x.moveTo(10, h/2);
-      x.lineTo(w-10, h/2);
-      x.stroke();
-      x.fillStyle = "#fff";
-      x.beginPath();
-      x.arc(w/2, h/2, 4, 0, Math.PI*2);
-      x.fill();
-    }
-
-    // Esegui sincronizzazione all'avvio
-    syncData();
-    // Aggiorna ogni 30 secondi
-    setInterval(syncData, 30000);
+    updatePlan();
+    setInterval(updatePlan, 5000);
   </script>
-
 </body>
 </html>
