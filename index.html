@@ -4,254 +4,111 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BUMPER Terminal Pro</title>
-
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
   <style>
-    :root {
-      --bg: #05060b;
-      --card-bg: rgba(13, 17, 28, 0.7);
-      --accent: #6bb6ff;
-      --green: #4aff8a;
-      --red: #ff5c5c;
-      --border: rgba(255, 255, 255, 0.08);
-    }
-
-    body {
-      background: radial-gradient(circle at top right, #1a1f35, #05060b 60%);
-      color: #e2e8f0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      margin: 0; padding: 20px; min-height: 100vh;
-    }
-
-    @keyframes pulse-live {
-      0% { box-shadow: 0 0 0 0 rgba(74, 255, 138, 0.4); }
-      70% { box-shadow: 0 0 0 8px rgba(74, 255, 138, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(74, 255, 138, 0); }
-    }
-
-    .live-indicator {
-      width: 8px; height: 8px; background: var(--green); border-radius: 50%;
-      display: inline-block; margin-right: 8px; animation: pulse-live 2s infinite;
-    }
-
+    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.08); }
+    body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; min-height: 100vh; }
     .menu { position: sticky; top: 0; display: flex; justify-content: flex-end; gap: 12px; z-index: 1000; padding: 15px 0; }
-    .pill {
-      padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px;
-      color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px;
-      background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .pill:hover, .pill.active {
-      background: var(--accent); color: #000; border-color: #fff;
-      box-shadow: 0 0 20px rgba(107, 182, 255, 0.4); transform: translateY(-2px);
-    }
-
-    .card {
-      background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 20px; padding: 24px; position: relative; overflow: hidden;
-      backdrop-filter: blur(10px); transition: 0.3s;
-    }
-    .card:hover { border-color: rgba(107, 182, 255, 0.3); }
-
-    .value { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 800; letter-spacing: -1px; }
-    .section-title {
-      font-size: 11px; font-weight: 800; text-transform: uppercase;
-      letter-spacing: 2px; color: #64748b; margin-bottom: 15px; display: block;
-    }
-
-    .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
-    .view { display: none; }
-    .view.active { display: block; animation: slideUp 0.5s ease-out; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-    input[type="number"], .input-box {
-      width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border);
-      background: rgba(0,0,0,0.3); color: #fff; font-family: 'JetBrains Mono', monospace;
-      margin: 10px 0; outline: none;
-    }
-
-    .quick-btn {
-      padding: 10px 18px; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-      color: #fff; border-radius: 10px; cursor: pointer; font-weight: 700;
-    }
-
+    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); transition: 0.3s; }
+    .pill:hover, .pill.active { background: var(--accent); color: #000; border-color: #fff; box-shadow: 0 0 20px rgba(107, 182, 255, 0.4); }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 24px; backdrop-filter: blur(10px); transition: 0.3s; margin-bottom: 20px; }
+    .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .value { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 800; }
+    .section-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #64748b; margin-bottom: 15px; display: block; }
+    .dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
     table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
     th { padding: 12px; font-size: 12px; color: #64748b; text-align: left; }
-    td { padding: 16px; background: rgba(255,255,255,0.02); }
-    td:first-child { border-radius: 12px 0 0 12px; }
-    td:last-child { border-radius: 0 12px 12px 0; }
-
-    .green { color: var(--green); }
-    .red { color: var(--red); }
-
+    td { padding: 16px; background: rgba(255,255,255,0.02); font-family: 'JetBrains Mono'; }
+    .green { color: var(--green); } .red { color: var(--red); }
     @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-
   <div class="menu">
-    <a class="pill active" data-view="dashboard">TERMINAL</a>
-    <a class="pill" data-view="vendita">STRATEGY</a>
-    <a class="pill" href="piano.html">PLAN</a>
+    <a href="index.html" class="pill active">TERMINAL</a>
+    <a href="vendita.html" class="pill">STRATEGY</a>
+    <a href="piano.html" class="pill">PLAN</a>
   </div>
 
-  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:40px">
-    <div style="display:flex; align-items:center; gap:20px">
-      <img id="logo" src="logo.png" alt="Logo" style="width:60px; height:60px; border-radius:15px; box-shadow: 0 0 30px rgba(107,182,255,0.2)">
-      <div>
-        <h1 style="margin:0; font-size:32px; font-weight:900; letter-spacing:-1px">BUMPER <span style="color:var(--accent)">OS</span></h1>
-        <div style="font-size:12px; color:#64748b"><span class="live-indicator"></span>SYSTEMS ONLINE - REAL-TIME FEED</div>
-      </div>
+  <header style="display:flex; align-items:center; gap:20px; margin-bottom:40px">
+    <img src="logo.png" style="width:60px; height:60px; border-radius:15px; box-shadow: 0 0 30px rgba(107,182,255,0.2)">
+    <div>
+      <h1 style="margin:0; font-size:32px; font-weight:900;">BUMPER <span style="color:var(--accent)">OS</span></h1>
+      <div style="font-size:12px; color:#64748b">SYSTEMS ONLINE - REAL-TIME FEED</div>
     </div>
-  </div>
+  </header>
 
-  <div id="viewDashboard" class="view active">
-    <div class="dashboard-grid">
-      <div class="card">
-        <span class="section-title">Market Price</span>
-        <div id="price" class="value">$0.00000000</div>
-        <div id="priceChange" style="font-weight:700; margin-top:5px">--%</div>
-      </div>
-      <div class="card">
-        <span class="section-title">Net Liquidity</span>
-        <div id="liquidity" class="value">$0</div>
-        <div id="fdv" style="font-size:12px; color:#64748b; margin-top:5px">FDV: --</div>
-      </div>
-      <div class="card">
-        <span class="section-title">24h Sentiment</span>
-        <div style="display:flex; align-items:center; gap:20px">
-          <div style="width:70px; height:70px"><canvas id="pieChart"></canvas></div>
-          <div>
-            <div id="sentimentLabel" style="font-size:18px; font-weight:900">--</div>
-            <div id="bs-counts" style="font-size:11px; color:#64748b; font-family:'JetBrains Mono'"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="dashboard-grid" style="grid-template-columns: 1fr 1fr;">
-      <div class="card">
-        <span class="section-title">Volume Analytics (USDT)</span>
-        <div id="bs-details" style="font-size:13px; line-height:2.2; font-family:'JetBrains Mono'"></div>
-      </div>
-      <div class="card">
-        <span class="section-title">Timeframe Projections</span>
-        <div id="vol-projections" style="font-size:13px; line-height:2.2; font-family:'JetBrains Mono'"></div>
-      </div>
-    </div>
-
+  <div class="dashboard-grid">
     <div class="card">
-      <span class="section-title">DEX Execution Hub</span>
-      <table id="pairsTable">
-        <thead><tr><th>DEX</th><th>POOL</th><th>PRICE</th><th>24H%</th><th>LIQUIDITY</th></tr></thead>
-        <tbody></tbody>
-      </table>
+      <span class="section-title">Market Price</span>
+      <div id="price" class="value">$0.00000000</div>
+      <div id="priceChange" style="font-weight:700; margin-top:5px">--%</div>
+    </div>
+    <div class="card">
+      <span class="section-title">Net Liquidity</span>
+      <div id="liquidity" class="value">$0</div>
+      <div id="fdv" style="font-size:12px; color:#64748b; margin-top:5px">FDV: --</div>
+    </div>
+    <div class="card">
+      <span class="section-title">24h Sentiment</span>
+      <div style="display:flex; align-items:center; gap:20px">
+        <canvas id="pieChart" style="max-width:70px"></canvas>
+        <div id="sentimentLabel" style="font-weight:900">--</div>
+      </div>
     </div>
   </div>
 
-  <div id="viewVendita" class="view">
-    <div class="card" style="max-width:600px; margin:0 auto; padding:40px">
-      <span class="section-title">Exit Strategy Simulator</span>
-      <label style="font-size:11px; font-weight:800; color:#64748b">PORTFOLIO BALANCE (BUMPER)</label>
-      <input id="userBalance" type="number" placeholder="0.00" oninput="updateCustomSell()">
-      <label style="font-size:11px; font-weight:800; color:#64748b">AMOUNT TO LIQUIDATE</label>
-      <input id="customSellInput" type="number" placeholder="0.00" oninput="updateCustomSell()">
-      <input id="customSlider" type="range" min="0" max="100" value="0" style="width:100%" oninput="sliderChanged()">
-      <div id="customResults" style="background:rgba(0,0,0,0.4); border-radius:15px; padding:25px; border:1px solid var(--border); display:none; margin-top:20px">
-        <div style="display:flex; justify-content:space-between"><span>Estimated USDC</span><span id="customUSDC" class="green">--</span></div>
-        <div style="display:flex; justify-content:space-between; margin-top:10px"><span>Price Impact</span><span id="customImpact">--</span></div>
-      </div>
-    </div>
+  <div class="card" style="margin-top:20px">
+    <span class="section-title">DEX Execution Hub</span>
+    <table>
+      <thead><tr><th>DEX</th><th>POOL</th><th>PRICE</th><th>24H%</th><th>LIQUIDITY</th></tr></thead>
+      <tbody id="pairsTable"></tbody>
+    </table>
   </div>
 
   <script>
     const TOKEN = "5bp5PwTyu4i1hGyQsRwRYqiR2CmxyHt2cPJGEbXEbonk";
-    let state = { price:0, liq:0, vol24:0, chart:null };
-    const fmtUsd = (v) => v < 1 ? "$" + v.toFixed(6) : "$" + (+v).toLocaleString();
+    let state = { chart: null };
 
     async function loadDex() {
       try {
         const r = await fetch("https://api.dexscreener.com/latest/dex/tokens/" + TOKEN);
         const d = await r.json();
-        if (!d.pairs) return;
-
         const best = d.pairs.sort((a,b) => (b.liquidity?.usd||0) - (a.liquidity?.usd||0))[0];
-        state.price = +best.priceUsd;
-        state.liq = d.pairs.reduce((a,p) => a + (p.liquidity?.usd||0), 0);
-        state.vol24 = d.pairs.reduce((a,p) => a + (p.volume?.h24||0), 0);
-
-        document.getElementById("price").textContent = "$" + state.price.toFixed(8);
-        document.getElementById("priceChange").textContent = (best.priceChange?.h24||0) + "%";
-        document.getElementById("priceChange").className = best.priceChange?.h24 >= 0 ? 'green' : 'red';
-        document.getElementById("liquidity").textContent = fmtUsd(state.liq);
-        document.getElementById("fdv").textContent = "FDV: " + fmtUsd(best.fdv || 0);
-
-        let V24B=0, V24S=0, B24=0, S24=0;
-        d.pairs.forEach(p => {
-          const b = p.txns?.h24?.buys || 0;
-          const s = p.txns?.h24?.sells || 0;
-          const t = b + s;
-          if(t > 0) {
-            V24B += (p.volume.h24 * (b/t));
-            V24S += (p.volume.h24 * (s/t));
-          }
-          B24 += b; S24 += s;
-        });
-
-        updateSentiment(B24, S24);
         
-        document.getElementById("bs-details").innerHTML = `
-          24H BUY: <span class="green">${fmtUsd(V24B)}</span><br>
-          24H SELL: <span class="red">${fmtUsd(V24S)}</span><br>
-          TOTAL: <b>${fmtUsd(V24B + V24S)}</b>
-        `;
+        const price = +best.priceUsd;
+        const liq = d.pairs.reduce((a,p) => a + (p.liquidity?.usd||0), 0);
 
-        // PROIEZIONI IN ORDINE CRESCENTE
-        let ratioB = V24B / (V24B + V24S) || 0.5;
-        const p = (h, mult) => {
-          let vTotal = state.vol24 * mult;
-          return `<b>${h}H:</b> <span class="green">▲ ${fmtUsd(vTotal * ratioB)}</span> | <span class="red">▼ ${fmtUsd(vTotal * (1-ratioB))}</span>`;
-        };
+        // SALVATAGGIO PER ALTRE PAGINE
+        localStorage.setItem("globalPrice", price);
+        localStorage.setItem("globalLiquidity", liq);
 
-        document.getElementById("vol-projections").innerHTML = `
-          ${p(24, 1)}<br>
-          ${p(48, 1.8)}<br>
-          ${p(72, 2.5)}<br>
-          ${p(96, 3.2)}
-        `;
+        document.getElementById("price").textContent = "$" + price.toFixed(8);
+        document.getElementById("liquidity").textContent = "$" + liq.toLocaleString();
+        document.getElementById("priceChange").textContent = (best.priceChange.h24) + "%";
+        document.getElementById("priceChange").className = best.priceChange.h24 >= 0 ? 'green' : 'red';
+        document.getElementById("fdv").textContent = "FDV: $" + (best.fdv || 0).toLocaleString();
 
-        const tbody = document.querySelector("#pairsTable tbody");
-        tbody.innerHTML = d.pairs.slice(0,5).map(p => `
+        updateSentiment(best.txns.h24.buys, best.txns.h24.sells);
+        
+        document.getElementById("pairsTable").innerHTML = d.pairs.slice(0,5).map(p => `
           <tr><td>${p.dexId.toUpperCase()}</td><td>${p.quoteToken.symbol}</td>
           <td>$${(+p.priceUsd).toFixed(6)}</td><td class="${p.priceChange.h24>=0?'green':'red'}">${p.priceChange.h24}%</td>
-          <td>${fmtUsd(p.liquidity?.usd || 0)}</td></tr>
+          <td>$${(p.liquidity?.usd || 0).toLocaleString()}</td></tr>
         `).join('');
-
-      } catch(e) { console.error(e); }
+      } catch(e) { console.error("Error fetching data"); }
     }
 
     function updateSentiment(b, s) {
       document.getElementById("sentimentLabel").innerHTML = b > s ? '<span class="green">BULLISH</span>' : '<span class="red">BEARISH</span>';
-      document.getElementById("bs-counts").innerHTML = `BUY TX: ${b}<br>SELL TX: ${s}`;
-      const ctx = document.getElementById('pieChart').getContext('2d');
       if (state.chart) state.chart.destroy();
-      state.chart = new Chart(ctx, {
+      state.chart = new Chart(document.getElementById('pieChart'), {
         type: 'doughnut',
         data: { datasets: [{ data: [b, s], backgroundColor: ['#4aff8a', '#ff5c5c'], borderWidth: 0 }] },
-        options: { cutout: '80%', plugins: { legend: { display: false } } }
+        options: { cutout: '70%', plugins: { legend: { display: false } } }
       });
     }
-
-    // SPA logic
-    document.querySelectorAll(".pill[data-view]").forEach(p => {
-      p.onclick = () => {
-        document.querySelectorAll('.pill, .view').forEach(x => x.classList.remove('active'));
-        p.classList.add('active');
-        document.getElementById("view" + p.dataset.view.charAt(0).toUpperCase() + p.dataset.view.slice(1)).classList.add('active');
-      };
-    });
 
     loadDex();
     setInterval(loadDex, 15000);
