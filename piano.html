@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Jupiter Setup Plan</title>
+  <title>Jupiter Setup Plan - Ultra Safe</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.1); }
@@ -14,6 +14,7 @@
     .jupiter-box { background: rgba(107, 182, 255, 0.05); border: 1px solid var(--accent); border-radius: 15px; padding: 20px; font-family: 'JetBrains Mono'; line-height: 2; }
     .value { font-size: 24px; font-weight: 800; color: #fff; }
     .green { color: var(--green); }
+    .alert-box { background: rgba(255, 92, 92, 0.1); border: 1px solid var(--red); padding: 15px; border-radius: 10px; font-size: 12px; margin-top: 15px; color: #ffbcbc; }
   </style>
 </head>
 <body>
@@ -23,18 +24,20 @@
     <a href="piano.html" class="pill active">PLAN</a>
   </div>
 
-  <h1 style="font-weight:900; margin-bottom:20px">JUPITER <span style="color:var(--accent)">DCA SETUP</span></h1>
+  <h1 style="font-weight:900; margin-bottom:20px">JUPITER <span style="color:var(--accent)">ULTRA-SAFE SETUP</span></h1>
 
   <div class="card">
-    <div style="font-size:10px; font-weight:800; color:#64748b">SAFE EXIT CAPACITY (MAX 0.18% IMPACT)</div>
-    <div id="safe" class="value" style="margin-top:10px">$0.00</div>
+    <div style="font-size:10px; font-weight:800; color:#64748b">MAX PRICE IMPACT PER STEP</div>
+    <div class="value" style="margin-top:10px; color: var(--green);">0.12%</div>
+    <p style="font-size:12px; color:#64748b">Soglia ridotta per prevenire il calo cumulativo del prezzo.</p>
   </div>
 
   <div class="card">
-    <div style="font-size:11px; font-weight:800; margin-bottom:15px; color:var(--accent)">PARAMETRI DA INSERIRE SU JUPITER.AG</div>
-    <div id="jup" class="jupiter-box">Inserisci il saldo nella pagina Strategy per vedere il piano...</div>
-    <div style="margin-top:15px; font-size:12px; color:#64748b">
-      💡 Con questi parametri, Jupiter venderà in modo "invisibile", permettendo alla pool di rigenerarsi tra un ordine e l'altro.
+    <div style="font-size:11px; font-weight:800; margin-bottom:15px; color:var(--accent)">COPIA QUESTI PARAMETRI SU JUPITER.AG</div>
+    <div id="jup" class="jupiter-box">Analisi liquidità in corso...</div>
+    
+    <div class="alert-box">
+        ⚠️ <b>PROTEZIONE PRICE ACTION:</b> Questo piano è stato ricalibrato per evitare che le tue vendite causino un "dump" visibile sul grafico.
     </div>
   </div>
 
@@ -45,9 +48,9 @@
       const bal = parseFloat(localStorage.getItem("userBumperBalance") || 0);
 
       if(price && liq) {
-        const safeUsd = liq * 0.0018; // Limite prudente 0.18%
-        document.getElementById("safe").innerText = "$"+safeUsd.toLocaleString(undefined,{maximumFractionDigits:2});
-
+        // SOGLIA ULTRA PRUDENTE: 0.12% di impatto per step
+        const safeUsd = liq * 0.0012; 
+        
         if(bal > 0) {
           const totalVal = bal * price;
           const tranches = Math.ceil(totalVal / safeUsd);
@@ -59,7 +62,7 @@
             🔹 NO. OF ORDERS: <b style="color:white">${tranches}</b><br>
             <div style="border-top:1px solid rgba(255,255,255,0.1); margin-top:10px; padding-top:10px">
               🔹 SELL PER ORDER: <b class="green">${Math.floor(size).toLocaleString()} BP</b><br>
-              🔹 MAX SLIPPAGE: <b class="green">0.3% (Fixed)</b>
+              🔹 MAX SLIPPAGE: <b class="green">0.2% (Fixed)</b>
             </div>
           `;
         }
