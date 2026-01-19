@@ -2,248 +2,103 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Vendita Personalizzata – BUMPER</title>
-
+  <title>BUMPER OS – Strategy Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
   <style>
-    body {
-      background:#0b0d10;
-      color:#e6e6e6;
-      font-family:Arial;
-      padding:25px;
-      margin:0;
-    }
-
-    /* MENU IN ALTO A DESTRA */
-    .menu {
-      position:absolute;
-      top:20px;
-      right:30px;
-      display:flex;
-      gap:12px;
-    }
-
-    .pill {
-      padding:8px 16px;
-      border:2px solid #9ecbff;
-      border-radius:20px;
-      color:#9ecbff;
-      text-decoration:none;
-      font-weight:bold;
-      transition:0.2s;
-    }
-
-    .pill:hover {
-      background:#9ecbff22;
-      color:white;
-      border-color:white;
-    }
-
-    /* PULSANTE ATTIVO */
-    .active {
-      border-color:white !important;
-      color:white !important;
-      background:#9ecbff22;
-      cursor:default;
-    }
-
-    /* HEADER */
-    h1 {
-      display:flex;
-      align-items:center;
-      gap:15px;
-      font-size:28px;
-      font-weight:bold;
-    }
-
-    #logo {
-      width:70px;
-      height:70px;
-      border-radius:10px;
-      background:#111;
-    }
-
-    /* CARD */
-    .card {
-      background:#161a20;
-      padding:20px;
-      border-radius:12px;
-      margin-bottom:20px;
-      border:1px solid #222;
-    }
-
-    .input-box {
-      width:100%;
-      padding:10px;
-      border-radius:8px;
-      border:1px solid #444;
-      background:#222;
-      color:white;
-      font-size:16px;
-      margin-bottom:10px;
-    }
-
-    .quick-btn {
-      padding:8px 14px;
-      margin-right:8px;
-      background:#333;
-      border:1px solid #555;
-      border-radius:6px;
-      color:white;
-      cursor:pointer;
-      font-weight:bold;
-    }
-
-    .update-btn {
-      padding:10px 18px;
-      background:#00cc33;
-      border:none;
-      border-radius:8px;
-      color:black;
-      font-weight:bold;
-      cursor:pointer;
-    }
-
-    .green { color:#00cc33; font-weight:bold; }
-    .red { color:#ff3333; font-weight:bold; }
-
-    .sparkline {
-      width:120px;
-      height:30px;
-      background:#111;
-      border-radius:6px;
-      margin-top:8px;
-    }
+    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.7); --accent: #6bb6ff; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.08); }
+    body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; }
+    .menu { display: flex; justify-content: flex-end; gap: 12px; padding: 15px 0; }
+    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; transition: 0.3s; }
+    .pill.active { background: var(--accent); color: #000; border-color: #fff; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 30px; max-width: 600px; margin: 40px auto; backdrop-filter: blur(10px); }
+    input { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-family: 'JetBrains Mono'; margin: 10px 0; box-sizing: border-box; }
+    .quick-btn { padding: 8px 15px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; border-radius: 8px; cursor: pointer; margin-right: 5px; }
+    .result-box { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-top: 20px; }
+    .green { color: var(--green); } .red { color: var(--red); }
   </style>
 </head>
-
 <body>
-
-  <!-- MENU -->
   <div class="menu">
-    <a href="index.html" class="pill">Dashboard</a>
-    <a href="vendita.html" class="pill active">Vendita</a>
+    <a href="index.html" class="pill">TERMINAL</a>
+    <a href="vendita.html" class="pill active">STRATEGY</a>
+    <a href="piano.html" class="pill">PLAN</a>
   </div>
 
-  <!-- HEADER -->
-  <h1>
-    <img id="logo" src="logo.png">
-    <span>Vendita Personalizzata</span>
-  </h1>
-
-  <!-- CARD VENDITA PERSONALIZZATA -->
   <div class="card">
-    <h2>Vendita Personalizzata</h2>
+    <span style="text-transform:uppercase; color:var(--accent); font-weight:800; font-size:12px">Exit Strategy Simulator</span>
+    <h2 style="margin: 10px 0 30px 0">Simulatore Vendita</h2>
 
-    <label>Quanti BUMPER possiedi?</label>
-    <input id="userBalance" class="input-box" type="number" placeholder="Inserisci saldo">
-    <button class="update-btn" onclick="updateUserBalance()">Aggiorna</button>
+    <label style="font-size:11px; color:#64748b">IL TUO SALDO (BUMPER)</label>
+    <input id="userBalance" type="number" placeholder="0.00" oninput="saveBalance()">
 
-    <hr style="border-color:#333;margin:20px 0">
-
-    <label>Quanti BUMPER vuoi vendere?</label>
-    <input id="customSellInput" class="input-box" type="number" oninput="updateCustomSell()">
-    <input id="customSlider" type="range" min="0" max="100" value="0" style="width:100%" oninput="sliderChanged()">
-
-    <div style="margin-top:10px">
-      <button class="quick-btn" onclick="quickSell(10)">10%</button>
-      <button class="quick-btn" onclick="quickSell(25)">25%</button>
-      <button class="quick-btn" onclick="quickSell(50)">50%</button>
-      <button class="quick-btn" onclick="quickSell(100)">100%</button>
+    <label style="font-size:11px; color:#64748b">QUANTITÀ DA VENDERE</label>
+    <input id="sellInput" type="number" placeholder="0.00" oninput="calculate()">
+    
+    <div style="margin-bottom:20px">
+      <button class="quick-btn" onclick="setQuick(25)">25%</button>
+      <button class="quick-btn" onclick="setQuick(50)">50%</button>
+      <button class="quick-btn" onclick="setQuick(100)">MAX</button>
     </div>
 
-    <div style="margin-top:20px;font-size:16px">
-      <div>USDC ottenuti: <span id="customUSDC" class="green">–</span></div>
-      <div>Impatto stimato: <span id="customImpact">–</span></div>
-      <div>Tranche consigliate: <span id="customTranche" class="green">–</span></div>
-      <div>Per restare in verde: <span id="customGreenTranche" class="green">–</span></div>
-      <div>Confronto con piano ottimale: <span id="customDiff">–</span></div>
-      <div style="margin-top:10px;font-size:13px">Prezzo dopo vendita: <span id="customPrice">–</span></div>
-      <canvas id="sparkline" class="sparkline"></canvas>
+    <div id="results" class="result-box" style="display:none">
+      <div style="display:flex; justify-content:space-between; margin-bottom:10px">
+        <span>Valore Stimato:</span><span id="resUSDC" class="green">--</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:10px">
+        <span>Impatto Prezzo:</span><span id="resImpact">--</span>
+      </div>
+      <div style="display:flex; justify-content:space-between; border-top:1px solid var(--border); pt-10; margin-top:10px">
+        <span style="font-size:12px; color:#64748b">Prezzo Post-Vendita:</span><span id="resNewPrice" style="font-size:12px">--</span>
+      </div>
     </div>
   </div>
 
-  <!-- SCRIPT (solo funzioni necessarie) -->
   <script>
-    let userBalance=0, globalPrice=0, globalLiquidity=0, planImpact=0;
+    let price = 0, liq = 0;
 
-    function fmtUsd(v){
-      if(!v)return"–";
-      v=+v;
-      return v<1?"$"+v.toFixed(2):"$"+v.toLocaleString();
+    function sync() {
+      price = parseFloat(localStorage.getItem("globalPrice") || 0);
+      liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
+      if(document.getElementById("sellInput").value) calculate();
     }
 
-    function signed(v){
-      if(v===null||isNaN(v))return"–";
-      let pos=v>=0;
-      let txt=v.toFixed(2)+"% "+(pos?"(sotto soglia)":"(sopra soglia)");
-      return `<span style="color:${pos?"#00cc33":"#ff3333"};font-weight:bold">${txt}</span>`;
+    function saveBalance() {
+      localStorage.setItem("userBumperBalance", document.getElementById("userBalance").value);
+      calculate();
     }
 
-    function updateUserBalance(){
-      userBalance=+document.getElementById("userBalance").value;
-      updateCustomSell();
+    function setQuick(p) {
+      const bal = parseFloat(document.getElementById("userBalance").value || 0);
+      document.getElementById("sellInput").value = (bal * p / 100).toFixed(2);
+      calculate();
     }
 
-    function sliderChanged(){
-      if(!userBalance)return;
-      customSellInput.value=Math.floor(userBalance*(+customSlider.value)/100);
-      updateCustomSell();
-    }
-
-    function quickSell(p){
-      if(!userBalance)return;
-      customSellInput.value=Math.floor(userBalance*p/100);
-      customSlider.value=p;
-      updateCustomSell();
-    }
-
-    function drawSpark(c,val){
-      let x=c.getContext("2d");
-      x.clearRect(0,0,c.width,c.height);
-      if(!val||isNaN(val))return;
-      let max=1.5,y=c.height-(Math.min(val,max)/max)*c.height;
-      x.strokeStyle=val>=0.75?"#ff3333":val>=0.25?"#ffcc00":"#00cc33";
-      x.lineWidth=2;
-      x.beginPath();x.moveTo(5,y);x.lineTo(c.width-5,y);x.stroke();
-    }
-
-    function updateCustomSell(){
-      let amt=+customSellInput.value;
-      if(!amt||!globalPrice||!globalLiquidity){
-        customUSDC.textContent="–";
-        customImpact.innerHTML="–";
-        customTranche.textContent="–";
-        customGreenTranche.textContent="–";
-        customDiff.innerHTML="–";
-        customPrice.textContent="–";
-        drawSpark(sparkline,null);
-        return;
+    function calculate() {
+      const amt = parseFloat(document.getElementById("sellInput").value || 0);
+      const resDiv = document.getElementById("results");
+      
+      if(amt > 0 && price > 0) {
+        resDiv.style.display = "block";
+        const usd = amt * price;
+        const impact = (usd / (liq / 2)) * 100; // Modello XYK semplificato
+        
+        document.getElementById("resUSDC").textContent = "$" + usd.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById("resImpact").textContent = impact.toFixed(2) + "%";
+        document.getElementById("resImpact").className = impact > 1 ? "red" : "green";
+        document.getElementById("resNewPrice").textContent = "$" + (price * (1 - impact/100)).toFixed(8);
+      } else {
+        resDiv.style.display = "none";
       }
-
-      let usd=amt*globalPrice;
-      let impact=usd/globalLiquidity*100;
-
-      customUSDC.textContent=fmtUsd(usd);
-      customImpact.innerHTML=signed(impact);
-
-      let tr=Math.max(1,Math.ceil(impact/0.25));
-      customTranche.textContent=tr;
-      customGreenTranche.textContent=tr;
-
-      let diff=impact-planImpact;
-      customDiff.innerHTML=signed(diff);
-
-      customPrice.textContent="$"+(globalPrice*(1-impact/100)).toFixed(8);
-      drawSpark(sparkline,impact);
     }
 
-    /* IMPORTA I DATI DALLA DASHBOARD */
-    fetch("index.html")  
-      .then(()=>{  
-        globalPrice = parseFloat(localStorage.getItem("globalPrice")||0);
-        globalLiquidity = parseFloat(localStorage.getItem("globalLiquidity")||0);
-        planImpact = parseFloat(localStorage.getItem("planImpact")||0);
-      });
+    window.onload = () => {
+      document.getElementById("userBalance").value = localStorage.getItem("userBumperBalance") || "";
+      sync();
+      setInterval(sync, 5000);
+    };
+  </script>
+</body>
+</html>
   </script>
 
 </body>
