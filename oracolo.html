@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>BUMPER OS – L'Oracolo</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.8); --accent: #a855f7; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.08); }
+    body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; line-height: 1.6; }
+    
+    .menu { display: flex; justify-content: flex-end; gap: 12px; padding-bottom: 30px; }
+    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; transition: 0.3s; background: rgba(255, 255, 255, 0.03); }
+    .pill:hover { border-color: var(--accent); color: #fff; }
+    .pill.active { background: var(--accent); color: #fff; border-color: #fff; box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; padding: 35px; max-width: 800px; margin: 0 auto; backdrop-filter: blur(20px); text-align: center; }
+    
+    .oracle-sphere { width: 120px; height: 120px; background: radial-gradient(circle, var(--accent), transparent 70%); border-radius: 50%; margin: 0 auto 20px; filter: blur(20px); animation: pulse 3s infinite; }
+    @keyframes pulse { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
+
+    .verdict-box { margin: 25px 0; padding: 25px; border-radius: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); }
+    .verdict-title { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 2px; }
+    .verdict-text { font-size: 32px; font-weight: 900; margin: 10px 0; letter-spacing: -1px; }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+    .stat-card { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; border: 1px solid var(--border); text-align: left; }
+    .stat-label { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; }
+    .stat-value { font-family: 'JetBrains Mono'; font-size: 16px; margin-top: 5px; }
+
+    .advice-note { margin-top: 30px; font-size: 14px; color: #94a3b8; font-style: italic; border-top: 1px solid var(--border); padding-top: 20px; }
+    .green { color: var(--green); } .red { color: var(--red); } .purple { color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <nav class="menu">
+    <a href="index.html" class="pill">TERMINAL</a>
+    <a href="vendita.html" class="pill">STRATEGY</a>
+    <a href="piano.html" class="pill">PLAN</a>
+    <a href="oracolo.html" class="pill active">ORACOLO</a>
+  </nav>
+
+  <div class="card">
+    <div class="oracle-sphere"></div>
+    <h1 style="margin:0; font-size:28px; font-weight:900;">L'ORACOLO BUMPER</h1>
+    <p style="color:#64748b; font-size:14px">Analisi matematica della stabilità e del sentiment</p>
+
+    <div class="verdict-box">
+      <div class="verdict-title">Responso Algoritmico</div>
+      <div id="verdict" class="verdict-text">CARICAMENTO...</div>
+      <div id="confidence" style="font-size:12px; font-weight:700;">Calcolo probabilità in corso</div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Stabilità Liquidità</div>
+        <div id="liqStability" class="stat-value">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Rapporto di Forza</div>
+        <div id="powerRatio" class="stat-value">--</div>
+      </div>
+    </div>
+
+    <p id="advice" class="advice-note">L'Oracolo sta leggendo i dati dal LocalStorage...</p>
+  </div>
+
+  <script>
+    function consultOracle() {
+      // Recupero dati dal terminale
+      const price = parseFloat(localStorage.getItem("globalPrice") || 0);
+      const liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
+      
+      if (price === 0 || liq === 0) {
+        document.getElementById("verdict").textContent = "TERMINAL CHIUSO";
+        document.getElementById("advice").textContent = "Apri la pagina Terminal per sincronizzare i dati di mercato.";
+        return;
+      }
+
+      // 1. Calcolo del Volatilty Risk (Simulato basato su Price/Liq ratio)
+      // Un rapporto alto tra prezzo e liquidità indica un token "sottile" (rischioso)
+      const healthScore = (liq / (price * 1000000000)) / 100; 
+      
+      // 2. Lettura del sentiment (semplificata per l'esempio, basata su dati correnti)
+      // In un caso reale, qui potresti passare i volumi Buy/Sell calcolati in index.html
+      const verdictEl = document.getElementById("verdict");
+      const adviceEl = document.getElementById("advice");
+      const confidenceEl = document.getElementById("confidence");
+
+      // Simuliamo un'analisi basata sulla solidità della liquidità
+      if (liq > 500000) {
+        verdictEl.textContent = "ACCUMULO SICURO";
+        verdictEl.className = "verdict-text green";
+        confidenceEl.textContent = "PROBABILITÀ DI TENUTA: 88%";
+        adviceEl.textContent = "La liquidità è profonda. Le balene non possono dumpare facilmente senza essere assorbite.";
+      } else if (liq > 100000) {
+        verdictEl.textContent = "ATTESA ATTIVA";
+        verdictEl.className = "verdict-text purple";
+        confidenceEl.textContent = "PROBABILITÀ DI TENUTA: 54%";
+        adviceEl.textContent = "Mercato in equilibrio. Monitora i volumi sulle 4h prima di entrare pesantemente.";
+      } else {
+        verdictEl.textContent = "ALTO RISCHIO";
+        verdictEl.className = "verdict-text red";
+        confidenceEl.textContent = "PROBABILITÀ DI TENUTA: 21%";
+        adviceEl.textContent = "Liquidità scarsa. Anche una piccola vendita può causare un crollo del -10% immediato.";
+      }
+
+      document.getElementById("liqStability").textContent = (liq / 1000).toFixed(1) + "k Factor";
+      document.getElementById("powerRatio").textContent = "Stable";
+    }
+
+    window.addEventListener('storage', consultOracle);
+    window.onload = consultOracle;
+  </script>
+</body>
+</html>
