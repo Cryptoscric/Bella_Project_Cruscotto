@@ -2,42 +2,32 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>BUMPER OS – L'Oracolo Supremo</title>
+  <title>BUMPER OS – Technical Oracle</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;700;800&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.85); --accent: #a855f7; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.08); }
-    body { background: radial-gradient(circle at top right, #1a1f35, #05060b 60%); color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; line-height: 1.6; overflow-x: hidden; }
+    :root { --bg: #05060b; --card-bg: rgba(13, 17, 28, 0.9); --accent: #a855f7; --green: #4aff8a; --red: #ff5c5c; --border: rgba(255, 255, 255, 0.1); }
+    body { background: #05060b; color: #e2e8f0; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 20px; }
     
     .menu { display: flex; justify-content: flex-end; gap: 12px; padding-bottom: 30px; }
-    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; transition: 0.3s; background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); }
-    .pill:hover { border-color: var(--accent); color: #fff; }
-    .pill.active { background: var(--accent); color: #fff; border-color: #fff; box-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+    .pill { padding: 10px 22px; border: 1px solid var(--border); border-radius: 12px; color: #94a3b8; text-decoration: none; font-weight: 700; font-size: 13px; background: rgba(255, 255, 255, 0.03); transition: 0.3s; }
+    .pill.active { background: var(--accent); color: #fff; border-color: #fff; }
 
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 28px; padding: 40px; max-width: 850px; margin: 0 auto; backdrop-filter: blur(30px); border-top: 2px solid var(--accent); }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; padding: 35px; max-width: 850px; margin: 0 auto; }
     
-    /* EFFETTO SFERA */
-    .oracle-container { position: relative; width: 150px; height: 150px; margin: 0 auto 30px; }
-    .oracle-sphere { width: 100%; height: 100%; background: radial-gradient(circle, var(--accent), #1a1f35 80%); border-radius: 50%; filter: blur(2px); box-shadow: 0 0 60px rgba(168, 85, 247, 0.4); animation: rotate 10s linear infinite; position: relative; z-index: 2; }
-    .oracle-glow { position: absolute; top: -20%; left: -20%; width: 140%; height: 140%; background: radial-gradient(circle, rgba(168, 85, 247, 0.2), transparent 70%); animation: pulse 4s infinite; }
+    .header-tech { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 30px; }
+    .verdict-text { font-family: 'JetBrains Mono'; font-size: 32px; font-weight: 800; text-transform: uppercase; margin: 10px 0; }
+
+    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 25px 0; }
+    .m-card { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
+    .m-label { font-size: 9px; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
+    .m-value { font-family: 'JetBrains Mono'; font-size: 18px; font-weight: 700; }
+
+    /* REAL TERMINAL LOG */
+    .terminal-header { background: #1a1f35; padding: 8px 15px; border-radius: 10px 10px 0 0; font-family: 'JetBrains Mono'; font-size: 10px; color: #64748b; border: 1px solid var(--border); border-bottom: none; display: flex; justify-content: space-between; }
+    .terminal-body { background: #000; border-radius: 0 0 10px 10px; padding: 20px; font-family: 'JetBrains Mono'; font-size: 11px; color: #4aff8a; text-align: left; height: 180px; overflow-y: auto; border: 1px solid var(--border); line-height: 1.5; }
     
-    @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    @keyframes pulse { 0%, 100% { opacity: 0.3; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.1); } }
-
-    .verdict-box { margin-bottom: 30px; }
-    .verdict-text { font-size: 42px; font-weight: 900; letter-spacing: -2px; text-transform: uppercase; margin: 5px 0; text-shadow: 0 0 20px rgba(255,255,255,0.1); }
-
-    /* GRID METRICHE */
-    .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px; }
-    .m-card { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px solid var(--border); text-align: left; }
-    .m-label { font-size: 10px; color: #64748b; font-weight: 800; letter-spacing: 1px; }
-    .m-value { font-family: 'JetBrains Mono'; font-size: 20px; font-weight: 700; margin: 8px 0; }
-    
-    /* TERMINAL LOG */
-    .terminal-log { background: #000; border-radius: 15px; padding: 20px; margin-top: 30px; font-family: 'JetBrains Mono'; font-size: 11px; color: #4aff8a; text-align: left; height: 100px; overflow-y: hidden; border: 1px solid rgba(74, 255, 138, 0.2); }
-    .cursor { animation: blink 1s infinite; }
-    @keyframes blink { 50% { opacity: 0; } }
-
     .green { color: var(--green); } .red { color: var(--red); } .purple { color: var(--accent); }
+    .dim { color: #64748b; }
   </style>
 </head>
 <body>
@@ -50,39 +40,33 @@
   </nav>
 
   <div class="card">
-    <div class="oracle-container">
-      <div class="oracle-glow"></div>
-      <div class="oracle-sphere"></div>
+    <div class="header-tech">
+      <div style="font-size: 10px; font-weight: 800; color: #64748b; letter-spacing: 2px;">QUANTITATIVE ANALYSIS ENGINE</div>
+      <div id="verdict" class="verdict-text">INITIALIZING...</div>
+      <div id="sub-verdict" style="font-size: 13px; color: #94a3b8;">Calcolo indicatori di rischio basati su Liquidità e Slippage</div>
     </div>
 
-    <div class="verdict-box">
-      <div style="font-size: 12px; font-weight: 800; color: var(--accent); letter-spacing: 3px;">RESPONSO DEFINITIVO</div>
-      <div id="verdict" class="verdict-text">ANALISI...</div>
-      <div id="sub-verdict" style="font-size: 14px; color: #94a3b8; font-weight: 600;">Interrogando la blockchain...</div>
-    </div>
-
-    <div class="metrics-row">
+    <div class="metrics-grid">
       <div class="m-card">
-        <div class="m-label">PROBABILITY PUMP</div>
-        <div id="pumpProb" class="m-value">--</div>
-        <div style="font-size:10px; color: var(--green)">Basato su Vol/Liq</div>
+        <div class="m-label">Liq/Mcap Ratio</div>
+        <div id="liqRatio" class="m-value">--</div>
       </div>
       <div class="m-card">
-        <div class="m-label">STABILITY INDEX</div>
-        <div id="stabIndex" class="m-value">--</div>
-        <div style="font-size:10px; color: var(--accent)">Resistenza Whale</div>
+        <div class="m-label">1% Depth (Est.)</div>
+        <div id="depth" class="m-value">--</div>
       </div>
       <div class="m-card">
-        <div class="m-label">MARKET TIME</div>
-        <div id="marketTime" class="m-value">--</div>
-        <div style="font-size:10px; color: #64748b">Zodiaco Crypto</div>
+        <div class="m-label">Volatility Risk</div>
+        <div id="volRisk" class="m-value">--</div>
       </div>
     </div>
 
-    <div class="terminal-log" id="log">
-      > Inizializzazione protocollo v2.4...<br>
-      > Scansione liquidità pool Solana...<br>
-      > Calcolo Price Impact per 10M token...<span class="cursor">_</span>
+    <div class="terminal-header">
+      <span>REAL-TIME COMPUTATION LOG</span>
+      <span id="log-status">ACTIVE</span>
+    </div>
+    <div class="terminal-body" id="log">
+      > In attesa di dati dal Terminale...
     </div>
   </div>
 
@@ -90,7 +74,7 @@
     function updateLog(msg) {
       const log = document.getElementById("log");
       const time = new Date().toLocaleTimeString();
-      log.innerHTML += `<br>> [${time}] ${msg}`;
+      log.innerHTML += `<div style="margin-bottom:4px"><span class="dim">[${time}]</span> ${msg}</div>`;
       log.scrollTop = log.scrollHeight;
     }
 
@@ -98,48 +82,53 @@
       const price = parseFloat(localStorage.getItem("globalPrice") || 0);
       const liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
       
-      if (price === 0) return;
+      if (price === 0 || liq === 0) return;
 
-      // 1. Probabilità di Pump (Logica: Più liq c'è rispetto al prezzo, più è "carico")
-      const pumpRatio = Math.min(99, (liq / (price * 1000000000)) * 2).toFixed(1);
-      document.getElementById("pumpProb").textContent = pumpRatio + "%";
+      const log = document.getElementById("log");
+      log.innerHTML = ""; // Pulisce per mostrare calcoli reali correnti
 
-      // 2. Stability Index
-      const stab = Math.min(100, (liq / 350000) * 100).toFixed(0);
-      document.getElementById("stabIndex").textContent = stab + "/100";
+      updateLog("Fetch dati completato.");
+      
+      // 1. Calcolo Slippage Reale (quanto sposta il prezzo una vendita da 1000$)
+      const testAmount = 1000;
+      const poolSide = liq / 2;
+      const slippage1k = (testAmount / poolSide) * 100;
+      updateLog(`Calcolo Price Impact (1k USD): <span class="purple">${slippage1k.toFixed(4)}%</span>`);
 
-      // 3. Market Time (Basato su ora reale)
-      const hour = new Date().getHours();
-      let timeStatus = (hour >= 14 && hour <= 20) ? "USA VOLATILITY" : "ASIA FLOW";
-      document.getElementById("marketTime").textContent = timeStatus;
+      // 2. Calcolo 1% Depth (quanti $ servono per muovere il prezzo dell'1%)
+      const depth1perc = poolSide * 0.01;
+      document.getElementById("depth").textContent = "$" + depth1perc.toLocaleString(undefined, {maximumFractionDigits:0});
+      updateLog(`Calcolo 1% Depth: <span class="purple">$${depth1perc.toFixed(2)}</span>`);
 
-      // Verdetto finale
+      // 3. Rapporto Liquidità / Prezzo (Indicatori di salute)
+      // Usiamo una formula semplificata del Mcap se non abbiamo la supply
+      const liqHealth = (liq > 200000) ? "STABLE" : "THIN";
+      document.getElementById("liqRatio").textContent = liqHealth;
+
+      // 4. Calcolo Rischio Volatilità
+      let riskScore = "LOW";
+      let riskColor = "green";
+      if (slippage1k > 0.1) { riskScore = "MEDIUM"; riskColor = "purple"; }
+      if (slippage1k > 0.5) { riskScore = "HIGH"; riskColor = "red"; }
+      document.getElementById("volRisk").textContent = riskScore;
+      document.getElementById("volRisk").className = "m-value " + riskColor;
+
+      // Verdetto Tecnico
       const v = document.getElementById("verdict");
-      const sv = document.getElementById("sub-verdict");
-
-      if (pumpRatio > 70) {
-        v.textContent = "MOON READY";
+      if (slippage1k < 0.05) {
+        v.textContent = "HIGH LIQUIDITY";
         v.className = "verdict-text green";
-        sv.textContent = "Le condizioni di liquidità suggeriscono un breakout imminente.";
-        updateLog("Segnale Bullish rilevato. Pressione d'acquisto in aumento.");
-      } else if (pumpRatio > 40) {
-        v.textContent = "SIDEWAYS";
+        updateLog("Analisi terminata: Asset altamente liquido. Esecuzione trade sicura.");
+      } else if (slippage1k < 0.2) {
+        v.textContent = "MODERATE RISK";
         v.className = "verdict-text purple";
-        sv.textContent = "Il token sta consolidando. Non forzare l'entrata.";
-        updateLog("Consolidamento rilevato. Nessuna anomalia nei flussi.");
+        updateLog("Analisi terminata: Liquidità sufficiente per piccoli trade. Attenzione a ordini > $5k.");
       } else {
-        v.textContent = "DANGER ZONE";
+        v.textContent = "LOW LIQUIDITY";
         v.className = "verdict-text red";
-        sv.textContent = "Liquidità insufficiente per sostenere il prezzo attuale.";
-        updateLog("WARNING: Liquidità sotto la soglia di sicurezza!");
+        updateLog("WARNING: Slippage elevato rilevato. Rischio volatilità estrema.");
       }
     }
-
-    // Effetto hacker nel log ogni 5 secondi
-    setInterval(() => {
-      const msgs = ["Sincronizzazione DEX...", "Analisi holders top 10...", "Verifica rug-check...", "Aggiornamento feed dati..."];
-      updateLog(msgs[Math.floor(Math.random() * msgs.length)]);
-    }, 7000);
 
     window.addEventListener('storage', consultOracle);
     window.onload = consultOracle;
