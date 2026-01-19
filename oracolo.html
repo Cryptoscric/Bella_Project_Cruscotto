@@ -15,19 +15,22 @@
 
     .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; padding: 35px; max-width: 800px; margin: 0 auto; backdrop-filter: blur(20px); text-align: center; }
     
-    .oracle-sphere { width: 120px; height: 120px; background: radial-gradient(circle, var(--accent), transparent 70%); border-radius: 50%; margin: 0 auto 20px; filter: blur(20px); animation: pulse 3s infinite; }
-    @keyframes pulse { 0% { opacity: 0.5; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.1); } 100% { opacity: 0.5; transform: scale(1); } }
+    .oracle-sphere { width: 100px; height: 100px; background: radial-gradient(circle, var(--accent), transparent 70%); border-radius: 50%; margin: 0 auto 20px; filter: blur(15px); animation: pulse 3s infinite; box-shadow: 0 0 50px var(--accent); }
+    @keyframes pulse { 0% { opacity: 0.4; transform: scale(1); } 50% { opacity: 0.9; transform: scale(1.2); } 100% { opacity: 0.4; transform: scale(1); } }
 
-    .verdict-box { margin: 25px 0; padding: 25px; border-radius: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); }
-    .verdict-title { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 2px; }
-    .verdict-text { font-size: 32px; font-weight: 900; margin: 10px 0; letter-spacing: -1px; }
+    .verdict-box { margin: 25px 0; padding: 25px; border-radius: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); position: relative; overflow: hidden; }
+    .verdict-text { font-size: 32px; font-weight: 900; margin: 10px 0; letter-spacing: -1px; text-transform: uppercase; }
 
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
-    .stat-card { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; border: 1px solid var(--border); text-align: left; }
-    .stat-label { font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; }
-    .stat-value { font-family: 'JetBrains Mono'; font-size: 16px; margin-top: 5px; }
+    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 30px; }
+    .metric-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; border: 1px solid var(--border); text-align: center; }
+    .metric-label { font-size: 9px; color: #64748b; font-weight: 800; text-transform: uppercase; margin-bottom: 5px; }
+    .metric-value { font-family: 'JetBrains Mono'; font-size: 14px; font-weight: 700; }
 
-    .advice-note { margin-top: 30px; font-size: 14px; color: #94a3b8; font-style: italic; border-top: 1px solid var(--border); padding-top: 20px; }
+    .gauge-bar { width: 100%; height: 6px; background: #1a1f35; border-radius: 10px; margin-top: 10px; overflow: hidden; }
+    .gauge-fill { height: 100%; background: var(--accent); width: 0%; transition: 1s ease-out; }
+
+    .advice-note { margin-top: 30px; padding: 20px; background: rgba(168, 85, 247, 0.05); border-radius: 12px; font-size: 14px; border-left: 4px solid var(--accent); text-align: left; }
+    
     .green { color: var(--green); } .red { color: var(--red); } .purple { color: var(--accent); }
   </style>
 </head>
@@ -42,71 +45,74 @@
 
   <div class="card">
     <div class="oracle-sphere"></div>
-    <h1 style="margin:0; font-size:28px; font-weight:900;">L'ORACOLO BUMPER</h1>
-    <p style="color:#64748b; font-size:14px">Analisi matematica della stabilità e del sentiment</p>
-
+    <h1 style="margin:0; font-size:28px; font-weight:900; letter-spacing: -1px;">SISTEMA <span class="purple">ORACOLO</span> V2</h1>
+    
     <div class="verdict-box">
-      <div class="verdict-title">Responso Algoritmico</div>
-      <div id="verdict" class="verdict-text">CARICAMENTO...</div>
-      <div id="confidence" style="font-size:12px; font-weight:700;">Calcolo probabilità in corso</div>
+      <div id="verdict" class="verdict-text">CONNETTENDO...</div>
+      <div id="confidence" style="font-size:12px; font-weight:700; color: #64748b;">Analisi flussi in corso</div>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Stabilità Liquidità</div>
-        <div id="liqStability" class="stat-value">--</div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Resistenza Dump</div>
+        <div id="dumpResistance" class="metric-value">--</div>
+        <div class="gauge-bar"><div id="dumpFill" class="gauge-fill"></div></div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Rapporto di Forza</div>
-        <div id="powerRatio" class="stat-value">--</div>
+      <div class="metric-card">
+        <div class="metric-label">Buy Pressure</div>
+        <div id="buyPressure" class="metric-value">--</div>
+        <div class="gauge-bar"><div id="buyFill" class="gauge-fill"></div></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Rischio Whale</div>
+        <div id="whaleRisk" class="metric-value">--</div>
+        <div class="gauge-bar"><div id="whaleFill" class="gauge-fill"></div></div>
       </div>
     </div>
 
-    <p id="advice" class="advice-note">L'Oracolo sta leggendo i dati dal LocalStorage...</p>
+    <div id="advice" class="advice-note">
+      L'Oracolo richiede i dati del Terminale per manifestarsi...
+    </div>
   </div>
 
   <script>
     function consultOracle() {
-      // Recupero dati dal terminale
       const price = parseFloat(localStorage.getItem("globalPrice") || 0);
       const liq = parseFloat(localStorage.getItem("globalLiquidity") || 0);
       
-      if (price === 0 || liq === 0) {
-        document.getElementById("verdict").textContent = "TERMINAL CHIUSO";
-        document.getElementById("advice").textContent = "Apri la pagina Terminal per sincronizzare i dati di mercato.";
+      if (price === 0) {
+        document.getElementById("verdict").textContent = "OFFLINE";
         return;
       }
 
-      // 1. Calcolo del Volatilty Risk (Simulato basato su Price/Liq ratio)
-      // Un rapporto alto tra prezzo e liquidità indica un token "sottile" (rischioso)
-      const healthScore = (liq / (price * 1000000000)) / 100; 
-      
-      // 2. Lettura del sentiment (semplificata per l'esempio, basata su dati correnti)
-      // In un caso reale, qui potresti passare i volumi Buy/Sell calcolati in index.html
-      const verdictEl = document.getElementById("verdict");
-      const adviceEl = document.getElementById("advice");
-      const confidenceEl = document.getElementById("confidence");
+      // 1. Calcolo Resistenza al Dump (basato sulla profondità della liquidità)
+      const resScore = Math.min(100, (liq / 500000) * 100);
+      document.getElementById("dumpResistance").textContent = resScore.toFixed(0) + "%";
+      document.getElementById("dumpFill").style.width = resScore + "%";
 
-      // Simuliamo un'analisi basata sulla solidità della liquidità
-      if (liq > 500000) {
-        verdictEl.textContent = "ACCUMULO SICURO";
-        verdictEl.className = "verdict-text green";
-        confidenceEl.textContent = "PROBABILITÀ DI TENUTA: 88%";
-        adviceEl.textContent = "La liquidità è profonda. Le balene non possono dumpare facilmente senza essere assorbite.";
-      } else if (liq > 100000) {
-        verdictEl.textContent = "ATTESA ATTIVA";
-        verdictEl.className = "verdict-text purple";
-        confidenceEl.textContent = "PROBABILITÀ DI TENUTA: 54%";
-        adviceEl.textContent = "Mercato in equilibrio. Monitora i volumi sulle 4h prima di entrare pesantemente.";
+      // 2. Calcolo Whale Risk (Se la liq è bassa rispetto al market cap simulato)
+      const whaleRisk = Math.max(0, 100 - (liq / 200000 * 100));
+      document.getElementById("whaleRisk").textContent = whaleRisk.toFixed(0) + "%";
+      document.getElementById("whaleFill").style.width = whaleRisk + "%";
+      document.getElementById("whaleFill").style.background = whaleRisk > 60 ? 'var(--red)' : 'var(--accent)';
+
+      // 3. Verdetto Finale
+      const v = document.getElementById("verdict");
+      const a = document.getElementById("advice");
+
+      if (resScore > 70 && whaleRisk < 30) {
+        v.textContent = "Fortezza Inviolabile";
+        v.className = "verdict-text green";
+        a.innerHTML = "<b>Profezia:</b> Il pavimento è solido. Le balene hanno paura di vendere perché verrebbero riassorbite immediatamente. Ottimo momento per holding.";
+      } else if (resScore > 40) {
+        v.textContent = "Equilibrio Instabile";
+        v.className = "verdict-text purple";
+        a.innerHTML = "<b>Profezia:</b> Il mercato respira. Non c'è una direzione chiara. Aspetta un segnale di volume dal Terminale prima di muoverti.";
       } else {
-        verdictEl.textContent = "ALTO RISCHIO";
-        verdictEl.className = "verdict-text red";
-        confidenceEl.textContent = "PROBABILITÀ DI TENUTA: 21%";
-        adviceEl.textContent = "Liquidità scarsa. Anche una piccola vendita può causare un crollo del -10% immediato.";
+        v.textContent = "Sabbie Mobili";
+        v.className = "verdict-text red";
+        a.innerHTML = "<b>Profezia:</b> Attenzione. La liquidità è sottile come ghiaccio. Una singola vendita di medie dimensioni potrebbe innescare una reazione a catena.";
       }
-
-      document.getElementById("liqStability").textContent = (liq / 1000).toFixed(1) + "k Factor";
-      document.getElementById("powerRatio").textContent = "Stable";
     }
 
     window.addEventListener('storage', consultOracle);
